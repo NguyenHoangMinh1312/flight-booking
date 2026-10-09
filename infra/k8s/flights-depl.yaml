@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flights-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flights
+  template:
+    metadata:
+      labels:
+        app: flights
+    spec:
+      containers:
+        - name: flights
+          image: mint1312/flights
+          # image: asia.gcr.io/ticketing-dev-508215/flights
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          env:
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: "ticketing"
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MONGO_URI
+              value: "mongodb://flights-mongo-srv:27017/flights?replicaSet=rs0"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flights-srv
+spec:
+  selector:
+    app: flights
+  ports:
+    - name: flights
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

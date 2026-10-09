@@ -1,0 +1,1 @@
+export const columnLabel = (column: number) => String.fromCharCode(64 + column);

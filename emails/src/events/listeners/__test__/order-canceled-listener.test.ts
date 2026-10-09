@@ -1,0 +1,52 @@
+import { OrderCanceledEvent } from "@mint1312-flight-booking/common"
+import { natsWrapper } from "../../../nats-wrapper"
+import { OrderCanceledListener } from "../order-canceled-listener"
+import mongoose from "mongoose"
+import { User } from "../../../models/user"
+import { emailSendQueue } from "../../../queues/email-send-queue"
+
+it(
+  "Checks if the listener handles the event order:canceled successfully",
+  async () => {
+    // create an event listener
+    const listener = new OrderCanceledListener(natsWrapper.client)
+
+    // create an user
+    const user = User.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
+      email: "test@test.com"
+    })
+    await user.save()
+
+    // create a fake event
+    const data: OrderCanceledEvent["data"] = {
+      id: new mongoose.Types.ObjectId().toHexString(),
+      version: 1,
+      ticket: {
+        id: new mongoose.Types.ObjectId().toHexString()
+      },
+      userId: user.id
+    }
+
+    // fake the ack function
+    // @ts-ignore
+    const msg: Message = {
+      ack: jest.fn()
+    }
+
+    // call the listener
+    await listener.onMessage(data, msg)
+
+    // checks if the request sent to queue
+    expect(emailSendQueue.add).toHaveBeenCalledTimes(1)
+    expect(emailSendQueue.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        receiver: user.email,
+        subject: `Your order ${data.id} has been canceled.`
+      })
+    )
+
+    // checks if the ack is sent
+    expect(msg.ack).toHaveBeenCalledTimes(1)
+  }
+)

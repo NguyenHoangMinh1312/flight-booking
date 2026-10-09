@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emails-redis-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emails-redis
+  template:
+    metadata:
+      labels:
+        app: emails-redis
+    spec:
+      containers:
+        - name: emails-redis
+          image: redis
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emails-redis-srv
+spec:
+  selector:
+    app: emails-redis
+  ports:
+    - name: db
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
