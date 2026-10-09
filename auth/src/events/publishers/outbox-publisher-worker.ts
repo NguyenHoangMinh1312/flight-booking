@@ -7,8 +7,8 @@ import { natsWrapper } from "../../nats-wrapper"
 export const outboxPublisherWorker = (pollIntervalMs = 1000) => {
   let isProcessing = false
 
-  const userCreatedPublisher = new UserCreatedPublisher(natsWrapper.client)
-  const userOtpRequestedPublisher = new UserOtpRequestedPublisher(natsWrapper.client)
+  const userCreatedPublisher = new UserCreatedPublisher(natsWrapper.nc)
+  const userOtpRequestedPublisher = new UserOtpRequestedPublisher(natsWrapper.nc)
 
   return setInterval(async () => {
     // Prevent overlapping runs from processing the same events

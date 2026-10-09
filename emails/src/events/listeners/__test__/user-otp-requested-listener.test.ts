@@ -1,4 +1,5 @@
 import { UserOtpRequestedEvent } from "@mint1312-flight-booking/common"
+import { JsMsg } from "nats"
 import { natsWrapper } from "../../../nats-wrapper"
 import { UserOtpRequestedListener } from "../user-otp-requested-listener"
 import mongoose from "mongoose"
@@ -9,7 +10,7 @@ it(
   "Checks if the listener handles the event user:otp-requested successfully",
   async () => {
     // create an event listener
-    const listener = new UserOtpRequestedListener(natsWrapper.client)
+    const listener = new UserOtpRequestedListener(natsWrapper.js)
 
     // create a fake event
     const data: UserOtpRequestedEvent["data"] = {
@@ -18,10 +19,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

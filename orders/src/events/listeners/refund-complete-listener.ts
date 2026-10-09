@@ -1,16 +1,15 @@
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Subjects, Listener, RefundCompleteEvent, OrderStatus } from "@mint1312-flight-booking/common"
 import { Order } from "../../models/order"
 import { queueGroupName } from "./queue-group-name"
 import mongoose from "mongoose"
-import { Outbox } from "../../models/outbox"
 import { OrderCanceledPublisher } from "../publishers/order-canceled-publisher"
 
 export class RefundCompleteListener extends Listener<RefundCompleteEvent> {
   readonly subject = Subjects.RefundComplete
   queueGroupName = queueGroupName
 
-  async onMessage(data: RefundCompleteEvent["data"], msg: Message) {
+  async onMessage(data: RefundCompleteEvent["data"], msg: JsMsg) {
     // change the order status to canceled
     const order = await Order.findById(data.orderId).populate("ticket")
 

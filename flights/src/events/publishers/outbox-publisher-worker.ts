@@ -8,9 +8,9 @@ import { natsWrapper } from "../../nats-wrapper"
 export const outboxPublisherWorker = (pollIntervalMs = 1000) => {
   let isProcessing = false
 
-  const ticketCreatedPublisher = new TicketCreatedPublisher(natsWrapper.client)
-  const ticketUpdatedPublisher = new TicketUpdatedPublisher(natsWrapper.client)
-  const ticketCanceledPublisher = new TicketCanceledPublisher(natsWrapper.client)
+  const ticketCreatedPublisher = new TicketCreatedPublisher(natsWrapper.nc)
+  const ticketUpdatedPublisher = new TicketUpdatedPublisher(natsWrapper.nc)
+  const ticketCanceledPublisher = new TicketCanceledPublisher(natsWrapper.nc)
 
   return setInterval(async () => {
     // Prevent overlapping runs from processing the same events

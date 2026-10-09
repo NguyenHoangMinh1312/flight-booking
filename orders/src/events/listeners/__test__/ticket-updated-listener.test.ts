@@ -2,7 +2,7 @@ import { TicketUpdatedListener } from "../ticket-updated-listener"
 import { natsWrapper } from "../../../nats-wrapper"
 import { FlightStatus, TicketUpdatedEvent } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Ticket } from "../../../models/ticket"
 
 const buildTicket = async (ticketId?: string) => {
@@ -30,7 +30,7 @@ it(
     const ticket = await buildTicket()
 
     // create an event listener
-    const listener = new TicketUpdatedListener(natsWrapper.client)
+    const listener = new TicketUpdatedListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketUpdatedEvent["data"] = {
@@ -48,10 +48,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     try {
@@ -73,7 +72,7 @@ it(
     const ticket = await buildTicket(ticketId)
 
     // create an event listener
-    const listener = new TicketUpdatedListener(natsWrapper.client)
+    const listener = new TicketUpdatedListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketUpdatedEvent["data"] = {
@@ -91,10 +90,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

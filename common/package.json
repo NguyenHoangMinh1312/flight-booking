@@ -1,6 +1,6 @@
 {
   "name": "@mint1312-flight-booking/common",
-  "version": "1.0.25",
+  "version": "1.0.31",
   "description": "",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
@@ -28,7 +28,7 @@
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
-    "node-nats-streaming": "^0.3.2"
+    "nats": "^2.29.3"
   },
   "publishConfig": {
     "access": "public"

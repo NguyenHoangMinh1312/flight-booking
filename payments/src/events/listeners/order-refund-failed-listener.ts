@@ -1,5 +1,5 @@
 import { Listener, OrderRefundFailedEvent, Subjects } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { Order } from "../../models/order"
 import { OrderStatus } from "@mint1312-flight-booking/common"
@@ -8,7 +8,7 @@ export class OrderRefundFailedListener extends Listener<OrderRefundFailedEvent> 
   readonly subject = Subjects.OrderRefundFailed
   queueGroupName = queueGroupName
 
-  async onMessage(data: OrderRefundFailedEvent["data"], msg: Message) {
+  async onMessage(data: OrderRefundFailedEvent["data"], msg: JsMsg) {
     const order = await Order.findById(data.id)
 
     if (!order)

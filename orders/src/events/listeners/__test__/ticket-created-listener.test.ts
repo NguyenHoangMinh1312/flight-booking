@@ -2,14 +2,14 @@ import { TicketCreatedListener } from "../ticket-created-listener"
 import { natsWrapper } from "../../../nats-wrapper"
 import { FlightStatus, TicketCreatedEvent } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Ticket } from "../../../models/ticket"
 
 it(
   "Checks if the listener handles event ticket:created successfully",
   async () => {
     // create an event listener
-    const listener = new TicketCreatedListener(natsWrapper.client)
+    const listener = new TicketCreatedListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketCreatedEvent["data"] = {
@@ -26,10 +26,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

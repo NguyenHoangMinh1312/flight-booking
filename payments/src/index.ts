@@ -24,9 +24,6 @@ const start = async () => {
   if (!process.env.NATS_CLIENT_ID)
     throw new Error("No NATS_CLIENT_ID found!")
 
-  if (!process.env.NATS_CLUSTER_ID)
-    throw new Error("No NATS_CLUSTER_ID found!")
-
   if (!process.env.STRIPE_KEY)
     throw new Error("No STRIPE_KEY found!")
 
@@ -35,24 +32,13 @@ const start = async () => {
 
   try {
     // connect to NATS
-    await natsWrapper.connect(
-      process.env.NATS_CLUSTER_ID,
-      process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL)
-
-    natsWrapper.client.on("close", () => {
-      console.log("NATS connection closed!")
-      process.exit()
-    })
-
-    process.on("SIGINT", () => natsWrapper.client.close())
-    process.on("SIGTERM", () => natsWrapper.client.close())
+    await natsWrapper.connect(process.env.NATS_URL)
 
     // Initiate listeners
-    new OrderCreatedListener(natsWrapper.client).listen()
-    new OrderCanceledListener(natsWrapper.client).listen()
-    new OrderCompleteListener(natsWrapper.client).listen()
-    new OrderAwaitingRefundListener(natsWrapper.client).listen()
+    new OrderCreatedListener(natsWrapper.nc).listen()
+    new OrderCanceledListener(natsWrapper.nc).listen()
+    new OrderCompleteListener(natsWrapper.nc).listen()
+    new OrderAwaitingRefundListener(natsWrapper.nc).listen()
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI)

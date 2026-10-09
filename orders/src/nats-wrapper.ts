@@ -1,32 +1,31 @@
-import nats from "node-nats-streaming"
-import { Stan } from "node-nats-streaming"
+import { connect, NatsConnection, ConnectionOptions } from "nats";
+import { createStream } from "@mint1312-flight-booking/common";
 
 class NatsWrapper {
-  private _client?: Stan
+  private _nc?: NatsConnection;
 
-  get client() {
-    if (!this._client)
-      throw new Error("Cannot access NATS client before connecting")
-    else
-      return this._client
+  get nc(): NatsConnection {
+    if (!this._nc) {
+      throw new Error("Cannot access NATS client before connecting");
+    }
+    return this._nc;
   }
 
-  connect(clusterId: string, clientId: string, url: string): Promise<void> {
-    this._client = nats.connect(clusterId, clientId, { url })
+  async connect(url: string): Promise<void> {
+    this._nc = await connect({ servers: url });
 
-    return new Promise((resolve, reject) => {
-      this.client.on("connect", () => {
-        console.log("Connected to NATS")
-        resolve()
-      })
+    await createStream(this._nc);
 
-      this.client.on("error", (err) => {
-        reject(err)
-      })
-    })
+    console.log("Connected to NATS JetStream");
 
+    this._nc.closed().then((err) => {
+      if (err) {
+        console.error("NATS connection closed with error:", err);
+      } else {
+        console.log("NATS connection closed");
+      }
+    });
   }
-
 }
 
-export const natsWrapper = new NatsWrapper()
+export const natsWrapper = new NatsWrapper();

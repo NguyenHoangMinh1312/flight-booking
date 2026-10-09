@@ -1,0 +1,1 @@
+export const streamName = "flight-booking"

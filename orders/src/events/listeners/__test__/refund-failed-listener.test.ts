@@ -1,7 +1,7 @@
 import { natsWrapper } from "../../../nats-wrapper"
 import { Subjects, OrderStatus, RefundFailedEvent, FlightStatus } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Order } from "../../../models/order"
 import { Ticket } from "../../../models/ticket"
 import { Outbox } from "../../../models/outbox"
@@ -10,7 +10,7 @@ it(
   "Checks if the listener handles event refund:failed successfully",
   async () => {
     // create an event listener
-    const listener = new RefundFailedListener(natsWrapper.client)
+    const listener = new RefundFailedListener(natsWrapper.nc)
 
     // create a ticket
     const ticket = Ticket.build({
@@ -42,10 +42,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

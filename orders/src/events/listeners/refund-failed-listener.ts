@@ -1,4 +1,4 @@
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Subjects, Listener, RefundFailedEvent, OrderStatus } from "@mint1312-flight-booking/common"
 import { Order } from "../../models/order"
 import { queueGroupName } from "./queue-group-name"
@@ -9,7 +9,7 @@ export class RefundFailedListener extends Listener<RefundFailedEvent> {
   readonly subject = Subjects.RefundFailed
   queueGroupName = queueGroupName
 
-  async onMessage(data: RefundFailedEvent["data"], msg: Message) {
+  async onMessage(data: RefundFailedEvent["data"], msg: JsMsg) {
     // change the order status to canceled
     const order = await Order.findById(data.orderId).populate("ticket")
 

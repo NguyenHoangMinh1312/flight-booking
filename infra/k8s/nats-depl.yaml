@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nats
-          image: nats-streaming:0.17.0
+          image: nats:2.10-alpine
           resources:
             requests:
               cpu: "100m"
@@ -23,19 +23,10 @@ spec:
               cpu: "200m"
               memory: "512Mi"
           args: [
-            "-p",
-            "4222",
-            "-m",
-            "8222",
-            "-hbi",
-            "5s",
-            "-hbt",
-            "5s",
-            "-hbf",
-            "2",
-            "-SD",
-            "-cid",
-            "ticketing"
+            "-p", "4222",
+            "-m", "8222",
+            "-js",            
+            "-sd", "/data"
           ]
 ---
 apiVersion: v1

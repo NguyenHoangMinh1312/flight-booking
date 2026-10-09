@@ -25,35 +25,15 @@ const start = async () => {
   if (!process.env.NATS_URL)
     throw new Error("No NATS_URL found!")
 
-  if (!process.env.NATS_CLIENT_ID)
-    throw new Error("No NATS_CLIENT_ID found!")
-
-  if (!process.env.NATS_CLUSTER_ID)
-    throw new Error("No NATS_CLUSTER_ID found!")
-
-  if (!process.env.REDIS_HOST)
-    throw new Error("No REDIS_HOST found!")
-
   try {
     // connect to NATS
-    await natsWrapper.connect(
-      process.env.NATS_CLUSTER_ID,
-      process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL)
-
-    natsWrapper.client.on("close", () => {
-      console.log("NATS connection closed!")
-      process.exit()
-    })
-
-    process.on("SIGINT", () => natsWrapper.client.close())
-    process.on("SIGTERM", () => natsWrapper.client.close())
+    await natsWrapper.connect(process.env.NATS_URL)
 
     // Listen to events from other services
-    new UserCreatedListener(natsWrapper.client).listen()
-    new OrderCompleteListener(natsWrapper.client).listen()
-    new OrderCanceledListener(natsWrapper.client).listen()
-    new UserOtpRequestedListener(natsWrapper.client).listen()
+    new UserCreatedListener(natsWrapper.nc).listen()
+    new OrderCompleteListener(natsWrapper.nc).listen()
+    new OrderCanceledListener(natsWrapper.nc).listen()
+    new UserOtpRequestedListener(natsWrapper.nc).listen()
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI)

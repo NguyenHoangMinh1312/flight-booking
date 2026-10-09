@@ -1,4 +1,5 @@
 import { OrderCanceledEvent } from "@mint1312-flight-booking/common"
+import { JsMsg } from "nats"
 import { natsWrapper } from "../../../nats-wrapper"
 import { OrderCanceledListener } from "../order-canceled-listener"
 import mongoose from "mongoose"
@@ -9,7 +10,7 @@ it(
   "Checks if the listener handles the event order:canceled successfully",
   async () => {
     // create an event listener
-    const listener = new OrderCanceledListener(natsWrapper.client)
+    const listener = new OrderCanceledListener(natsWrapper.js)
 
     // create an user
     const user = User.build({
@@ -29,10 +30,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

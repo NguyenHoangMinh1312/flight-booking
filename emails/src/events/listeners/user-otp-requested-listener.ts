@@ -1,5 +1,5 @@
 import { Listener, UserOtpRequestedEvent, Subjects } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { emailSendQueue } from "../../queues/email-send-queue"
 
@@ -7,7 +7,7 @@ export class UserOtpRequestedListener extends Listener<UserOtpRequestedEvent> {
   readonly subject = Subjects.UserOtpRequested
   queueGroupName = queueGroupName
 
-  async onMessage(data: UserOtpRequestedEvent["data"], msg: Message) {
+  async onMessage(data: UserOtpRequestedEvent["data"], msg: JsMsg) {
     await emailSendQueue.add({
       receiver: data.email,
       subject: "Your Flight Booking Verification Code",

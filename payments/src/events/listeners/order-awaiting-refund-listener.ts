@@ -1,5 +1,5 @@
 import { Listener, OrderAwaitingRefundEvent, Subjects, OrderStatus } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { Order } from "../../models/order"
 import { Payment } from "../../models/payment"
@@ -10,7 +10,7 @@ export class OrderAwaitingRefundListener extends Listener<OrderAwaitingRefundEve
   readonly subject = Subjects.OrderAwaitingRefund
   queueGroupName = queueGroupName
 
-  async onMessage(data: OrderAwaitingRefundEvent["data"], msg: Message) {
+  async onMessage(data: OrderAwaitingRefundEvent["data"], msg: JsMsg) {
     // find the order
     const order = await Order.findById(data.id)
 

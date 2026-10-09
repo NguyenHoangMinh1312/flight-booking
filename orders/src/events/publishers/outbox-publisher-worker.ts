@@ -17,11 +17,11 @@ import { natsWrapper } from "../../nats-wrapper"
 export const outboxPublisherWorker = (pollIntervalMs = 1000) => {
   let isProcessing = false
 
-  const orderAwaitingRefundPublisher = new OrderAwaitingRefundPublisher(natsWrapper.client)
-  const orderCanceledPublisher = new OrderCanceledPublisher(natsWrapper.client)
-  const orderCompletePublisher = new OrderCompletePublisher(natsWrapper.client)
-  const orderCreatedPublisher = new OrderCreatedPublisher(natsWrapper.client)
-  const orderRefundFailedPublisher = new OrderRefundFailedPublisher(natsWrapper.client)
+  const orderAwaitingRefundPublisher = new OrderAwaitingRefundPublisher(natsWrapper.nc)
+  const orderCanceledPublisher = new OrderCanceledPublisher(natsWrapper.nc)
+  const orderCompletePublisher = new OrderCompletePublisher(natsWrapper.nc)
+  const orderCreatedPublisher = new OrderCreatedPublisher(natsWrapper.nc)
+  const orderRefundFailedPublisher = new OrderRefundFailedPublisher(natsWrapper.nc)
 
   return setInterval(async () => {
     // Prevent overlapping runs from processing the same events

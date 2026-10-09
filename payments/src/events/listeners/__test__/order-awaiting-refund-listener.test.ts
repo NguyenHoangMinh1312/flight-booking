@@ -1,7 +1,7 @@
 import { natsWrapper } from "../../../nats-wrapper"
 import { OrderAwaitingRefundListener } from "../order-awaiting-refund-listener"
 import mongoose from "mongoose"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Order } from "../../../models/order"
 import { OrderAwaitingRefundEvent, OrderStatus } from "@mint1312-flight-booking/common"
 import { Payment } from "../../../models/payment"
@@ -13,7 +13,7 @@ it(
   "Checks if the listener handles event order:awating-refund successfully",
   async () => {
     // create an event listener
-    const listener = new OrderAwaitingRefundListener(natsWrapper.client)
+    const listener = new OrderAwaitingRefundListener(natsWrapper.nc)
 
     // create a new order
     const order = Order.build({
@@ -42,10 +42,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

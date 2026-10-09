@@ -19,36 +19,19 @@ const start = async () => {
   if (!process.env.NATS_URL)
     throw new Error("No NATS_URL found!")
 
-  if (!process.env.NATS_CLIENT_ID)
-    throw new Error("No NATS_CLIENT_ID found!")
-
-  if (!process.env.NATS_CLUSTER_ID)
-    throw new Error("No NATS_CLUSTER_ID found!")
-
   if (!process.env.REDIS_HOST)
     throw new Error("No REDIS_HOST found!")
 
   try {
     // connect to NATS
-    await natsWrapper.connect(
-      process.env.NATS_CLUSTER_ID,
-      process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL)
-
-    natsWrapper.client.on("close", () => {
-      console.log("NATS connection closed!")
-      process.exit()
-    })
-
-    process.on("SIGINT", () => natsWrapper.client.close())
-    process.on("SIGTERM", () => natsWrapper.client.close())
+    await natsWrapper.connect(process.env.NATS_URL)
 
     // Listen to events from other services
-    new TicketCreatedListener(natsWrapper.client).listen()
-    new TicketUpdatedListener(natsWrapper.client).listen()
-    new TicketCanceledListener(natsWrapper.client).listen()
-    new PaymentCreatedListener(natsWrapper.client).listen()
-    new RefundCompleteListener(natsWrapper.client).listen()
+    new TicketCreatedListener(natsWrapper.nc).listen()
+    new TicketUpdatedListener(natsWrapper.nc).listen()
+    new TicketCanceledListener(natsWrapper.nc).listen()
+    new PaymentCreatedListener(natsWrapper.nc).listen()
+    new RefundCompleteListener(natsWrapper.nc).listen()
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI)

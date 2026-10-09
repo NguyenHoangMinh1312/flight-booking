@@ -1,4 +1,4 @@
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Subjects, Listener, PaymentCreatedEvent, OrderStatus } from "@mint1312-flight-booking/common"
 import { Order } from "../../models/order"
 import { queueGroupName } from "./queue-group-name"
@@ -9,7 +9,7 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
   readonly subject = Subjects.PaymentCreated
   queueGroupName = queueGroupName
 
-  async onMessage(data: PaymentCreatedEvent["data"], msg: Message) {
+  async onMessage(data: PaymentCreatedEvent["data"], msg: JsMsg) {
     // change the order status to completed
     const order = await Order.findById(data.orderId).populate("ticket")
 

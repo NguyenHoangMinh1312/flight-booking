@@ -1,5 +1,5 @@
 import { Listener, OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { Ticket } from "../../models/ticket"
 import mongoose from "mongoose"
@@ -9,7 +9,7 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
   readonly subject = Subjects.OrderCanceled
   queueGroupName = queueGroupName
 
-  async onMessage(data: OrderCanceledEvent["data"], msg: Message) {
+  async onMessage(data: OrderCanceledEvent["data"], msg: JsMsg) {
     // find the ticket that the order is reserving
     const ticket = await Ticket.findById(data.ticket.id).populate("flight")
 

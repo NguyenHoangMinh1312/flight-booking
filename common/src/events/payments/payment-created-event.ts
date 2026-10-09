@@ -1,4 +1,4 @@
-import { Subjects } from "./subjects"
+import { Subjects } from "../subjects"
 
 // couple the data to be sent to ticket:created channel
 export interface PaymentCreatedEvent {

@@ -1,4 +1,4 @@
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Subjects, Listener, TicketCanceledEvent, FlightStatus, OrderStatus } from "@mint1312-flight-booking/common"
 import { Ticket } from "../../models/ticket"
 import { Order } from "../../models/order"
@@ -11,7 +11,7 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
   readonly subject = Subjects.TicketCanceled
   queueGroupName = queueGroupName
 
-  async onMessage(data: TicketCanceledEvent["data"], msg: Message) {
+  async onMessage(data: TicketCanceledEvent["data"], msg: JsMsg) {
     // find the previous ticket version
     const ticket = await Ticket.findById(data.id)
 

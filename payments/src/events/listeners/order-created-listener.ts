@@ -1,5 +1,5 @@
 import { Listener, OrderCreatedEvent, Subjects } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { Order } from "../../models/order"
 
@@ -7,7 +7,7 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject = Subjects.OrderCreated
   queueGroupName = queueGroupName
 
-  async onMessage(data: OrderCreatedEvent["data"], msg: Message) {
+  async onMessage(data: OrderCreatedEvent["data"], msg: JsMsg) {
     const existingOrder = await Order.findById(data.id)
 
     if (existingOrder)

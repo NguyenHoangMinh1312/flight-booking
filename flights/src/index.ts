@@ -1,9 +1,9 @@
 import mongoose from "mongoose"
 import { app } from "./app"
-import { natsWrapper } from "./nats-wrapper"
 import { OrderCreatedListener } from "./events/listeners/order-created-listener"
 import { OrderCanceledListener } from "./events/listeners/order-canceled-listener"
 import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
+import { natsWrapper } from "./nats-wrapper"
 
 const start = async () => {
   if (!process.env.JWT_KEY)
@@ -15,30 +15,13 @@ const start = async () => {
   if (!process.env.NATS_URL)
     throw new Error("No NATS_URL found!")
 
-  if (!process.env.NATS_CLIENT_ID)
-    throw new Error("No NATS_CLIENT_ID found!")
-
-  if (!process.env.NATS_CLUSTER_ID)
-    throw new Error("No NATS_CLUSTER_ID found!")
-
   try {
     // connect to NATS
-    await natsWrapper.connect(
-      process.env.NATS_CLUSTER_ID,
-      process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL)
-
-    natsWrapper.client.on("close", () => {
-      console.log("NATS connection closed!")
-      process.exit()
-    })
-
-    process.on("SIGINT", () => natsWrapper.client.close())
-    process.on("SIGTERM", () => natsWrapper.client.close())
+    await natsWrapper.connect(process.env.NATS_URL)
 
     // Listen to events from other services
-    new OrderCreatedListener(natsWrapper.client).listen()
-    new OrderCanceledListener(natsWrapper.client).listen()
+    new OrderCreatedListener(natsWrapper.nc).listen()
+    new OrderCanceledListener(natsWrapper.nc).listen()
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI)

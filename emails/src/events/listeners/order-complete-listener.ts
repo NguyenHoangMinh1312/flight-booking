@@ -1,5 +1,5 @@
 import { Listener, OrderCompleteEvent, Subjects } from "@mint1312-flight-booking/common"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
 import { emailSendQueue } from "../../queues/email-send-queue"
 import { User } from "../../models/user"
@@ -8,7 +8,7 @@ export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
   readonly subject = Subjects.OrderComplete
   queueGroupName = queueGroupName
 
-  async onMessage(data: OrderCompleteEvent["data"], msg: Message) {
+  async onMessage(data: OrderCompleteEvent["data"], msg: JsMsg) {
     const user = await User.findById(data.userId)
 
     if (!user)

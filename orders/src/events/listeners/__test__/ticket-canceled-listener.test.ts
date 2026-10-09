@@ -2,7 +2,7 @@ import { TicketCanceledListener } from "../ticket-canceled-listener"
 import { natsWrapper } from "../../../nats-wrapper"
 import { FlightStatus, TicketCanceledEvent, OrderStatus, Subjects } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
-import { Message } from "node-nats-streaming"
+import { JsMsg } from "nats"
 import { Ticket } from "../../../models/ticket"
 import { Order } from "../../../models/order"
 import { Outbox } from "../../../models/outbox"
@@ -32,7 +32,7 @@ it(
     const ticket = await buildTicket()
 
     // create an event listener
-    const listener = new TicketCanceledListener(natsWrapper.client)
+    const listener = new TicketCanceledListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketCanceledEvent["data"] = {
@@ -41,10 +41,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     try {
@@ -66,7 +65,7 @@ it(
     const ticket = await buildTicket(ticketId)
 
     // create an event listener
-    const listener = new TicketCanceledListener(natsWrapper.client)
+    const listener = new TicketCanceledListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketCanceledEvent["data"] = {
@@ -75,10 +74,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)
@@ -111,7 +109,7 @@ it(
     await order.save()
 
     // create an event listener
-    const listener = new TicketCanceledListener(natsWrapper.client)
+    const listener = new TicketCanceledListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketCanceledEvent["data"] = {
@@ -120,10 +118,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)
@@ -167,7 +164,7 @@ it(
     await order.save()
 
     // create an event listener
-    const listener = new TicketCanceledListener(natsWrapper.client)
+    const listener = new TicketCanceledListener(natsWrapper.nc)
 
     // create a fake event
     const data: TicketCanceledEvent["data"] = {
@@ -176,10 +173,9 @@ it(
     }
 
     // fake the ack function
-    // @ts-ignore
-    const msg: Message = {
+    const msg = {
       ack: jest.fn()
-    }
+    } as unknown as JsMsg
 
     // call the listener
     await listener.onMessage(data, msg)

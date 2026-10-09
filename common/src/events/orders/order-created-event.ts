@@ -1,5 +1,5 @@
-import { Subjects } from "./subjects"
-import { OrderStatus } from "../types/order-status"
+import { Subjects } from "../subjects"
+import { OrderStatus } from "../../types/order-status"
 
 // couple the data to be sent to order:created channel
 export interface OrderCreatedEvent {
