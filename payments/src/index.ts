@@ -21,9 +21,6 @@ const start = async () => {
   if (!process.env.NATS_URL)
     throw new Error("No NATS_URL found!")
 
-  if (!process.env.NATS_CLIENT_ID)
-    throw new Error("No NATS_CLIENT_ID found!")
-
   if (!process.env.STRIPE_KEY)
     throw new Error("No STRIPE_KEY found!")
 

@@ -25,11 +25,7 @@ spec:
               memory: "512Mi"
           env:
             - name: NATS_URL
-              value: "http://nats-srv:4222"
-            - name: NATS_CLIENT_ID
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+              value: "nats://nats-srv:4222"
             - name: MONGO_URI
               value: "mongodb://payments-mongo-srv:27017/payments?replicaSet=rs0"
             - name: REDIS_HOST
