@@ -42,6 +42,13 @@ spec:
                 name: payments-srv
                 port:
                   number: 3000
+          # - path: /api/agents/?(.*)
+          #   pathType: ImplementationSpecific
+          #   backend:
+          #     service:
+          #       name: agents-srv
+          #       port:
+          #         number: 3000
           - path: /?(.*)
             pathType: ImplementationSpecific
             backend:

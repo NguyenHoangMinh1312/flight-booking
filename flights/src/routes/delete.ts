@@ -4,6 +4,7 @@ import { requireAuth, requireManager, BadRequestError, FlightStatus, NotFoundErr
 import mongoose from "mongoose"
 import { Ticket } from "../models/ticket"
 import { TicketCanceledPublisher } from "../events/publishers/ticket-canceled-publisher"
+import { Outbox } from "../models/outbox"
 
 const router = express.Router()
 
@@ -36,19 +37,22 @@ router.delete(
         return res.send({ message: "Cancellation is finished" })
 
       // set all the ticket status to canceled
-      await Promise.all(tickets.map((ticket) => {
-        ticket.set({ status: FlightStatus.Canceled })
-        return ticket.save({ session })
+      const operations = tickets.map((ticket) => ({
+        updateOne: {
+          filter: { id: ticket.id },
+          update: { $set: { status: FlightStatus.Canceled } }
+        }
       }))
+      await Ticket.bulkWrite(operations, { session })
 
       // save the events to outbox
-      await Promise.all(tickets.map((ticket) => {
-        const outboxEvent = TicketCanceledPublisher.buildOutboxEvent({
+      const outboxEvents = tickets.map((ticket) => {
+        return TicketCanceledPublisher.buildOutboxEvent({
           id: ticket.id,
           version: ticket.version,
         })
-        return outboxEvent.save({ session })
-      }))
+      })
+      await Outbox.insertMany(outboxEvents, { session })
 
       // commit db transaction
       await session.commitTransaction()

@@ -3,9 +3,9 @@ import { body } from "express-validator"
 import { NotFoundError, requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
 import { Flight } from "../models/flight"
 import { Ticket } from "../models/ticket"
-import { FlightClass } from "../models/flight"
 import mongoose from "mongoose"
 import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher"
+import { Outbox } from "../models/outbox"
 
 const router = express.Router()
 
@@ -51,25 +51,17 @@ router.put(
       flight.set({ description, priceConfig })
       await flight.save({ session })
 
-      // Find tickets
+      // Find tickets that has not been ordered
       const tickets = await Ticket.find({
         flight: flight._id,
-        orderId: { $exists: false },
-        $or: (Object.entries(priceConfig) as [FlightClass, number][]).map(
-          ([ticketClass, price]) => ({
-            class: ticketClass,
-            price: { $ne: price }
-          })
-        )
+        orderId: { $exists: false }
       }).populate("flight")
 
       // Save all updated tickets
-      await Promise.all(
-        tickets.map((ticket) => {
-          ticket.set({ price: priceConfig[ticket.class] })
-          return ticket.save({ session })
-        })
-      )
+      await Promise.all(tickets.map((ticket) => {
+        ticket.set({ price: priceConfig[ticket.class] })
+        return ticket.save({ session })
+      }))
 
       // save events the outbox
       const outboxEvents = tickets.map((ticket) => {
@@ -80,11 +72,11 @@ router.put(
           class: ticket.class,
           status: ticket.status,
           seat: ticket.seat,
-          departureDate: ticket.flight.departure.date
+          departureDate: flight.departure.date
         })
       })
 
-      await Promise.all(outboxEvents.map((event) => event.save({ session })))
+      await Outbox.insertMany(outboxEvents, { session })
 
       // commit db transaction
       await session.commitTransaction();

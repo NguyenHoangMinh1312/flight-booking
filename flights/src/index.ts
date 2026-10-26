@@ -4,6 +4,7 @@ import { OrderCreatedListener } from "./events/listeners/order-created-listener"
 import { OrderCanceledListener } from "./events/listeners/order-canceled-listener"
 import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
 import { natsWrapper } from "./nats-wrapper"
+import { seedAirports } from "./data/seed-airports"
 
 const start = async () => {
   if (!process.env.JWT_KEY)
@@ -26,6 +27,9 @@ const start = async () => {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI)
     console.log("Connected to MongoDB")
+
+    // Seed initial airports
+    await seedAirports()
 
     // start outbox worker
     outboxPublisherWorker()

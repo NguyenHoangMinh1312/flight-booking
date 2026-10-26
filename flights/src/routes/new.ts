@@ -6,6 +6,8 @@ import { Ticket } from "../models/ticket"
 import { TicketDoc } from "../models/ticket"
 import mongoose from "mongoose"
 import { TicketCreatedPublisher } from "../events/publishers/ticket-created-publisher"
+import { Airport } from "../models/airport"
+import { Outbox } from "../models/outbox"
 
 const router = express.Router()
 
@@ -89,10 +91,20 @@ router.post(
       priceConfig
     } = req.body
 
-    // input validation
+    // validate the airport code
+    const departureAirport = await Airport.findOne({ code: departure.airport })
+    if (!departureAirport)
+      throw new BadRequestError("Invalid departure airport code")
+
+    const arrivalAirport = await Airport.findOne({ code: arrival.airport })
+    if (!arrivalAirport)
+      throw new BadRequestError("Invalid arrival airport code")
+
+    // validate the departure and arrival time
     if (departure.date >= arrival.date)
       throw new BadRequestError("Departure date must be earlier than arrival date")
 
+    // validate the seat config
     for (const classConfig of seatConfig.classes) {
       if (classConfig.fromRow > classConfig.toRow) {
         throw new BadRequestError(
@@ -118,7 +130,6 @@ router.post(
         }
       }
     }
-
 
     // db transaction
     const session = await mongoose.startSession()
@@ -162,7 +173,7 @@ router.post(
           tickets.push(ticket)
         }
       }
-      await Promise.all(tickets.map((ticket) => ticket.save({ session })))
+      await Ticket.insertMany(tickets, { session })
 
       // save events to outbox
       const outboxEvents = tickets.map((ticket) => {
@@ -176,8 +187,7 @@ router.post(
           departureDate: ticket.flight.departure.date
         })
       })
-
-      await Promise.all(outboxEvents.map((event) => event.save({ session })))
+      await Outbox.insertMany(outboxEvents, { session })
 
       // commit db transaction
       await session.commitTransaction()

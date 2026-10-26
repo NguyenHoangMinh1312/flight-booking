@@ -52,11 +52,11 @@ it(
         flightNumber: "VN123",
         description: "Hanoi to Ho Chi Minh City",
         departure: {
-          airport: "Noi Bai",
+          airport: "HAN",
           date: "2026-09-04T17:39:50"
         },
         arrival: {
-          airport: "Tan Son Nhat",
+          airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
         seatConfig: {

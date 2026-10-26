@@ -1,10 +1,7 @@
 import request from "supertest"
 import { app } from "../../app"
-import { Flight } from "../../models/flight"
 import { Ticket } from "../../models/ticket"
-import { natsWrapper } from "../../nats-wrapper"
 import { Subjects, UserRole } from "@mint1312-flight-booking/common"
-import { jest } from "@jest/globals"
 import { Outbox } from "../../models/outbox"
 
 it(
@@ -35,7 +32,7 @@ it(
       .post("/api/flights")
       .set("Cookie", global.signin(UserRole.Manager))
       .send({
-        flightNumber: "",
+        flightNumber: "VN123",
         description: "",
         departure: {
           airport: "Noi Bai",
@@ -56,11 +53,11 @@ it(
         flightNumber: "VN123",
         description: "Hanoi to Ho Chi Minh City",
         departure: {
-          airport: "Noi Bai",
+          airport: "HAN",
           date: "2026-09-04T17:39:50"
         },
         arrival: {
-          airport: "Tan Son Nhat",
+          airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
         seatConfig: {

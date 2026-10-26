@@ -6,6 +6,7 @@ import { queueGroupName } from "./queue-group-name"
 import mongoose from "mongoose"
 import { OrderCanceledPublisher } from "../publishers/order-canceled-publisher"
 import { OrderAwaitingRefundPublisher } from "../publishers/order-awaiting-refund-publisher"
+import { Outbox } from "../../models/outbox"
 
 export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
   readonly subject = Subjects.TicketCanceled
@@ -86,8 +87,7 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
       }
 
       // save the outbox events
-      await Promise.all(outboxEvents.map((event) => event.save({ session })))
-
+      await Outbox.insertMany(outboxEvents, { session })
       // commit db transaction
       await session.commitTransaction()
 

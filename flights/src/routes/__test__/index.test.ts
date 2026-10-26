@@ -7,11 +7,11 @@ const buildFlight = async () => {
     flightNumber: "VN123",
     description: "Hanoi to Ho Chi Minh City",
     departure: {
-      airport: "Noi Bai",
+      airport: "HAN",
       date: new Date()
     },
     arrival: {
-      airport: "Tan Son Nhat",
+      airport: "SGN",
       date: new Date()
     },
     seatConfig: {

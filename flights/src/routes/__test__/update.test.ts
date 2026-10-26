@@ -60,11 +60,11 @@ it(
         flightNumber: "VN123",
         description: "Hanoi to Ho Chi Minh City",
         departure: {
-          airport: "Noi Bai",
+          airport: "HAN",
           date: "2026-09-04T17:39:50"
         },
         arrival: {
-          airport: "Tan Son Nhat",
+          airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
         seatConfig: {
@@ -110,7 +110,6 @@ it(
       })
       .expect(200)
 
-
     // check the updated data was persisted
     const getFlightRes = await request(app)
       .get(`/api/flights/${createFlightRes.body.id}`)
@@ -122,6 +121,6 @@ it(
     // expect the event to be saved to outbox
     const outboxEvents = await Outbox.find({})
     expect(outboxEvents).toBeDefined()
-    expect(outboxEvents).toHaveLength(6 + 4)
+    expect(outboxEvents).toHaveLength(6 + 6)
   }
 )

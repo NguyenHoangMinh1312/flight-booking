@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 import { jest } from "@jest/globals"
 import { UserRole } from "@mint1312-flight-booking/common"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { seedAirports } from "../data/seed-airports"
 
 declare global {
   var signin: (role: UserRole) => string[]
@@ -32,6 +33,9 @@ beforeEach(async () => {
       await collection.deleteMany({});
     }
   }
+
+  // Seed initial airports for tests
+  await seedAirports()
 })
 
 // disconnect from mongodb after all tests

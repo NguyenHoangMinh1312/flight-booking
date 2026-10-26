@@ -36,7 +36,7 @@ spec:
             - name: MANAGER_EMAIL
               value: "manager@flightbooking.com"
             - name: MANAGER_PASSWORD
-              value: "ManagerSecretPass123"
+              value: "manager@flightbooking.com"
 ---
 apiVersion: v1
 kind: Service

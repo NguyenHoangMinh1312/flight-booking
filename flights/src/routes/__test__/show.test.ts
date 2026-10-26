@@ -26,11 +26,11 @@ it(
         flightNumber: "VN123",
         description: "Hanoi to Ho Chi Minh City",
         departure: {
-          airport: "Noi Bai",
+          airport: "HAN",
           date: "2026-09-04T17:39:50"
         },
         arrival: {
-          airport: "Tan Son Nhat",
+          airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
         seatConfig: {
@@ -63,8 +63,8 @@ it(
     expect(getFlightRes.body.flight.description).toEqual(
       "Hanoi to Ho Chi Minh City"
     )
-    expect(getFlightRes.body.flight.departure.airport).toEqual("Noi Bai")
-    expect(getFlightRes.body.flight.arrival.airport).toEqual("Tan Son Nhat")
+    expect(getFlightRes.body.flight.departure.airport).toEqual("HAN")
+    expect(getFlightRes.body.flight.arrival.airport).toEqual("SGN")
     expect(getFlightRes.body.flight.seatConfig.rows).toEqual(2)
     expect(getFlightRes.body.flight.seatConfig.columns).toEqual(2)
     expect(getFlightRes.body.flight.seatConfig.classes).toEqual(
