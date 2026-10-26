@@ -10,6 +10,7 @@ import "./queues/expiration-queue"
 import { TicketCanceledListener } from "./events/listeners/ticket-canceled-listener"
 
 const start = async () => {
+
   if (!process.env.JWT_KEY)
     throw new Error("No JWT_KEY found!")
 
