@@ -37,10 +37,10 @@ beforeEach(async () => {
 
 // disconnect from mongodb after all tests
 afterAll(async () => {
+  await mongoose.connection.close()
   if (mongo) {
     await mongo.stop()
   }
-  await mongoose.connection.close()
 }, 30000)
 
 // global helper function for testing 
