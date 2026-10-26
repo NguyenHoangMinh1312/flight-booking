@@ -1,8 +1,9 @@
 name: tests-flights
 
 on:
-  pull_request
-
+  pull_request:
+    paths: 
+      - 'flights/**'
 jobs:
   build:
     runs-on: ubuntu-24.04
