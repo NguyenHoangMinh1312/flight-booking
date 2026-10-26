@@ -6,7 +6,6 @@ import { natsWrapper } from "./nats-wrapper"
 import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
 
 const start = async () => {
-  console.log("Starting up...")
   if (!process.env.JWT_KEY)
     throw new Error("No JWT_KEY found!")
 
