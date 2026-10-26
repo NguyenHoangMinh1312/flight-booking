@@ -41,7 +41,7 @@ afterAll(async () => {
     await mongo.stop()
   }
   await mongoose.connection.close()
-})
+}, 30000)
 
 // global helper function for testing 
 global.signin = (id?: string) => {
