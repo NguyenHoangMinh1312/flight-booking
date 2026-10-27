@@ -14,5 +14,7 @@
 
 `kubectl create secret generic google-secret --from-literal=GMAIL_USER=<gmail@gmail.com> --from-literal=GOOGLE_APP_PASSWORD=<abcdefghijklmnop>`
 
+`kubectl create secret generic manager-secret --from-literal=MANAGER_EMAIL=<gmail@gmail.com> --from-literal=MANAGER_PASSWORD=<abcdefghijklmnop>`
+
 # 5. Listen on Stripe Webhook (Local only)
 `stripe listen --all-snapshot --forward-to localhost/api/payments/stripe-webhook`

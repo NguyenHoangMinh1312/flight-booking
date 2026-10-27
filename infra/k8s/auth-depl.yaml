@@ -34,9 +34,13 @@ spec:
                   name: jwt-secret
                   key: JWT_KEY
             - name: MANAGER_EMAIL
-              value: "manager@flightbooking.com"
+              valueFrom:
+                name: manager-secret
+                key: MANAGER_EMAIL
             - name: MANAGER_PASSWORD
-              value: "manager@flightbooking.com"
+              valueFrom:
+                name: manager-secret
+                key: MANAGER_PASSWORD
 ---
 apiVersion: v1
 kind: Service
