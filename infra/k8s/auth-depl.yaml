@@ -35,12 +35,14 @@ spec:
                   key: JWT_KEY
             - name: MANAGER_EMAIL
               valueFrom:
-                name: manager-secret
-                key: MANAGER_EMAIL
+                secretKeyRef:
+                  name: manager-secret
+                  key: MANAGER_EMAIL
             - name: MANAGER_PASSWORD
               valueFrom:
-                name: manager-secret
-                key: MANAGER_PASSWORD
+                secretKeyRef:
+                  name: manager-secret
+                  key: MANAGER_PASSWORD
 ---
 apiVersion: v1
 kind: Service
