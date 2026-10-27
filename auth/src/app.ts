@@ -16,8 +16,8 @@ app.use(json())
 app.use(cookieSession({
   signed: false,
   httpOnly: true,
-  secure: false,   // if using GCP, turn it to true 
-  // sameSite: "none",   // uncomment this line if using GCP
+  secure: false,   // in deployment, turn it to true 
+  // sameSite: "none",   // uncomment this line if deployment
 }));
 
 app.use(currentUserRouter)
