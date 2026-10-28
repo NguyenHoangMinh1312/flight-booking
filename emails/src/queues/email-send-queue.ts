@@ -15,12 +15,16 @@ const emailSendQueue = new Queue<Payload>("email:send", {
 })
 
 emailSendQueue.process(async (job) => {
-  await emailClient.sendMail({
-    from: process.env.GMAIL_USER,
-    to: job.data.receiver,
+  const { data, error } = await emailClient.emails.send({
+    from: 'Acme <onboarding@resend.dev>',
+    to: [job.data.receiver],
     subject: job.data.subject,
-    text: job.data.content
+    html: job.data.content
   })
+
+  if (error) {
+    return console.error({ error });
+  }
 })
 
 export { emailSendQueue }

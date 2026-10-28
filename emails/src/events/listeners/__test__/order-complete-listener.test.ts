@@ -10,7 +10,7 @@ it(
   "Checks if the listener handles the event order:comnplete successfully",
   async () => {
     // create an event listener
-    const listener = new OrderCompleteListener(natsWrapper.js)
+    const listener = new OrderCompleteListener(natsWrapper.nc)
 
     // create an user
     const user = User.build({
@@ -43,7 +43,7 @@ it(
       expect.objectContaining({
         receiver: user.email,
         content: expect.stringMatching(
-          new RegExp(`${data.id}.*${data.ticket.id}`)
+          new RegExp(`${data.id}.*${data.ticket.id}`, "s")
         )
       })
     )

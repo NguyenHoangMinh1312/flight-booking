@@ -1,9 +1,3 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-export const emailClient = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GOOGLE_APP_PASSWORD
-  }
-})
+export const emailClient = new Resend(process.env.RESEND_API_KEY || "123")

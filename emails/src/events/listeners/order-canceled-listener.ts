@@ -17,14 +17,31 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
     await emailSendQueue.add({
       receiver: user.email,
       subject: `Your order ${data.id} has been canceled.`,
-      content: `Hello,
+      content: `
+    <html>
+      <body>
+        <h2>Order Canceled</h2>
 
-Your order with ID ${data.id} for ticket ${data.ticket.id} has been canceled.
+        <p>Hello,</p>
 
-If you did not request this cancellation or have any questions, please contact our support team.
+        <p>
+          Your order with ID <strong>${data.id}</strong>
+          for ticket <strong>${data.ticket.id}</strong>
+          has been canceled.
+        </p>
 
-Best regards,
-Flight Booking Team`
+        <p>
+          If you did not request this cancellation or have any
+          questions, please contact our support team.
+        </p>
+
+        <p>
+          Best regards,<br />
+          Flight Booking Team
+        </p>
+      </body>
+    </html>
+  `
     })
 
     msg.ack()

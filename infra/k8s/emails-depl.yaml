@@ -30,16 +30,21 @@ spec:
               value: "mongodb://emails-mongo-srv:27017/emails?replicaSet=rs0"
             - name: REDIS_HOST
               value: "emails-redis-srv"
-            - name: GMAIL_USER
+            # - name: GMAIL_USER
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: google-secret
+            #       key: GMAIL_USER
+            # - name: GOOGLE_APP_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: google-secret
+            #       key: GOOGLE_APP_PASSWORD
+            - name: RESEND_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: google-secret
-                  key: GMAIL_USER
-            - name: GOOGLE_APP_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: google-secret
-                  key: GOOGLE_APP_PASSWORD
+                  name: resend-secret
+                  key: RESEND_API_KEY
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
