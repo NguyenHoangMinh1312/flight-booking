@@ -16,7 +16,7 @@ const emailSendQueue = new Queue<Payload>("email:send", {
 
 emailSendQueue.process(async (job) => {
   const { data, error } = await emailClient.emails.send({
-    from: 'Acme <onboarding@resend.dev>',
+    from: 'Flight Booking <noreply@flight-booking.shop>',
     to: [job.data.receiver],
     subject: job.data.subject,
     html: job.data.content
