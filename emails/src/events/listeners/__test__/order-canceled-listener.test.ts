@@ -10,7 +10,7 @@ it(
   "Checks if the listener handles the event order:canceled successfully",
   async () => {
     // create an event listener
-    const listener = new OrderCanceledListener(natsWrapper.js)
+    const listener = new OrderCanceledListener(natsWrapper.nc)
 
     // create an user
     const user = User.build({

@@ -12,7 +12,9 @@
 
 `kubectl create secret generic stripe-secret --from-literal=STRIPE_KEY=<sk_test_1234> --from-literal=STRIPE_WEBHOOK_SECRET=<whsec_1234>`
 
-`kubectl create secret generic google-secret --from-literal=GMAIL_USER=<gmail@gmail.com> --from-literal=GOOGLE_APP_PASSWORD=<abcdefghijklmnop>`
+<!-- `kubectl create secret generic google-secret --from-literal=GMAIL_USER=<gmail@gmail.com> --from-literal=GOOGLE_APP_PASSWORD=<abcdefghijklmnop>` -->
+
+`kubectl create secret generic resend-secret --from-literal=RESEND_API_KEY=<resend-api-key>`
 
 `kubectl create secret generic manager-secret --from-literal=MANAGER_EMAIL=<gmail@gmail.com> --from-literal=MANAGER_PASSWORD=<abcdefghijklmnop>`
 

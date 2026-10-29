@@ -9,7 +9,7 @@ it(
   "Checks if the listener handles the event user:created successfully",
   async () => {
     // create an event listener
-    const listener = new UserCreatedListener(natsWrapper.js)
+    const listener = new UserCreatedListener(natsWrapper.nc)
 
     // create a fake event
     const data: UserCreatedEvent["data"] = {

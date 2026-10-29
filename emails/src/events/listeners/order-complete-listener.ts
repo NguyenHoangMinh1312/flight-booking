@@ -14,20 +14,45 @@ export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
     if (!user)
       throw new Error("User not found")
 
+
     await emailSendQueue.add({
       receiver: user.email,
-      subject: `Thank you for your order!`,
-      content: `Hello,
+      subject: "Thank you for your order!",
+      content: `
+    <html>
+      <body>
+        <h2>Booking Confirmed</h2>
 
-Thank you for your order! Your booking (ID: ${data.id}) for ticket ${data.ticket.id} has been successfully confirmed.
+        <p>Hello,</p>
 
-For additional information, please visit http://localhost/orders/${data.id}
+        <p>
+          Thank you for your order! Your booking
+          (ID: <strong>${data.id}</strong>) for ticket
+          <strong>${data.ticket.id}</strong> has been
+          successfully confirmed.
+        </p>
 
-If you have any questions or need further assistance, please feel free to contact our support team.
+        <p>
+          For additional information, please visit
+          <a href="http://flight-booking.shop/orders/${data.id}">
+            your order details
+          </a>.
+        </p>
 
-Best regards,
-Flight Booking Team`
+        <p>
+          If you have any questions or need further assistance,
+          please feel free to contact our support team.
+        </p>
+
+        <p>
+          Best regards,<br />
+          Flight Booking Team
+        </p>
+      </body>
+    </html>
+  `
     })
+
 
     msg.ack()
   }

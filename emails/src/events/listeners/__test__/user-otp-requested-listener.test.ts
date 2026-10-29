@@ -2,15 +2,13 @@ import { UserOtpRequestedEvent } from "@mint1312-flight-booking/common"
 import { JsMsg } from "nats"
 import { natsWrapper } from "../../../nats-wrapper"
 import { UserOtpRequestedListener } from "../user-otp-requested-listener"
-import mongoose from "mongoose"
-import { User } from "../../../models/user"
 import { emailSendQueue } from "../../../queues/email-send-queue"
 
 it(
   "Checks if the listener handles the event user:otp-requested successfully",
   async () => {
     // create an event listener
-    const listener = new UserOtpRequestedListener(natsWrapper.js)
+    const listener = new UserOtpRequestedListener(natsWrapper.nc)
 
     // create a fake event
     const data: UserOtpRequestedEvent["data"] = {

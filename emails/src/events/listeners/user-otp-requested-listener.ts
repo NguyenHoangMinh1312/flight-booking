@@ -8,18 +8,35 @@ export class UserOtpRequestedListener extends Listener<UserOtpRequestedEvent> {
   queueGroupName = queueGroupName
 
   async onMessage(data: UserOtpRequestedEvent["data"], msg: JsMsg) {
+
     await emailSendQueue.add({
       receiver: data.email,
       subject: "Your Flight Booking Verification Code",
-      content: `Hello,
-    
-Your verification code is: ${data.otp}
+      content: `
+    <html>
+      <body>
+        <h2>Email Verification</h2>
 
-This code will expire in 5 minutes. If you did not request this, please ignore this email.
+        <p>Hello,</p>
 
-Best regards,
-Flight Booking Team`
+        <p>Your verification code is:</p>
+
+        <h1>${data.otp}</h1>
+
+        <p>
+          This code will expire in <strong>5 minutes</strong>.
+          If you did not request this, please ignore this email.
+        </p>
+
+        <p>
+          Best regards,<br />
+          Flight Booking Team
+        </p>
+      </body>
+    </html>
+  `
     });
+
 
     msg.ack()
   }

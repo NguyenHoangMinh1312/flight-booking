@@ -16,11 +16,14 @@ const start = async () => {
   if (!process.env.REDIS_HOST)
     throw new Error("No REDIS_HOST found!")
 
-  if (!process.env.GMAIL_USER)
-    throw new Error("No GMAIL_USER found!")
+  // if (!process.env.GMAIL_USER)
+  //   throw new Error("No GMAIL_USER found!")
 
-  if (!process.env.GOOGLE_APP_PASSWORD)
-    throw new Error("No GOOGLE_APP_PASSWORD found!")
+  // if (!process.env.GOOGLE_APP_PASSWORD)
+  //   throw new Error("No GOOGLE_APP_PASSWORD found!")
+
+  if (!process.env.RESEND_API_KEY)
+    throw new Error("No RESEND_API_KEY found!")
 
   if (!process.env.NATS_URL)
     throw new Error("No NATS_URL found!")

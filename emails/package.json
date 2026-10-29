@@ -27,7 +27,7 @@
     "bull": "^4.16.5",
     "mongoose": "^9.0.1",
     "nats": "^2.29.3",
-    "nodemailer": "^10.0.14",
+    "resend": "^6.35.0",
     "tsx": "^4.23.15"
   },
   "devDependencies": {
