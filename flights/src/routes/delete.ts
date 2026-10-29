@@ -37,13 +37,10 @@ router.delete(
         return res.send({ message: "Cancellation is finished" })
 
       // set all the ticket status to canceled
-      const operations = tickets.map((ticket) => ({
-        updateOne: {
-          filter: { id: ticket.id },
-          update: { $set: { status: FlightStatus.Canceled } }
-        }
+      await Promise.all(tickets.map(ticket => {
+        ticket.set({ status: FlightStatus.Canceled })
+        return ticket.save({ session })
       }))
-      await Ticket.bulkWrite(operations, { session })
 
       // save the events to outbox
       const outboxEvents = tickets.map((ticket) => {
