@@ -1,4 +1,4 @@
-import { NotFoundError, requireAuth, UnauthorizedError, BadRequestError, OrderStatus } from "@mint1312-flight-booking/common"
+import { NotFoundError, requireAuth, UnauthorizedError, BadRequestError, OrderStatus, UserRole } from "@mint1312-flight-booking/common"
 import express, { Request, Response } from "express"
 import { Order } from "../models/order"
 import mongoose from "mongoose"
@@ -17,7 +17,7 @@ router.delete(
     if (!order)
       throw new NotFoundError()
 
-    if (order.userId !== req.currentUser!.id)
+    if (req.currentUser?.role === UserRole.Customer && order.userId !== req.currentUser!.id)
       throw new UnauthorizedError()
 
     if (order.status === OrderStatus.Canceled)
