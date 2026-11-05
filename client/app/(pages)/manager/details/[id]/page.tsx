@@ -9,6 +9,7 @@ import { Flight } from "@/app/types/flight";
 import FlightInfo from "@/app/(pages)/(customer)/details/[id]/components/FlightInfo";
 import SeatsMatrix from "./components/SeatsMatrix";
 import TicketInfo from "./components/TicketInfo";
+import CancelFlightWarningBox from "./components/CancelFlightWarningBox";
 import { Ticket } from "@/app/types/ticket";
 import { apiFetch } from "@/app/utils/api-client";
 
@@ -25,6 +26,7 @@ export default function FlightDetailsPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCanceling, setIsCanceling] = useState(false);
+  const [showCancelWarning, setShowCancelWarning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // load the flight details
@@ -56,6 +58,7 @@ export default function FlightDetailsPage() {
       })
 
       toast.success("Flight canceled successfully!")
+      setShowCancelWarning(false)
       router.push("/manager")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to cancel flight")
@@ -123,7 +126,7 @@ export default function FlightDetailsPage() {
               </Link>
               <button
                 type="button"
-                onClick={handleCancelFlight}
+                onClick={() => setShowCancelWarning(true)}
                 disabled={isCanceling || details.flight.status === "canceled"}
                 className="w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
@@ -133,6 +136,13 @@ export default function FlightDetailsPage() {
           </div>
         </div>
       </div>
+
+      <CancelFlightWarningBox
+        isOpen={showCancelWarning}
+        onClose={() => setShowCancelWarning(false)}
+        onConfirm={handleCancelFlight}
+        isLoading={isCanceling}
+      />
     </div>
   );
 }
