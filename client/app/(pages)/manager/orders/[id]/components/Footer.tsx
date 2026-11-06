@@ -54,6 +54,15 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
       <>
         <footer className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h4 className="text-base font-bold text-slate-900">
+                Need to cancel this booking?
+              </h4>
+              <p className="mt-1 text-sm text-slate-500">
+                You can request a refund for this ticket.
+              </p>
+            </div>
+
             <button
               type="button"
               onClick={() => setIsWarningBoxOpen(true)}
@@ -82,21 +91,6 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
           isLoading={isRefunding}
         />
       </>
-    );
-  }
-
-  if (status === "awaiting-refund") {
-    return (
-      <footer className="rounded-2xl border border-purple-200 bg-purple-50/70 p-6 sm:p-8 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
-            <FaUndoAlt className="text-base" />
-          </div>
-          <p className="mt-0.5 text-xs text-purple-700">
-            Refund request is under processing.
-          </p>
-        </div>
-      </footer>
     );
   }
 
