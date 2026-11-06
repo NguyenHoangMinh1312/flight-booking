@@ -40,7 +40,7 @@ export default function RefundWarningBox({
         </div>
 
         <p className="mt-4 text-sm text-slate-600">
-          A 5,000 VND penalty fee will be charged if you proceed with this refund request.
+          A penalty fee will be charged if you proceed with this refund request.
         </p>
 
         {/* Refund reason selection */}
