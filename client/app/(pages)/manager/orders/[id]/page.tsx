@@ -8,10 +8,12 @@ import FlightInfo from "@/app/(pages)/(customer)/orders/[id]/components/FlightIn
 import TicketInfo from "@/app/(pages)/(customer)/orders/[id]/components/TicketInfo";
 import OrderInfo from "@/app/(pages)/(customer)/orders/[id]/components/OrderInfo";
 import CustomerInfo from "./components/CustomerInfo";
+import Footer from "./components/Footer";
 import { Order } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
 import { User } from "@/app/types/user";
 import { apiFetch } from "@/app/utils/api-client";
+
 
 export default function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -76,6 +78,16 @@ export default function OrderDetailsPage() {
     fetchFlightAndCustomer()
 
   }, [order])
+
+  const handleRefundSuccess = () => {
+    // Update local order status immediately to awaiting refund
+    if (order) {
+      setOrder({
+        ...order,
+        status: "awaiting-refund",
+      });
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 py-10">
@@ -148,6 +160,12 @@ export default function OrderDetailsPage() {
 
             {/* 4. Customer Information */}
             <CustomerInfo customer={customer} userId={order.userId} />
+
+            {/* 4. Footer */}
+            <Footer
+              order={order}
+              onRefundSuccess={handleRefundSuccess}
+            />
           </div>
         )}
       </div>

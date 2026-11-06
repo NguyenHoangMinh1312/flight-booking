@@ -3,13 +3,15 @@ import { OutboxDoc } from "../models/outbox";
 import { stripe } from "../stripe";
 import { RefundCompletePublisher } from "../events/publishers/refund-complete-publisher";
 import { RefundFailedPublisher } from "../events/publishers/refund-failed-publisher";
+import { RefundReason } from "@mint1312-flight-booking/common";
 
-const PENALTY_FEE = 5000  // keep 5000 as penalty refund fee 
+const PENALTY_PERCENTILE = 0.01
 
 interface Payload {
   orderId: string,
   stripeId: string,
-  price: number
+  price: number,
+  reason: RefundReason
 }
 
 const refundQueue = new Queue<Payload>("payments:refund", {
@@ -20,7 +22,8 @@ const refundQueue = new Queue<Payload>("payments:refund", {
 })
 
 refundQueue.process(async (job) => {
-  const refundAmount = job.data.price - PENALTY_FEE
+  const penaltyFee = job.data.reason === RefundReason.FlightCanceled ? 0 : PENALTY_PERCENTILE * job.data.price
+  const refundAmount = job.data.price - penaltyFee
 
   if (refundAmount <= 0)
     throw new Error(`Refund amount (${refundAmount} VND) must be greater than 0`)
@@ -32,7 +35,8 @@ refundQueue.process(async (job) => {
     metadata: {
       orderId: job.data.orderId,
       originalPrice: job.data.price,
-      penaltyFee: PENALTY_FEE
+      penaltyFee: penaltyFee,
+      reason: job.data.reason
     }
   })
 

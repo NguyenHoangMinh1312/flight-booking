@@ -7,14 +7,15 @@ import { FaUndoAlt, FaRedo, FaCreditCard, FaSpinner } from "react-icons/fa";
 import { Order } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
 import RefundWarningBox from "./RefundWarningBox";
-
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
+import { apiFetch } from "@/app/utils/api-client";
+import { RefundReason } from "@/app/types/order";
 
 type FooterProps = {
   order: Order;
   flight: Flight | null;
   onRefundSuccess?: () => void;
 };
+
 
 export default function Footer({ order, flight, onRefundSuccess }: FooterProps) {
   const router = useRouter();
@@ -23,34 +24,20 @@ export default function Footer({ order, flight, onRefundSuccess }: FooterProps) 
 
   const status = order.status?.toLowerCase();
 
-  const handleRefund = async () => {
+  const handleRefund = async (refundReason: RefundReason) => {
     try {
       setIsRefunding(true);
-      const response = await fetch(`${backendUrl}/api/orders/${order.id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
 
-      const data = await response.json().catch(() => null);
+      const data = await apiFetch<{ message: string }>(
+        `/api/orders/${order.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          body: JSON.stringify({ refundReason })
+        }
+      )
 
-      if (!response.ok) {
-        const message =
-          data &&
-            typeof data === "object" &&
-            "errors" in data &&
-            Array.isArray(data.errors)
-            ? data.errors[0]?.message
-            : data?.message || "Failed to process refund. Please try again.";
-
-        throw new Error(message);
-      }
-
-      toast.success(
-        data?.message || "Your order cancel request is being processed"
-      );
+      toast.success(data.message || "Your order cancel request is being processed");
 
       setIsWarningBoxOpen(false);
 
@@ -59,9 +46,7 @@ export default function Footer({ order, flight, onRefundSuccess }: FooterProps) 
       }
     } catch (err) {
       toast.error(
-        err instanceof Error
-          ? err.message
-          : "We could not process your refund request."
+        err instanceof Error ? err.message : "We could not process your refund request."
       );
     } finally {
       setIsRefunding(false);

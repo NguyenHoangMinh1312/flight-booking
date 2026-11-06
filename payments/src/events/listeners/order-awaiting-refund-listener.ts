@@ -45,7 +45,8 @@ export class OrderAwaitingRefundListener extends Listener<OrderAwaitingRefundEve
       refundQueue.add({
         orderId: order.id,
         stripeId: payment.stripeId,
-        price: order.price
+        price: order.price,
+        reason: data.reason
       })
 
       // commit db transaction

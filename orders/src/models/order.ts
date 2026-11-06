@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { OrderStatus } from "@mint1312-flight-booking/common"
+import { OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
 import { TicketDoc } from "./ticket"
 
 // interface that describes the properties to create a new order
@@ -7,7 +7,8 @@ interface OrderAttrs {
   userId: string,
   status: OrderStatus,
   expiresAt: Date,
-  ticket: TicketDoc
+  ticket: TicketDoc,
+  refundReason?: RefundReason
 }
 
 // interface that describes the properties that a Order model has
@@ -23,7 +24,8 @@ export interface OrderDoc extends mongoose.Document {
   status: OrderStatus,
   createdAt: Date,
   expiresAt: Date,
-  ticket: TicketDoc
+  ticket: TicketDoc,
+  refundReason?: RefundReason
 }
 
 // User model schema
@@ -45,6 +47,10 @@ const orderSchema = new mongoose.Schema(
     ticket: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Ticket"
+    },
+    refundReason: {
+      type: String,
+      enum: Object.values(RefundReason)
     }
   },
   {
@@ -60,7 +66,8 @@ const orderSchema = new mongoose.Schema(
           status: ret.status,
           expiresAt: ret.expiresAt,
           createdAt: ret.createdAt,
-          ticket: ret.ticket
+          ticket: ret.ticket,
+          refundReason: ret.refundReason
         }
       }
     }

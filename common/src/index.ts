@@ -38,3 +38,4 @@ export * from "./events/payments/refund-failed-event"
 
 export * from "./types/order-status"
 export * from "./types/flight-status"
+export * from "./types/refund-reason"
