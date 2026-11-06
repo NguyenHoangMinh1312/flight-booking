@@ -1,6 +1,6 @@
 import { TicketCanceledListener } from "../ticket-canceled-listener"
 import { natsWrapper } from "../../../nats-wrapper"
-import { FlightStatus, TicketCanceledEvent, OrderStatus, Subjects } from "@mint1312-flight-booking/common"
+import { FlightStatus, TicketCanceledEvent, OrderStatus, Subjects, RefundReason } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
 import { JsMsg } from "nats"
 import { Ticket } from "../../../models/ticket"
@@ -190,6 +190,7 @@ it(
     const updatedOrder = await Order.findById(order.id)
     expect(updatedOrder).toBeDefined()
     expect(updatedOrder!.status).toEqual(OrderStatus.AwaitingRefund)
+    expect(updatedOrder!.refundReason).toEqual(RefundReason.FlightCanceled)
 
     // check if the event is saved to outbox
     const outboxEvents = await Outbox.find({})

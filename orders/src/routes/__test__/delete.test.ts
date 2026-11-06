@@ -2,7 +2,7 @@ import request from "supertest"
 import { app } from "../../app"
 import { Ticket } from "../../models/ticket"
 import { Order } from "../../models/order"
-import { OrderStatus, FlightStatus } from "@mint1312-flight-booking/common"
+import { OrderStatus, FlightStatus, RefundReason } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
 import { Outbox } from "../../models/outbox"
 
@@ -25,6 +25,20 @@ const buildTicket = async () => {
 }
 
 it(
+  "Returns 400 if a user sends invalid refund reason",
+  async () => {
+    // Make request to delete order
+    await request(app)
+      .delete(`/api/orders/123`)
+      .set("Cookie", global.signin())
+      .send({
+        refundReason: RefundReason.FlightCanceled
+      })
+      .expect(400)
+  }
+)
+
+it(
   "Returns 401 if a user tries to delete order of another user",
   async () => {
     // Create a ticket
@@ -43,6 +57,9 @@ it(
     await request(app)
       .delete(`/api/orders/${order.body.id}`)
       .set("Cookie", global.signin())
+      .send({
+        refundReason: RefundReason.Emergency
+      })
       .expect(401)
   }
 )
@@ -67,6 +84,9 @@ it(
     await request(app)
       .delete(`/api/orders/${order.body.id}`)
       .set("Cookie", user)
+      .send({
+        refundReason: RefundReason.Emergency
+      })
       .expect(200)
 
     // get the order from MongoDB
@@ -106,12 +126,16 @@ it(
     await request(app)
       .delete(`/api/orders/${order?.id}`)
       .set("Cookie", user)
+      .send({
+        refundReason: RefundReason.Emergency
+      })
       .expect(200)
 
     // get the order from MongoDB
     const updatedOrder = await Order.findById(order?.id)
     expect(updatedOrder).toBeDefined()
     expect(updatedOrder!.status).toEqual(OrderStatus.AwaitingRefund)
+    expect(updatedOrder!.refundReason).toEqual(RefundReason.Emergency)
 
     // expect the event to be saved to outbox
     const outboxEvents = await Outbox.find({})
@@ -145,6 +169,9 @@ it(
     await request(app)
       .delete(`/api/orders/${order?.id}`)
       .set("Cookie", user)
+      .send({
+        refundReason: RefundReason.Emergency
+      })
       .expect(400)
   }
 )

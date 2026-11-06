@@ -3,7 +3,7 @@ import { OrderAwaitingRefundListener } from "../order-awaiting-refund-listener"
 import mongoose from "mongoose"
 import { JsMsg } from "nats"
 import { Order } from "../../../models/order"
-import { OrderAwaitingRefundEvent, OrderStatus } from "@mint1312-flight-booking/common"
+import { OrderAwaitingRefundEvent, OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
 import { Payment } from "../../../models/payment"
 import { refundQueue } from "../../../queues/refund-queue"
 
@@ -38,7 +38,8 @@ it(
       version: order.version + 1,
       ticket: {
         id: new mongoose.Types.ObjectId().toHexString(),
-      }
+      },
+      reason: RefundReason.FlightCanceled
     }
 
     // fake the ack function

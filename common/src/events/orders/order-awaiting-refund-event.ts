@@ -1,3 +1,4 @@
+import { RefundReason } from "../../types/refund-reason"
 import { Subjects } from "../subjects"
 
 // couple the data to be sent to order:canceled channel
@@ -8,6 +9,7 @@ export interface OrderAwaitingRefundEvent {
     version: number,
     ticket: {
       id: string,
-    }
+    },
+    reason: RefundReason
   }
 }

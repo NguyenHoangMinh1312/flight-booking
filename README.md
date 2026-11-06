@@ -9,7 +9,7 @@ This guide explains how to deploy the Flight Booking application locally using *
 Create a local Kubernetes cluster using the provided configuration:
 
 ```bash
-kind create cluster --name kind-flight-booking --config infra/kind/kind-config.yaml
+kind create cluster --name flight-booking --config infra/kind/kind-config.yaml
 ```
 
 ### Step 2: Install the Ingress Controller

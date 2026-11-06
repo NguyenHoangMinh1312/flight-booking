@@ -1,5 +1,5 @@
 import { JsMsg } from "nats"
-import { Subjects, Listener, TicketCanceledEvent, FlightStatus, OrderStatus } from "@mint1312-flight-booking/common"
+import { Subjects, Listener, TicketCanceledEvent, FlightStatus, OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
 import { Ticket } from "../../models/ticket"
 import { Order } from "../../models/order"
 import { queueGroupName } from "./queue-group-name"
@@ -69,7 +69,10 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
 
         // if the order is paid
         if ([OrderStatus.Complete, OrderStatus.RefundFailed].includes(order.status)) {
-          order.set({ status: OrderStatus.AwaitingRefund })
+          order.set({
+            status: OrderStatus.AwaitingRefund,
+            refundReason: RefundReason.FlightCanceled
+          })
           await order.save({ session })
 
           // save the event to outbox
@@ -79,7 +82,8 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
               version: order.version,
               ticket: {
                 id: ticket.id
-              }
+              },
+              reason: RefundReason.FlightCanceled
             })
           )
           continue

@@ -31,8 +31,6 @@ function getOrderStatusConfig(status: string) {
         icon: <FaClock className="text-amber-500" />,
       };
     case "awaiting-refund":
-    case "awating-refund":
-    case "awaiting_refund":
       return {
         label: "Awaiting Refund",
         description: "Your refund request is being processed.",
@@ -40,7 +38,6 @@ function getOrderStatusConfig(status: string) {
         icon: <FaUndoAlt className="text-purple-500" />,
       };
     case "canceled":
-    case "cancelled":
       return {
         label: "Canceled",
         description: "This order has been canceled.",

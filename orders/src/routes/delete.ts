@@ -1,9 +1,10 @@
-import { NotFoundError, requireAuth, UnauthorizedError, BadRequestError, OrderStatus } from "@mint1312-flight-booking/common"
+import { NotFoundError, requireAuth, UnauthorizedError, BadRequestError, OrderStatus, UserRole, validateRequest, RefundReason } from "@mint1312-flight-booking/common"
 import express, { Request, Response } from "express"
 import { Order } from "../models/order"
 import mongoose from "mongoose"
 import { OrderCanceledPublisher } from "../events/publishers/order-canceled-publisher"
 import { OrderAwaitingRefundPublisher } from "../events/publishers/order-awaiting-refund-publisher"
+import { body } from "express-validator"
 
 const router = express.Router()
 const LATEST_ORDER_WINDOW = 3 * 60 * 60 * 1000  // user can only refund a paid order in latest 3 hour before the departure time
@@ -11,13 +12,27 @@ const LATEST_ORDER_WINDOW = 3 * 60 * 60 * 1000  // user can only refund a paid o
 router.delete(
   "/api/orders/:orderId",
   requireAuth,
+  [
+    body("refundReason")
+      .isString()
+      .isIn(Object.values(RefundReason))
+      .withMessage("refundReason is invalid")
+  ],
+  validateRequest,
   async (req: Request, res: Response) => {
+    // get the refund reason
+    const { refundReason } = req.body
+
+    // customer cannot send FlightCanceled reason
+    if (req.currentUser?.role === UserRole.Customer && refundReason === RefundReason.FlightCanceled)
+      throw new BadRequestError("Invalid refund reason")
+
     // find the order
     const order = await Order.findById(req.params.orderId).populate("ticket")
     if (!order)
       throw new NotFoundError()
 
-    if (order.userId !== req.currentUser!.id)
+    if (req.currentUser?.role === UserRole.Customer && order.userId !== req.currentUser!.id)
       throw new UnauthorizedError()
 
     if (order.status === OrderStatus.Canceled)
@@ -57,7 +72,10 @@ router.delete(
 
       // if the order is paid
       else if ([OrderStatus.Complete, OrderStatus.RefundFailed].includes(order.status)) {
-        order.set({ status: OrderStatus.AwaitingRefund })
+        order.set({
+          status: OrderStatus.AwaitingRefund,
+          refundReason
+        })
         await order.save({ session })
 
         // save the event to outbox
@@ -66,7 +84,8 @@ router.delete(
           version: order.version,
           ticket: {
             id: order.ticket.id
-          }
+          },
+          reason: refundReason
         })
         await outboxEvent.save({ session })
       }
