@@ -1,13 +1,7 @@
-import express, { Request, Response } from "express"
+import express from "express"
 import { body } from "express-validator"
-import { BadRequestError, requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
-import { Flight } from "../models/flight"
-import { Ticket } from "../models/ticket"
-import { TicketDoc } from "../models/ticket"
-import mongoose from "mongoose"
-import { TicketCreatedPublisher } from "../events/publishers/ticket-created-publisher"
-import { Airport } from "../models/airport"
-import { Outbox } from "../models/outbox"
+import { requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
+import { createFlightController } from "../controllers/create-flight-controller"
 
 const router = express.Router()
 
@@ -81,126 +75,7 @@ router.post(
       .withMessage("Economy-class price must be positive")
   ],
   validateRequest,
-  async (req: Request, res: Response) => {
-    const {
-      flightNumber,
-      description,
-      departure,
-      arrival,
-      seatConfig,
-      priceConfig
-    } = req.body
-
-    // validate the airport code
-    const departureAirport = await Airport.findOne({ code: departure.airport })
-    if (!departureAirport)
-      throw new BadRequestError("Invalid departure airport code")
-
-    const arrivalAirport = await Airport.findOne({ code: arrival.airport })
-    if (!arrivalAirport)
-      throw new BadRequestError("Invalid arrival airport code")
-
-    // validate the departure and arrival time
-    if (departure.date >= arrival.date)
-      throw new BadRequestError("Departure date must be earlier than arrival date")
-
-    // validate the seat config
-    for (const classConfig of seatConfig.classes) {
-      if (classConfig.fromRow > classConfig.toRow) {
-        throw new BadRequestError(
-          `Starting row (${classConfig.fromRow}) cannot be greater than ending row (${classConfig.toRow}) for ${classConfig.class} class`
-        )
-      }
-
-      if (classConfig.toRow > seatConfig.rows) {
-        throw new BadRequestError(
-          `Ending row (${classConfig.toRow}) for ${classConfig.class} class exceeds total rows (${seatConfig.rows})`
-        )
-      }
-    }
-
-    for (let i = 0; i < seatConfig.classes.length; i++) {
-      for (let j = i + 1; j < seatConfig.classes.length; j++) {
-        const a = seatConfig.classes[i]
-        const b = seatConfig.classes[j]
-        if (a.fromRow <= b.toRow && b.fromRow <= a.toRow) {
-          throw new BadRequestError(
-            `Seat class row ranges overlap between ${a.class} (rows ${a.fromRow}-${a.toRow}) and ${b.class} (rows ${b.fromRow}-${b.toRow})`
-          )
-        }
-      }
-    }
-
-    // db transaction
-    const session = await mongoose.startSession()
-
-    try {
-      session.startTransaction();
-
-      // Save the flight 
-      const flight = Flight.build({
-        flightNumber,
-        description,
-        departure,
-        arrival,
-        seatConfig,
-        priceConfig
-      })
-      await flight.save({ session })
-
-      // Save the tickets
-      const tickets: TicketDoc[] = []
-
-      for (let r = 1; r <= seatConfig.rows; r++) {
-        const classConfig = seatConfig.classes.find(
-          ({ fromRow, toRow }: { fromRow: number; toRow: number }) => {
-            return r >= fromRow && r <= toRow
-          }
-        )
-        if (!classConfig)
-          continue
-
-        const price = priceConfig[classConfig.class]
-
-        for (let c = 1; c <= seatConfig.columns; c++) {
-          const ticket = Ticket.build({
-            flight,
-            price,
-            class: classConfig.class,
-            status: flight.status,
-            seat: { row: r, column: c }
-          })
-          tickets.push(ticket)
-        }
-      }
-      await Ticket.insertMany(tickets, { session })
-
-      // save events to outbox
-      const outboxEvents = tickets.map((ticket) => {
-        return TicketCreatedPublisher.buildOutboxEvent({
-          id: ticket.id,
-          version: ticket.version,
-          price: ticket.price,
-          class: ticket.class,
-          status: ticket.status,
-          seat: ticket.seat,
-          departureDate: ticket.flight.departure.date
-        })
-      })
-      await Outbox.insertMany(outboxEvents, { session })
-
-      // commit db transaction
-      await session.commitTransaction()
-
-      // response
-      res.status(201).send(flight)
-    } catch (err) {
-      await session.abortTransaction();
-      throw new Error("Something went wrong. Please try again")
-    } finally {
-      await session.endSession()
-    }
-  }
+  createFlightController
 )
 
 export { router as createFlightRouter }
