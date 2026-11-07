@@ -1,6 +1,6 @@
-import express, { Request, Response } from "express"
-import { currentUser, NotFoundError, requireAuth, requireManager } from "@mint1312-flight-booking/common"
-import { User } from "../models/user"
+import express from "express"
+import { currentUser, requireAuth, requireManager } from "@mint1312-flight-booking/common"
+import { showController } from "../controllers/show-controller"
 
 const router = express.Router()
 
@@ -9,18 +9,7 @@ router.get(
   currentUser,
   requireAuth,
   requireManager,
-  async (req: Request, res: Response) => {
-    // find the user 
-    const user = await User.findById(req.params.id)
-
-    if (!user || !user.isVerified)
-      throw new NotFoundError()
-
-    res.send({
-      id: user.id,
-      email: user.email
-    })
-  }
+  showController
 )
 
 export { router as showUserRouter }
