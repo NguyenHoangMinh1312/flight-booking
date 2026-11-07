@@ -1,30 +1,40 @@
 import Queue from "bull"
-import { emailClient } from "../email-client"
+import { EmailMessage, IEmailService } from "../services/send-email-interface"
+import { ResendEmailService } from "../services/resend-email-service"
 
-interface Payload {
-  receiver: string,
-  subject: string,
-  content: string
+export class EmailSendQueue {
+  private emailService: IEmailService
+  private queue: Queue.Queue<EmailMessage>
+
+  constructor(emailService: IEmailService, queue: Queue.Queue) {
+    this.emailService = emailService
+    this.queue = queue
+    this.queue.process(async (job) => { await this.emailService.send(job.data) })
+  }
+
+  public async add(message: EmailMessage) {
+    await this.queue.add(message, {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000
+      }
+    })
+  }
 }
 
-const emailSendQueue = new Queue<Payload>("email:send", {
+const resendEmailService = new ResendEmailService(
+  process.env.RESEND_API_KEY || " ",
+  'Flight Booking <noreply@flight-booking.shop>'
+)
+
+const queue = new Queue<EmailMessage>("email:send", {
   redis: {
     host: process.env.REDIS_HOST,
     port: 6379
   }
 })
 
-emailSendQueue.process(async (job) => {
-  const { data, error } = await emailClient.emails.send({
-    from: 'Flight Booking <noreply@flight-booking.shop>',
-    to: [job.data.receiver],
-    subject: job.data.subject,
-    html: job.data.content
-  })
-
-  if (error) {
-    return console.error({ error });
-  }
-})
+const emailSendQueue = new EmailSendQueue(resendEmailService, queue)
 
 export { emailSendQueue }
