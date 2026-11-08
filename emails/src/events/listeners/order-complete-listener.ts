@@ -1,7 +1,7 @@
 import { Listener, OrderCompleteEvent, Subjects } from "@mint1312-flight-booking/common"
 import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
-import { emailSendQueue } from "../../queues/email-send-queue"
+import { emailSendWorker } from "../../workers/email-send-worker"
 import { User } from "../../models/user"
 
 export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
@@ -15,7 +15,7 @@ export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
       throw new Error("User not found")
 
 
-    await emailSendQueue.add({
+    await emailSendWorker.add({
       receiver: user.email,
       subject: "Thank you for your order!",
       content: `

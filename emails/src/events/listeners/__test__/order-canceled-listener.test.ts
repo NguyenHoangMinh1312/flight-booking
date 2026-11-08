@@ -4,7 +4,7 @@ import { natsWrapper } from "../../../nats-wrapper"
 import { OrderCanceledListener } from "../order-canceled-listener"
 import mongoose from "mongoose"
 import { User } from "../../../models/user"
-import { emailSendQueue } from "../../../queues/email-send-queue"
+import { emailSendWorker } from "../../../workers/email-send-worker"
 
 it(
   "Checks if the listener handles the event order:canceled successfully",
@@ -38,8 +38,8 @@ it(
     await listener.onMessage(data, msg)
 
     // checks if the request sent to queue
-    expect(emailSendQueue.add).toHaveBeenCalledTimes(1)
-    expect(emailSendQueue.add).toHaveBeenCalledWith(
+    expect(emailSendWorker.add).toHaveBeenCalledTimes(1)
+    expect(emailSendWorker.add).toHaveBeenCalledWith(
       expect.objectContaining({
         receiver: user.email,
         subject: `Your order ${data.id} has been canceled.`

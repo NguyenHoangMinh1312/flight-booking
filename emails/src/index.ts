@@ -3,7 +3,7 @@ import { natsWrapper } from "./nats-wrapper"
 import { UserCreatedListener } from "./events/listeners/user-created-listener"
 import { OrderCompleteListener } from "./events/listeners/order-complete-listener"
 import { OrderCanceledListener } from "./events/listeners/order-canceled-listener"
-import "./queues/email-send-queue"
+import "./workers/email-send-worker"
 import { UserOtpRequestedListener } from "./events/listeners/user-otp-requested-listener"
 
 const start = async () => {
@@ -15,12 +15,6 @@ const start = async () => {
 
   if (!process.env.REDIS_HOST)
     throw new Error("No REDIS_HOST found!")
-
-  // if (!process.env.GMAIL_USER)
-  //   throw new Error("No GMAIL_USER found!")
-
-  // if (!process.env.GOOGLE_APP_PASSWORD)
-  //   throw new Error("No GOOGLE_APP_PASSWORD found!")
 
   if (!process.env.RESEND_API_KEY)
     throw new Error("No RESEND_API_KEY found!")

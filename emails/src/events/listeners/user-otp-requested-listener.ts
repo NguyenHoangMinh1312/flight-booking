@@ -1,7 +1,7 @@
 import { Listener, UserOtpRequestedEvent, Subjects } from "@mint1312-flight-booking/common"
 import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
-import { emailSendQueue } from "../../queues/email-send-queue"
+import { emailSendWorker } from "../../workers/email-send-worker"
 
 export class UserOtpRequestedListener extends Listener<UserOtpRequestedEvent> {
   readonly subject = Subjects.UserOtpRequested
@@ -9,7 +9,7 @@ export class UserOtpRequestedListener extends Listener<UserOtpRequestedEvent> {
 
   async onMessage(data: UserOtpRequestedEvent["data"], msg: JsMsg) {
 
-    await emailSendQueue.add({
+    await emailSendWorker.add({
       receiver: data.email,
       subject: "Your Flight Booking Verification Code",
       content: `

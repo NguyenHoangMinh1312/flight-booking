@@ -4,7 +4,7 @@ import { jest } from "@jest/globals"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 
 jest.mock("../nats-wrapper")
-jest.mock("../queues/email-send-queue")
+jest.mock("../workers/email-send-worker")
 
 let mongo: MongoMemoryReplSet
 

@@ -1,7 +1,7 @@
 import { Listener, OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common"
 import { JsMsg } from "nats"
 import { queueGroupName } from "./queue-group-name"
-import { emailSendQueue } from "../../queues/email-send-queue"
+import { emailSendWorker } from "../../workers/email-send-worker"
 import { User } from "../../models/user"
 
 export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
@@ -14,7 +14,7 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
     if (!user)
       throw new Error("User not found")
 
-    await emailSendQueue.add({
+    await emailSendWorker.add({
       receiver: user.email,
       subject: `Your order ${data.id} has been canceled.`,
       content: `

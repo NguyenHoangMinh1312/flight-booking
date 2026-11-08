@@ -2,7 +2,7 @@ import Queue from "bull"
 import { EmailMessage, IEmailService } from "../services/send-email-interface"
 import { ResendEmailService } from "../services/resend-email-service"
 
-export class EmailSendQueue {
+export class EmailSendWorker {
   private emailService: IEmailService
   private queue: Queue.Queue<EmailMessage>
 
@@ -35,6 +35,4 @@ const queue = new Queue<EmailMessage>("email:send", {
   }
 })
 
-const emailSendQueue = new EmailSendQueue(resendEmailService, queue)
-
-export { emailSendQueue }
+export const emailSendWorker = new EmailSendWorker(resendEmailService, queue)

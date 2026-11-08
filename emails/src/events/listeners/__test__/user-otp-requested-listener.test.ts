@@ -2,7 +2,7 @@ import { UserOtpRequestedEvent } from "@mint1312-flight-booking/common"
 import { JsMsg } from "nats"
 import { natsWrapper } from "../../../nats-wrapper"
 import { UserOtpRequestedListener } from "../user-otp-requested-listener"
-import { emailSendQueue } from "../../../queues/email-send-queue"
+import { emailSendWorker } from "../../../workers/email-send-worker"
 
 it(
   "Checks if the listener handles the event user:otp-requested successfully",
@@ -25,8 +25,8 @@ it(
     await listener.onMessage(data, msg)
 
     // checks if the request is sent to queue
-    expect(emailSendQueue.add).toHaveBeenCalledTimes(1)
-    expect(emailSendQueue.add).toHaveBeenCalledWith(
+    expect(emailSendWorker.add).toHaveBeenCalledTimes(1)
+    expect(emailSendWorker.add).toHaveBeenCalledWith(
       expect.objectContaining({
         receiver: data.email,
         content: expect.stringContaining(data.otp)
