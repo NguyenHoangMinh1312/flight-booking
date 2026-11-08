@@ -7,6 +7,5 @@ export interface PaymentCreatedEvent {
     id: string,
     version: number
     orderId: string,
-    stripeId: string,
   }
 }
