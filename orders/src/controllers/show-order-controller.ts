@@ -2,16 +2,17 @@ import { BadRequestError } from "@mint1312-flight-booking/common"
 import { Request, Response } from "express"
 import { showOrder } from "../services/show-order-service"
 
+type ReqParams = {
+  orderId: string
+}
+
 export const showOrderController = async (
-  req: Request,
+  req: Request<ReqParams>,
   res: Response
 ) => {
   const orderId = req.params.orderId
   const userId = req.currentUser?.id
   const userRole = req.currentUser?.role
-
-  if (typeof orderId !== "string")
-    throw new BadRequestError("Invalid order ID")
 
   if (!userId)
     throw new BadRequestError("User ID not provided")

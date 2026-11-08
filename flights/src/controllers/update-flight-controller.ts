@@ -2,22 +2,25 @@ import { Request, Response } from "express"
 import { updateFlight } from "../services/update-flight-service"
 import { FlightDoc } from "../models/flight"
 
-type updateFlightArgs = {
-  flightId: string,
+type ReqParams = {
+  id: string
+}
+
+type ReqBody = {
   description: string,
   priceConfig: FlightDoc["priceConfig"]
 }
 
 export const updateFlightController = async (
-  req: Request,
+  req: Request<ReqParams, any, ReqBody>,
   res: Response
 ) => {
-  const args = {
-    flightId: req.params.id,
-    ...req.body
-  } as updateFlightArgs
 
-  const flight = await updateFlight(args.flightId, args.description, args.priceConfig)
+  const flight = await updateFlight(
+    req.params.id,
+    req.body.description,
+    req.body.priceConfig
+  )
 
   res.send(flight)
 }

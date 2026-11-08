@@ -2,8 +2,16 @@ import { BadRequestError, RefundReason, UserRole } from "@mint1312-flight-bookin
 import { Request, Response } from "express";
 import { cancelOrder } from "../services/cancel-order-service";
 
+type ReqBody = {
+  refundReason: RefundReason
+}
+
+type ReqParams = {
+  orderId: string
+}
+
 export const cancelOrderController = async (
-  req: Request,
+  req: Request<ReqParams, any, ReqBody>,
   res: Response
 ) => {
   // input validation
@@ -11,12 +19,6 @@ export const cancelOrderController = async (
   const orderId = req.params.orderId
   const userRole = req.currentUser?.role
   const userId = req.currentUser?.id
-
-  if (!Object.values(RefundReason).includes(refundReason))
-    throw new BadRequestError("Invalid refund reason")
-
-  if (typeof orderId !== "string")
-    throw new BadRequestError("Invalid order ID")
 
   if (!userRole)
     throw new BadRequestError("User role is undefined")

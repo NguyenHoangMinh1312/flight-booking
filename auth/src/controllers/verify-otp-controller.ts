@@ -1,18 +1,16 @@
 import { Request, Response } from "express"
 import { verifyOtp } from "../services/verify-otp-service"
-import { BadRequestError } from "@mint1312-flight-booking/common"
+
+type ReqBody = {
+  email: string,
+  otp: string,
+}
 
 export const verifyOtpController = async (
-  req: Request,
+  req: Request<any, any, ReqBody>,
   res: Response
 ) => {
   const { email, otp } = req.body
-
-  if (typeof email !== "string")
-    throw new BadRequestError("Invalid email")
-
-  if (typeof otp !== "string")
-    throw new BadRequestError("Invalid otp")
 
   const { userJWT, user } = await verifyOtp(email, otp)
 

@@ -1,12 +1,15 @@
 import { Request, Response } from "express"
 import { resendOtp } from "../services/resend-otp-service"
-import { BadRequestError } from "@mint1312-flight-booking/common"
 
-export const resendOtpController = async (req: Request, res: Response) => {
-  const email = req.body
+type ReqBody = {
+  email: string
+}
 
-  if (typeof email !== "string")
-    throw new BadRequestError("Invalid email")
+export const resendOtpController = async (
+  req: Request<any, any, ReqBody>,
+  res: Response
+) => {
+  const { email } = req.body
 
   await resendOtp(email)
 

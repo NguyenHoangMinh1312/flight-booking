@@ -3,7 +3,7 @@ import { FlightDoc } from "../models/flight";
 import { createFlight } from "../services/create-flight-service";
 import { BadRequestError } from "@mint1312-flight-booking/common";
 
-type createFlightArgs = {
+type ReqBody = {
   flightNumber: string,
   description: string,
   departure: FlightDoc["departure"],
@@ -13,7 +13,7 @@ type createFlightArgs = {
 }
 
 export const createFlightController = async (
-  req: Request,
+  req: Request<any, any, ReqBody>,
   res: Response
 ) => {
   const {
@@ -23,7 +23,7 @@ export const createFlightController = async (
     arrival,
     seatConfig,
     priceConfig
-  } = req.body as createFlightArgs
+  } = req.body
 
   // input validation
   if (departure.date >= arrival.date)

@@ -3,8 +3,12 @@ import { Ticket } from "../models/ticket"
 import { NotFoundError } from "@mint1312-flight-booking/common"
 import { Flight } from "../models/flight"
 
+type ReqParams = {
+  id: string
+}
+
 export const showFlightController = async (
-  req: Request,
+  req: Request<ReqParams>,
   res: Response
 ) => {
   // find the flight
