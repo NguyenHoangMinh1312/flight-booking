@@ -6,13 +6,13 @@ import {
   OrderRefundFailedEvent,
   Subjects
 } from "@mint1312-flight-booking/common"
-import { Outbox } from "../../models/outbox"
-import { OrderAwaitingRefundPublisher } from "./order-awaiting-refund-publisher"
-import { OrderCanceledPublisher } from "./order-canceled-publisher"
-import { OrderCompletePublisher } from "./order-complete-publisher"
-import { OrderCreatedPublisher } from "./order-created-publisher"
-import { OrderRefundFailedPublisher } from "./order-refund-failed-publisher"
-import { natsWrapper } from "../../nats-wrapper"
+import { Outbox } from "../models/outbox"
+import { OrderAwaitingRefundPublisher } from "../events/publishers/order-awaiting-refund-publisher"
+import { OrderCanceledPublisher } from "../events/publishers/order-canceled-publisher"
+import { OrderCompletePublisher } from "../events/publishers/order-complete-publisher"
+import { OrderCreatedPublisher } from "../events/publishers/order-created-publisher"
+import { OrderRefundFailedPublisher } from "../events/publishers/order-refund-failed-publisher"
+import { natsWrapper } from "../nats-wrapper"
 
 export const outboxPublisherWorker = (pollIntervalMs = 1000) => {
   let isProcessing = false

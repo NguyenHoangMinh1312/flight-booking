@@ -10,7 +10,7 @@ declare global {
 }
 
 jest.mock("../nats-wrapper")
-jest.mock("../queues/expiration-queue")
+jest.mock("../workers/order-expiration-worker")
 
 let mongo: MongoMemoryReplSet
 

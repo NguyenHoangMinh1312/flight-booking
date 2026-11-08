@@ -2,7 +2,7 @@ import { NotFoundError, BadRequestError, FlightStatus, OrderStatus } from "@mint
 import { Ticket } from "../models/ticket"
 import { Order } from "../models/order"
 import { OrderCreatedPublisher } from "../events/publishers/order-created-publisher"
-import { expirationQueue } from "../queues/expiration-queue"
+import { orderExpirationWorker } from "../workers/order-expiration-worker"
 import mongoose from "mongoose"
 
 const EXPIRATION_WINDOW = 15 * 60    // order payment expires after 15 mins
@@ -62,9 +62,9 @@ export const createOrder = async (
     await outboxEvent.save({ session })
 
     // send the order to expiration queue
-    await expirationQueue.add(
+    await orderExpirationWorker.add(
       { orderId: order.id },
-      { delay: new Date(order.expiresAt).getTime() - new Date().getTime() }
+      new Date(order.expiresAt).getTime() - new Date().getTime()
     )
 
     // commit db transacrion

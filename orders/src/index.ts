@@ -5,8 +5,8 @@ import { TicketCreatedListener } from "./events/listeners/ticket-created-listene
 import { TicketUpdatedListener } from "./events/listeners/ticket-updated-listener"
 import { PaymentCreatedListener } from "./events/listeners/payment-created-listener"
 import { RefundCompleteListener } from "./events/listeners/refund-complete-listener"
-import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
-import "./queues/expiration-queue"
+import { outboxPublisherWorker } from "./workers/outbox-publisher-worker"
+import "./workers/order-expiration-worker"
 import { TicketCanceledListener } from "./events/listeners/ticket-canceled-listener"
 
 const start = async () => {

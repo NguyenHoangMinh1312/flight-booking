@@ -4,7 +4,7 @@ import mongoose from "mongoose"
 import { Ticket } from "../../models/ticket"
 import { Outbox } from "../../models/outbox"
 import { Subjects, FlightStatus } from "@mint1312-flight-booking/common"
-import { expirationQueue } from "../../queues/expiration-queue"
+import { orderExpirationWorker } from "../../workers/order-expiration-worker"
 
 const buildTicket = async (departureDate?: Date) => {
   const ticket = Ticket.build({
@@ -96,7 +96,7 @@ it(
       .expect(201)
 
     // check if the order is sent to expiration queue
-    expect(expirationQueue.add).toHaveBeenCalledTimes(1)
+    expect(orderExpirationWorker.add).toHaveBeenCalledTimes(1)
 
     // check if the ticket id in the response match the ticket
     expect(response.body.ticket.id).toEqual(ticket.id)
