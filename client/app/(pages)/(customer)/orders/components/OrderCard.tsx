@@ -5,6 +5,7 @@ import {
   FaCheckCircle,
   FaChevronRight,
   FaClock,
+  FaPlane,
   FaReceipt,
   FaTimesCircle,
   FaUndoAlt,
@@ -64,11 +65,6 @@ export default function OrderCard({ order }: OrderCardProps) {
   const ticket = order.ticket;
   const departure = formatDateTime(ticket?.departureDate);
 
-  const seatText =
-    ticket?.seat && ticket.seat.row && ticket.seat.column
-      ? `Seat ${ticket.seat.row}${columnLabel(ticket.seat.column)}`
-      : "Seat Unassigned";
-
   return (
     <Link
       href={`/orders/${order.id}`}
@@ -90,11 +86,17 @@ export default function OrderCard({ order }: OrderCardProps) {
             )}
           </div>
 
+          <div className="flex flex-wrap items-center gap-2 text-base font-bold text-slate-900 sm:text-lg">
+            <span>{ticket.departureAirport}</span>
+            <FaPlane className="text-xs text-sky-600 shrink-0" />
+            <span>{ticket.arrivalAirport}</span>
+          </div>
+
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-700">
             {/* Seat Info */}
             <div className="flex items-center gap-2 font-medium text-slate-900">
               <FaChair className="text-sky-600" />
-              <span>{seatText}</span>
+              <span>{`Seat ${ticket.seat.row}${columnLabel(ticket.seat.column)}`}</span>
             </div>
 
             {/* Departure Info */}

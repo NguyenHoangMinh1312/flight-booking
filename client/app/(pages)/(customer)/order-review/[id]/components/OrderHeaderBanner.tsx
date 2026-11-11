@@ -35,7 +35,7 @@ export default function OrderHeaderBanner({
 
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              Order #{order.id.slice(-8)}
+              Order #{order.id}
             </span>
 
             {isComplete ? (

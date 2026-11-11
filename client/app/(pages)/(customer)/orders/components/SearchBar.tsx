@@ -15,8 +15,8 @@ export type SearchFilters = {
 
 type SearchBarProps = {
   onSearch: (filters: SearchFilters) => void;
-  onReset?: () => void;
-  isLoading?: boolean;
+  onReset: () => void;
+  isLoading: boolean;
 };
 
 export default function SearchBar({
@@ -29,7 +29,7 @@ export default function SearchBar({
 
   const hasActiveFilters = Boolean(createdDate || status.trim());
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSearch({
       createdDate,
@@ -40,9 +40,8 @@ export default function SearchBar({
   const handleReset = () => {
     setCreatedDate("");
     setStatus("");
-    if (onReset) {
-      onReset();
-    }
+    onReset();
+
   };
 
   return (

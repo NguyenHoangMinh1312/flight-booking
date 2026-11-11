@@ -12,6 +12,22 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  useEffect(() => {
+    async function fetchInitialFlights() {
+      try {
+        const data = await apiFetch<Flight[]>("/api/flights");
+        setFlights(data);
+
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "We could not load the available flights.")
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchInitialFlights();
+  }, []);
+
   const searchFlights = async (filters?: SearchFilters) => {
     setIsLoading(true);
     setError(null);
@@ -54,37 +70,6 @@ export default function HomePage() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function fetchInitialFlights() {
-      try {
-        const data = await apiFetch<Flight[]>("/api/flights");
-        if (!ignore) {
-          setFlights(data);
-        }
-      } catch (err) {
-        if (!ignore) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "We could not load the available flights."
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    fetchInitialFlights();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   const handleSearch = (filters: SearchFilters) => {
     searchFlights(filters);

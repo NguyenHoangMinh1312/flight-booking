@@ -8,10 +8,12 @@ import FlightInfo from "@/app/(pages)/(customer)/orders/[id]/components/FlightIn
 import TicketInfo from "@/app/(pages)/(customer)/orders/[id]/components/TicketInfo";
 import OrderInfo from "@/app/(pages)/(customer)/orders/[id]/components/OrderInfo";
 import CustomerInfo from "./components/CustomerInfo";
+import PaymentInfo from "@/app/(pages)/(customer)/orders/[id]/components/PaymentInfo";
 import Footer from "./components/Footer";
 import { Order } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
 import { User } from "@/app/types/user";
+import { Payment } from "@/app/types/payment";
 import { apiFetch } from "@/app/utils/api-client";
 
 
@@ -20,6 +22,7 @@ export default function OrderDetailsPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
+  const [payment, setPayment] = useState<Payment | null>(null);
   const [customer, setCustomer] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +82,29 @@ export default function OrderDetailsPage() {
 
   }, [order])
 
+  // fetch the payment details
+  useEffect(() => {
+    async function fetchPayment() {
+      if (order?.status !== "complete" || !order.id)
+        return
+      try {
+        const data = await apiFetch<Payment>(
+          `/api/payments/${order.id}`,
+          {
+            credentials: "include"
+          }
+        )
+        setPayment(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load the payment details")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPayment()
+  }, [order])
+
   const handleRefundSuccess = () => {
     // Update local order status immediately to awaiting refund
     if (order) {
@@ -100,7 +126,7 @@ export default function OrderDetailsPage() {
             </h1>
             {order?.id && (
               <span className="rounded-full bg-slate-200/80 px-3 py-1 font-mono text-xs font-semibold text-slate-700">
-                #{order.id.slice(-8)}
+                #{order.id}
               </span>
             )}
           </div>
@@ -146,22 +172,19 @@ export default function OrderDetailsPage() {
         {/* Vertical Stacked Layout */}
         {!isLoading && order && (
           <div className="flex flex-col gap-6">
-            {/* 1. Flight Information */}
+            <CustomerInfo customer={customer} userId={order.userId} />
+
             <FlightInfo
               flight={flight}
               fallbackDepartureDate={order.ticket?.departureDate}
             />
 
-            {/* 2. Ticket Information */}
             <TicketInfo ticket={order.ticket} />
 
-            {/* 3. Order Information */}
             <OrderInfo order={order} />
 
-            {/* 4. Customer Information */}
-            <CustomerInfo customer={customer} userId={order.userId} />
+            <PaymentInfo payment={payment} />
 
-            {/* 4. Footer */}
             <Footer
               order={order}
               onRefundSuccess={handleRefundSuccess}

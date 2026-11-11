@@ -43,7 +43,7 @@ export default function FlightDetailsPage() {
     fetchFlightDetails()
   }, [id])
 
-  // handle when user clicks "Order"
+  // handle when user presses Order
   const orderTicket = async () => {
     if (!selectedTicket || selectedTicket.orderId || isOrdering)
       return
@@ -104,8 +104,8 @@ export default function FlightDetailsPage() {
       <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 pb-28 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8">
         <div className="space-y-6">
           <SeatsMatrix
-            rows={details.flight.seatConfig?.rows ?? 0}
-            columns={details.flight.seatConfig?.columns ?? 0}
+            rows={details.flight.rows}
+            classConfig={details.flight.classConfig}
             tickets={details.tickets}
             selectedTicketId={selectedTicket?.id ?? null}
             onSelect={setSelectedTicket}

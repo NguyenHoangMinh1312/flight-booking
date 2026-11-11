@@ -7,9 +7,11 @@ import { FaArrowLeft, FaExclamationCircle } from "react-icons/fa";
 import FlightInfo from "./components/FlightInfo";
 import TicketInfo from "./components/TicketInfo";
 import OrderInfo from "./components/OrderInfo";
+import PaymentInfo from "./components/PaymentInfo";
 import Footer from "./components/Footer";
 import { Order } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
+import { Payment } from "@/app/types/payment";
 import { apiFetch } from "@/app/utils/api-client";
 
 export default function OrderDetailsPage() {
@@ -17,6 +19,7 @@ export default function OrderDetailsPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
+  const [payment, setPayment] = useState<Payment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,6 +63,29 @@ export default function OrderDetailsPage() {
 
     fetchFlight()
   }, [order]);
+
+  // fetch the payment details
+  useEffect(() => {
+    async function fetchPayment() {
+      if (order?.status !== "complete" || !order.id)
+        return
+      try {
+        const data = await apiFetch<Payment>(
+          `/api/payments/${order.id}`,
+          {
+            credentials: "include"
+          }
+        )
+        setPayment(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load the payment details")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPayment()
+  }, [order])
 
   const handleRefundSuccess = () => {
     // Update local order status immediately to awaiting refund
@@ -146,7 +172,10 @@ export default function OrderDetailsPage() {
             {/* 3. Order Information */}
             <OrderInfo order={order} />
 
-            {/* 4. Footer */}
+            {/* 4. Payment Information */}
+            <PaymentInfo payment={payment} />
+
+            {/* 5. Footer */}
             <Footer
               order={order}
               flight={flight}

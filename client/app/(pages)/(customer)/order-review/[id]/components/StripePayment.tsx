@@ -53,7 +53,7 @@ export default function StripePayment({
 
       try {
         const data = await apiFetch<PaymentIntentResponse>(
-          `/api/payments/create-intent`,
+          `/api/payments`,
           {
             method: "POST",
             credentials: "include",
@@ -89,7 +89,7 @@ export default function StripePayment({
             <div>
               <h2 className="text-xl font-bold text-slate-900">Secure Payment</h2>
               <p className="text-xs text-slate-500">
-                Encrypted Stripe Checkout • Order #{orderId.slice(-8)}
+                Encrypted Stripe Checkout • Order #{orderId}
               </p>
             </div>
           </div>
