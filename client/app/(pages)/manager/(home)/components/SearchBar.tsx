@@ -11,6 +11,7 @@ import {
   FaTag,
   FaUndoAlt,
 } from "react-icons/fa";
+import { Airport } from "@/app/types/airport";
 
 export type SearchFilters = {
   departureAirport: string;
@@ -22,12 +23,14 @@ export type SearchFilters = {
 };
 
 type SearchBarProps = {
+  airports: Airport[];
   onSearch: (filters: SearchFilters) => void;
   onReset?: () => void;
   isLoading?: boolean;
 };
 
 export default function SearchBar({
+  airports = [],
   onSearch,
   onReset,
   isLoading = false,
@@ -85,15 +88,20 @@ export default function SearchBar({
               <FaPlaneDeparture className="text-sky-600" />
               Departure Airport
             </label>
-            <input
+            <select
               id="managerDepartureAirport"
               name="departureAirport"
-              type="text"
-              placeholder="e.g. Noi Bai"
               value={departureAirport}
               onChange={(e) => setDepartureAirport(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
-            />
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
+            >
+              <option value="">Select departure airport</option>
+              {airports.map((airport) => (
+                <option key={airport.code} value={airport.code}>
+                  {`${airport.code} (${airport.name}, ${airport.city}, ${airport.country})`}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Arrival Airport */}
@@ -105,15 +113,20 @@ export default function SearchBar({
               <FaPlaneArrival className="text-sky-600" />
               Arrival Airport
             </label>
-            <input
+            <select
               id="managerArrivalAirport"
               name="arrivalAirport"
-              type="text"
-              placeholder="e.g. Tan Son Nhat"
               value={arrivalAirport}
               onChange={(e) => setArrivalAirport(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
-            />
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
+            >
+              <option value="">Select arrival airport</option>
+              {airports.map((airport) => (
+                <option key={airport.code} value={airport.code}>
+                  {`${airport.code} (${airport.name}, ${airport.city}, ${airport.country})`}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Departure Date (past dates allowed) */}

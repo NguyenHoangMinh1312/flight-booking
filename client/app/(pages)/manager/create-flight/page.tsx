@@ -69,16 +69,18 @@ export default function CreateFlightPage() {
       arrivalAirport: formData.get("arrivalAirport"),
       arrivalDate: formData.get("arrivalDate"),
       rows: formData.get("rows"),
-      columns: formData.get("columns"),
       firstFromRow: formData.get("firstFromRow"),
       firstToRow: formData.get("firstToRow"),
+      firstColumns: formData.get("firstColumns"),
+      firstPrice: formData.get("firstPrice"),
       businessFromRow: formData.get("businessFromRow"),
       businessToRow: formData.get("businessToRow"),
+      businessColumns: formData.get("businessColumns"),
+      businessPrice: formData.get("businessPrice"),
       economyFromRow: formData.get("economyFromRow"),
       economyToRow: formData.get("economyToRow"),
-      priceFirst: formData.get("priceFirst"),
-      priceBusiness: formData.get("priceBusiness"),
-      priceEconomy: formData.get("priceEconomy"),
+      economyColumns: formData.get("economyColumns"),
+      economyPrice: formData.get("economyPrice"),
     });
 
     if (!result.success) {
@@ -93,39 +95,45 @@ export default function CreateFlightPage() {
     if (
       result.data.firstFromRow &&
       result.data.firstToRow &&
-      result.data.priceFirst
+      result.data.firstColumns &&
+      result.data.firstPrice
     ) {
       classConfig.push({
         class: "first",
         fromRow: result.data.firstFromRow,
         toRow: result.data.firstToRow,
-        price: result.data.priceFirst,
+        columns: result.data.firstColumns,
+        price: result.data.firstPrice,
       });
     }
 
     if (
       result.data.businessFromRow &&
       result.data.businessToRow &&
-      result.data.priceBusiness
+      result.data.businessColumns &&
+      result.data.businessPrice
     ) {
       classConfig.push({
         class: "business",
         fromRow: result.data.businessFromRow,
         toRow: result.data.businessToRow,
-        price: result.data.priceBusiness,
+        columns: result.data.businessColumns,
+        price: result.data.businessPrice,
       });
     }
 
     if (
       result.data.economyFromRow &&
       result.data.economyToRow &&
-      result.data.priceEconomy
+      result.data.economyColumns &&
+      result.data.economyPrice
     ) {
       classConfig.push({
         class: "economy",
         fromRow: result.data.economyFromRow,
         toRow: result.data.economyToRow,
-        price: result.data.priceEconomy,
+        columns: result.data.economyColumns,
+        price: result.data.economyPrice,
       });
     }
 
@@ -146,10 +154,7 @@ export default function CreateFlightPage() {
             airport: result.data.arrivalAirport,
             date: new Date(result.data.arrivalDate).toISOString(),
           },
-          seatConfig: {
-            rows: result.data.rows,
-            columns: result.data.columns,
-          },
+          rows: result.data.rows,
           classConfig,
         }),
       });

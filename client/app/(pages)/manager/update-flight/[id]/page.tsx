@@ -69,9 +69,9 @@ export default function UpdateFlightPage() {
 
     const result = updateFlightSchema.safeParse({
       description: formData.get("description"),
-      priceFirst: formData.get("priceFirst"),
-      priceBusiness: formData.get("priceBusiness"),
-      priceEconomy: formData.get("priceEconomy"),
+      firstPrice: formData.get("firstPrice"),
+      businessPrice: formData.get("businessPrice"),
+      economyPrice: formData.get("economyPrice"),
     });
 
     if (!result.success) {
@@ -81,14 +81,14 @@ export default function UpdateFlightPage() {
     }
 
     const priceConfig: { class: "first" | "business" | "economy"; price: number }[] = [];
-    if (result.data.priceFirst !== undefined) {
-      priceConfig.push({ class: "first", price: result.data.priceFirst });
+    if (result.data.firstPrice !== undefined) {
+      priceConfig.push({ class: "first", price: result.data.firstPrice });
     }
-    if (result.data.priceBusiness !== undefined) {
-      priceConfig.push({ class: "business", price: result.data.priceBusiness });
+    if (result.data.businessPrice !== undefined) {
+      priceConfig.push({ class: "business", price: result.data.businessPrice });
     }
-    if (result.data.priceEconomy !== undefined) {
-      priceConfig.push({ class: "economy", price: result.data.priceEconomy });
+    if (result.data.economyPrice !== undefined) {
+      priceConfig.push({ class: "economy", price: result.data.economyPrice });
     }
 
     setIsSubmitting(true);
@@ -176,21 +176,23 @@ export default function UpdateFlightPage() {
             />
 
             <SeatConfigCard
-              rows={flight.seatConfig?.rows}
-              columns={flight.seatConfig?.columns}
+              rows={flight.rows}
               firstFromRow={firstClass?.fromRow}
               firstToRow={firstClass?.toRow}
+              firstColumns={firstClass?.columns}
               businessFromRow={businessClass?.fromRow}
               businessToRow={businessClass?.toRow}
+              businessColumns={businessClass?.columns}
               economyFromRow={economyClass?.fromRow}
               economyToRow={economyClass?.toRow}
+              economyColumns={economyClass?.columns}
               enabledClasses={enabledClasses}
             />
 
             <TicketPriceCard
-              priceFirst={firstClass?.price}
-              priceBusiness={businessClass?.price}
-              priceEconomy={economyClass?.price}
+              firstPrice={firstClass?.price}
+              businessPrice={businessClass?.price}
+              economyPrice={economyClass?.price}
               enabledClasses={enabledClasses}
             />
 

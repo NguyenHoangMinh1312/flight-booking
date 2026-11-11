@@ -4,13 +4,15 @@ import { useState } from "react";
 
 export interface SeatConfigCardProps {
   rows?: number;
-  columns?: number;
   firstFromRow?: number;
   firstToRow?: number;
+  firstColumns?: number;
   businessFromRow?: number;
   businessToRow?: number;
+  businessColumns?: number;
   economyFromRow?: number;
   economyToRow?: number;
+  economyColumns?: number;
   enabledClasses?: {
     first: boolean;
     business: boolean;
@@ -24,13 +26,15 @@ export interface SeatConfigCardProps {
 
 export default function SeatConfigCard(props: SeatConfigCardProps) {
   const isRowsReadOnly = props.rows !== undefined;
-  const isColumnsReadOnly = props.columns !== undefined;
   const isFirstFromRowReadOnly = props.firstFromRow !== undefined;
   const isFirstToRowReadOnly = props.firstToRow !== undefined;
+  const isFirstColumnsReadOnly = props.firstColumns !== undefined;
   const isBusinessFromRowReadOnly = props.businessFromRow !== undefined;
   const isBusinessToRowReadOnly = props.businessToRow !== undefined;
+  const isBusinessColumnsReadOnly = props.businessColumns !== undefined;
   const isEconomyFromRowReadOnly = props.economyFromRow !== undefined;
   const isEconomyToRowReadOnly = props.economyToRow !== undefined;
+  const isEconomyColumnsReadOnly = props.economyColumns !== undefined;
 
   const isReadOnly = isRowsReadOnly;
 
@@ -90,31 +94,6 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
             }`}
           />
         </div>
-
-        <div>
-          <label
-            htmlFor="columns"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
-            Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="columns"
-            name="columns"
-            type="number"
-            min={1}
-            max={26}
-            defaultValue={props.columns}
-            readOnly={isColumnsReadOnly}
-            required
-            placeholder="6"
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
-              isColumnsReadOnly
-                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-            }`}
-          />
-        </div>
       </div>
 
       {/* Class Row Allocation */}
@@ -154,7 +133,7 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
           </div>
 
           {enabled.first ? (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label
                   htmlFor="firstFromRow"
@@ -201,6 +180,30 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   }`}
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="firstColumns"
+                  className="mb-1 block text-xs font-medium text-slate-600"
+                >
+                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="firstColumns"
+                  name="firstColumns"
+                  type="number"
+                  min={1}
+                  max={26}
+                  defaultValue={props.firstColumns}
+                  readOnly={isFirstColumnsReadOnly}
+                  required={enabled.first}
+                  placeholder="4"
+                  className={`w-full rounded-md border px-3 py-1.5 text-sm text-slate-900 outline-none transition ${
+                    isFirstColumnsReadOnly
+                      ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                      : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                  }`}
+                />
+              </div>
             </div>
           ) : (
             <p className="text-xs text-slate-400 italic">
@@ -235,7 +238,7 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
           </div>
 
           {enabled.business ? (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label
                   htmlFor="businessFromRow"
@@ -282,6 +285,30 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   }`}
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="businessColumns"
+                  className="mb-1 block text-xs font-medium text-slate-600"
+                >
+                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="businessColumns"
+                  name="businessColumns"
+                  type="number"
+                  min={1}
+                  max={26}
+                  defaultValue={props.businessColumns}
+                  readOnly={isBusinessColumnsReadOnly}
+                  required={enabled.business}
+                  placeholder="6"
+                  className={`w-full rounded-md border px-3 py-1.5 text-sm text-slate-900 outline-none transition ${
+                    isBusinessColumnsReadOnly
+                      ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                      : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                  }`}
+                />
+              </div>
             </div>
           ) : (
             <p className="text-xs text-slate-400 italic">
@@ -316,7 +343,7 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
           </div>
 
           {enabled.economy ? (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label
                   htmlFor="economyFromRow"
@@ -358,6 +385,30 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   placeholder="30"
                   className={`w-full rounded-md border px-3 py-1.5 text-sm text-slate-900 outline-none transition ${
                     isEconomyToRowReadOnly
+                      ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                      : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                  }`}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="economyColumns"
+                  className="mb-1 block text-xs font-medium text-slate-600"
+                >
+                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="economyColumns"
+                  name="economyColumns"
+                  type="number"
+                  min={1}
+                  max={26}
+                  defaultValue={props.economyColumns}
+                  readOnly={isEconomyColumnsReadOnly}
+                  required={enabled.economy}
+                  placeholder="6"
+                  className={`w-full rounded-md border px-3 py-1.5 text-sm text-slate-900 outline-none transition ${
+                    isEconomyColumnsReadOnly
                       ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
                       : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                   }`}

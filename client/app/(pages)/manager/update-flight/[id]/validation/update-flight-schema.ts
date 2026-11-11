@@ -8,7 +8,7 @@ const optionalPositiveNumber = (positiveMsg: string) =>
 
 export const updateFlightSchema = z.object({
   description: z.string().trim().min(1, "Description is required"),
-  priceFirst: optionalPositiveNumber("First class price must be positive"),
-  priceBusiness: optionalPositiveNumber("Business class price must be positive"),
-  priceEconomy: optionalPositiveNumber("Economy class price must be positive"),
+  firstPrice: optionalPositiveNumber("First class price must be positive"),
+  businessPrice: optionalPositiveNumber("Business class price must be positive"),
+  economyPrice: optionalPositiveNumber("Economy class price must be positive"),
 });

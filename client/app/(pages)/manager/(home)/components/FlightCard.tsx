@@ -28,8 +28,10 @@ function getStatusDetails(status?: string) {
 export default function FlightCard({ flight }: FlightCardProps) {
   const departure = formatDateTime(flight.departure.date);
   const arrival = formatDateTime(flight.arrival.date);
-  const economyPrice = flight.priceConfig?.economy;
   const statusDetails = getStatusDetails(flight.status);
+  const minPrice = flight.classConfig?.length
+    ? Math.min(...flight.classConfig.map((item) => item.price))
+    : undefined;
 
   return (
     <Link href={`/manager/details/${flight.id}`}
@@ -89,9 +91,9 @@ export default function FlightCard({ flight }: FlightCardProps) {
           From
         </p>
         <p className="mt-1 text-lg font-bold text-slate-900">
-          {economyPrice === undefined ?
+          {minPrice === undefined ?
             "Contact for price" :
-            currencyFormatter.format(economyPrice)}
+            currencyFormatter.format(minPrice)}
         </p>
       </div>
     </Link>

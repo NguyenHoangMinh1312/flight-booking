@@ -1,7 +1,7 @@
 export interface TicketPriceCardProps {
-  priceFirst?: number;
-  priceBusiness?: number;
-  priceEconomy?: number;
+  firstPrice?: number;
+  businessPrice?: number;
+  economyPrice?: number;
   enabledClasses?: {
     first: boolean;
     business: boolean;
@@ -12,16 +12,16 @@ export interface TicketPriceCardProps {
 export default function TicketPriceCard(props: TicketPriceCardProps) {
   const showFirst = props.enabledClasses
     ? props.enabledClasses.first
-    : props.priceFirst !== undefined ||
-      (!props.priceBusiness && !props.priceEconomy);
+    : props.firstPrice !== undefined ||
+      (!props.businessPrice && !props.economyPrice);
   const showBusiness = props.enabledClasses
     ? props.enabledClasses.business
-    : props.priceBusiness !== undefined ||
-      (!props.priceFirst && !props.priceEconomy);
+    : props.businessPrice !== undefined ||
+      (!props.firstPrice && !props.economyPrice);
   const showEconomy = props.enabledClasses
     ? props.enabledClasses.economy
-    : props.priceEconomy !== undefined ||
-      (!props.priceFirst && !props.priceBusiness);
+    : props.economyPrice !== undefined ||
+      (!props.firstPrice && !props.businessPrice);
 
   const hasAnyClass = showFirst || showBusiness || showEconomy;
 
@@ -40,17 +40,17 @@ export default function TicketPriceCard(props: TicketPriceCardProps) {
           {showFirst && (
             <div>
               <label
-                htmlFor="priceFirst"
+                htmlFor="firstPrice"
                 className="mb-1.5 block text-sm font-medium text-slate-700"
               >
                 First Class <span className="text-red-500">*</span>
               </label>
               <input
-                id="priceFirst"
-                name="priceFirst"
+                id="firstPrice"
+                name="firstPrice"
                 type="number"
                 min={1}
-                defaultValue={props.priceFirst}
+                defaultValue={props.firstPrice}
                 required={showFirst}
                 placeholder="5000000"
                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
@@ -61,17 +61,17 @@ export default function TicketPriceCard(props: TicketPriceCardProps) {
           {showBusiness && (
             <div>
               <label
-                htmlFor="priceBusiness"
+                htmlFor="businessPrice"
                 className="mb-1.5 block text-sm font-medium text-slate-700"
               >
                 Business Class <span className="text-red-500">*</span>
               </label>
               <input
-                id="priceBusiness"
-                name="priceBusiness"
+                id="businessPrice"
+                name="businessPrice"
                 type="number"
                 min={1}
-                defaultValue={props.priceBusiness}
+                defaultValue={props.businessPrice}
                 required={showBusiness}
                 placeholder="3000000"
                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
@@ -82,17 +82,17 @@ export default function TicketPriceCard(props: TicketPriceCardProps) {
           {showEconomy && (
             <div>
               <label
-                htmlFor="priceEconomy"
+                htmlFor="economyPrice"
                 className="mb-1.5 block text-sm font-medium text-slate-700"
               >
                 Economy Class <span className="text-red-500">*</span>
               </label>
               <input
-                id="priceEconomy"
-                name="priceEconomy"
+                id="economyPrice"
+                name="economyPrice"
                 type="number"
                 min={1}
-                defaultValue={props.priceEconomy}
+                defaultValue={props.economyPrice}
                 required={showEconomy}
                 placeholder="1000000"
                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"

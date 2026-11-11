@@ -13,16 +13,20 @@ export const createFlightSchema = z.object({
   arrivalAirport: z.string(),
   arrivalDate: z.string(),
   rows: z.coerce.number(),
-  columns: z.coerce.number(),
 
   firstFromRow: optionalNumber,
   firstToRow: optionalNumber,
+  firstColumns: optionalNumber,
+  firstPrice: optionalNumber,
+
   businessFromRow: optionalNumber,
   businessToRow: optionalNumber,
+  businessColumns: optionalNumber,
+  businessPrice: optionalNumber,
+
   economyFromRow: optionalNumber,
   economyToRow: optionalNumber,
+  economyColumns: optionalNumber,
+  economyPrice: optionalNumber
 
-  priceFirst: optionalNumber,
-  priceBusiness: optionalNumber,
-  priceEconomy: optionalNumber,
 });
