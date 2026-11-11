@@ -8,7 +8,6 @@ export interface OrderCanceledEvent {
     version: number,
     ticket: {
       id: string,
-    },
-    userId: string
+    }
   }
 }

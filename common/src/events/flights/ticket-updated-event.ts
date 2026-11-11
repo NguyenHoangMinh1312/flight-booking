@@ -14,6 +14,7 @@ export interface TicketUpdatedEvent {
       column: number
     },
     departureDate: Date
-    orderId?: string,
+    departureAirport: string,
+    arrivalAirport: string
   }
 }

@@ -7,9 +7,6 @@ export interface OrderAwaitingRefundEvent {
   data: {
     id: string,
     version: number,
-    ticket: {
-      id: string,
-    },
     reason: RefundReason
   }
 }

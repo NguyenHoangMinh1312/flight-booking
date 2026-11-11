@@ -13,6 +13,8 @@ export interface TicketCreatedEvent {
       row: number,
       column: number
     },
-    departureDate: Date
+    departureDate: Date,
+    departureAirport: string,
+    arrivalAirport: string
   }
 }
