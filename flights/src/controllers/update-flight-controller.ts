@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { updateFlight } from "../services/update-flight-service"
-import { FlightDoc } from "../models/flight"
+import { FlightClass, FlightDoc } from "../models/flight"
 
 type ReqParams = {
   id: string
@@ -8,7 +8,10 @@ type ReqParams = {
 
 type ReqBody = {
   description: string,
-  priceConfig: FlightDoc["priceConfig"]
+  priceConfig: {
+    class: FlightClass,
+    price: number
+  }[]
 }
 
 export const updateFlightController = async (

@@ -1,4 +1,4 @@
-import { FlightDoc } from "../models/flight";
+import { FlightClass } from "../models/flight";
 import { Flight } from "../models/flight";
 import { Ticket } from "../models/ticket";
 import { Outbox } from "../models/outbox";
@@ -9,7 +9,10 @@ import { NotFoundError } from "@mint1312-flight-booking/common";
 export const updateFlight = async (
   flightId: string,
   description: string,
-  priceConfig: FlightDoc["priceConfig"]
+  priceConfig: {
+    class: FlightClass,
+    price: number
+  }[]
 ) => {
   // find the flight
   const flight = await Flight.findById(flightId)
@@ -21,7 +24,17 @@ export const updateFlight = async (
   try {
     session.startTransaction()
 
-    flight.set({ description, priceConfig })
+    const mapping = new Map()
+    priceConfig.forEach((item) => mapping.set(item.class, item.price))
+
+    flight.classConfig.forEach((item) => {
+      item.price = mapping.get(item.class)
+    })
+
+    flight.set({
+      description,
+      classConfig: flight.classConfig
+    })
     await flight.save({ session })
 
     // Find tickets that have not been ordered
@@ -32,7 +45,7 @@ export const updateFlight = async (
 
     // Save all updated tickets
     await Promise.all(tickets.map((ticket) => {
-      ticket.set({ price: priceConfig[ticket.class] })
+      ticket.set({ price: mapping.get(ticket.class) })
       return ticket.save({ session })
     }))
 
@@ -45,7 +58,9 @@ export const updateFlight = async (
         class: ticket.class,
         status: ticket.status,
         seat: ticket.seat,
-        departureDate: flight.departure.date
+        departureDate: flight.departure.date,
+        departureAirport: ticket.flight.departure.airport,
+        arrivalAirport: ticket.flight.arrival.airport,
       })
     })
 

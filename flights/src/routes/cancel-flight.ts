@@ -11,4 +11,4 @@ router.delete(
   cancelFlightController
 )
 
-export { router as deleteFlightRouter }
+export { router as cancelFlightRouter }

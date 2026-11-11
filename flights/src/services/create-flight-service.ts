@@ -6,14 +6,13 @@ import { TicketCreatedPublisher } from "../events/publishers/ticket-created-publ
 import { BadRequestError } from "@mint1312-flight-booking/common"
 import mongoose from "mongoose"
 
-
 export const createFlight = async (
   flightNumber: string,
   description: string,
   departure: FlightDoc["departure"],
   arrival: FlightDoc["arrival"],
-  seatConfig: FlightDoc["seatConfig"],
-  priceConfig: FlightDoc["priceConfig"]
+  rows: number,
+  classConfig: FlightDoc["classConfig"]
 ) => {
   // validate the airport
   const departureAirport = await Airport.findOne({ code: departure.airport })
@@ -35,26 +34,29 @@ export const createFlight = async (
       description,
       departure,
       arrival,
-      seatConfig,
-      priceConfig
+      rows,
+      classConfig
     })
     await flight.save({ session })
 
     // Save the tickets
     const tickets = []
 
-    for (let r = 1; r <= seatConfig.rows; r++) {
-      const classConfig = seatConfig.classes.find(({ fromRow, toRow }) => r >= fromRow && r <= toRow)
-      if (!classConfig)
+    for (let r = 1; r <= rows; r++) {
+      const config = classConfig.find((item) => {
+        if (!item.fromRow || !item.toRow)
+          return false
+        return r >= item.fromRow && r <= item.toRow
+      })
+
+      if (!config)
         continue
 
-      const price = priceConfig[classConfig.class]
-
-      for (let c = 1; c <= seatConfig.columns; c++) {
+      for (let c = 1; c <= config.columns; c++) {
         const ticket = Ticket.build({
           flight,
-          price,
-          class: classConfig.class,
+          price: config.price,
+          class: config.class,
           status: flight.status,
           seat: { row: r, column: c }
         })
@@ -72,7 +74,9 @@ export const createFlight = async (
         class: ticket.class,
         status: ticket.status,
         seat: ticket.seat,
-        departureDate: ticket.flight.departure.date
+        departureDate: ticket.flight.departure.date,
+        departureAirport: ticket.flight.departure.airport,
+        arrivalAirport: ticket.flight.arrival.airport,
       })
     })
     await Outbox.insertMany(outboxEvents, { session })

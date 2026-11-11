@@ -14,11 +14,12 @@ it(
       .set("Cookie", global.signin(UserRole.Manager))
       .send({
         description: "Ho Chi Minh City to Hanoi",
-        priceConfig: {
-          first: 120,
-          business: 60,
-          economy: 15
-        }
+        priceConfig: [
+          {
+            class: "economy",
+            price: 500000
+          }
+        ]
       })
       .expect(404)
   }
@@ -67,32 +68,23 @@ it(
           airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
-        seatConfig: {
-          rows: 3,
-          columns: 2,
-          classes: [
-            {
-              class: "economy",
-              fromRow: 1,
-              toRow: 1
-            },
-            {
-              class: "business",
-              fromRow: 2,
-              toRow: 2
-            },
-            {
-              class: "first",
-              fromRow: 3,
-              toRow: 3
-            }
-          ]
-        },
-        priceConfig: {
-          first: 100,
-          business: 50,
-          economy: 10
-        }
+        rows: 2,
+        classConfig: [
+          {
+            class: "first",
+            fromRow: 1,
+            toRow: 1,
+            columns: 2,
+            price: 5000000
+          },
+          {
+            class: "business",
+            fromRow: 2,
+            toRow: 2,
+            columns: 4,
+            price: 3000000
+          }
+        ]
       })
       .expect(201)
 
@@ -102,11 +94,16 @@ it(
       .set("Cookie", global.signin(UserRole.Manager))
       .send({
         description: "Ho Chi Minh City to Hanoi",
-        priceConfig: {
-          first: 120,
-          business: 60,
-          economy: 10
-        }
+        priceConfig: [
+          {
+            class: "first",
+            price: 6000000
+          },
+          {
+            class: "business",
+            price: 3000000
+          }
+        ]
       })
       .expect(200)
 

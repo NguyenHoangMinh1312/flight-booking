@@ -8,8 +8,11 @@ type ReqQuery = {
   departureDate: string | undefined,
   flightNumber: string | undefined,
   status: FlightStatus | undefined,
-  maxPrice: number | undefined
+  maxPrice: string | undefined,
+  page: string | undefined,
+  limit: string | undefined
 }
+
 export const searchFlightsController = async (
   req: Request<any, any, any, ReqQuery>,
   res: Response
@@ -20,17 +23,21 @@ export const searchFlightsController = async (
     departureDate,
     flightNumber,
     status,
-    maxPrice
+    maxPrice,
+    page,
+    limit
   } = req.query
 
-  const flights = await searchFlights(
+  const { flights, total } = await searchFlights(
     departureAirport,
     arrivalAirport,
     departureDate,
     flightNumber,
     status,
-    maxPrice
+    Number(maxPrice) || 0,
+    Number(page) || 1,
+    Number(limit) || 10
   )
 
-  res.send(flights)
+  res.send({ flights, total })
 }

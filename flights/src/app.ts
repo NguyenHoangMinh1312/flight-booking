@@ -4,10 +4,11 @@ import cookieSession from "cookie-session"
 import { errorHandler, NotFoundError, currentUser } from "@mint1312-flight-booking/common"
 import { createFlightRouter } from "./routes/new"
 import { showFlightRouter } from "./routes/show"
-import { indexFlightRouter } from "./routes/index"
+import { searchFlightsRouter } from "./routes/search-flights"
 import { updateFlightRouter } from "./routes/update"
 import { showByTicketRouter } from "./routes/show-by-ticket"
-import { deleteFlightRouter } from "./routes/delete"
+import { cancelFlightRouter } from "./routes/cancel-flight"
+import { getAirportsRouter } from "./routes/get-airports"
 
 const app = express()
 app.set("trust proxy", true)
@@ -24,9 +25,10 @@ app.use(currentUser)
 app.use(createFlightRouter)
 app.use(showByTicketRouter)
 app.use(showFlightRouter)
-app.use(indexFlightRouter)
+app.use(searchFlightsRouter)
 app.use(updateFlightRouter)
-app.use(deleteFlightRouter)
+app.use(cancelFlightRouter)
+app.use(getAirportsRouter)
 
 app.all("/{*splat}", () => { throw new NotFoundError() })
 

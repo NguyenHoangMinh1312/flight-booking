@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 import { app } from "./app"
 import { OrderCreatedListener } from "./events/listeners/order-created-listener"
 import { OrderCanceledListener } from "./events/listeners/order-canceled-listener"
-import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
+import { outboxPublisherWorker } from "./workers/outbox-publisher-worker"
 import { natsWrapper } from "./nats-wrapper"
 import { seedAirports } from "./data/seed-airports"
 

@@ -2,6 +2,7 @@ import express from "express"
 import { body } from "express-validator"
 import { requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
 import { createFlightController } from "../controllers/create-flight-controller"
+import { FlightClass } from "../models/flight"
 
 const router = express.Router()
 
@@ -40,39 +41,27 @@ router.post(
       .isISO8601()
       .toDate()
       .withMessage("Arrival date must be a valid date"),
-    body("seatConfig")
-      .isObject()
-      .withMessage("Seat configuration is required"),
-    body("seatConfig.rows")
+    body("rows")
       .isInt({ gt: 0 })
       .withMessage("Seat rows must be a positive integer"),
-    body("seatConfig.columns")
+    body("classConfig")
+      .isArray({ min: 1 })
+      .withMessage("Class configuration must be a non-empty array"),
+    body("classConfig.*.class")
+      .isIn(Object.values(FlightClass))
+      .withMessage("Class name must be 'first', 'business' or 'economy'."),
+    body("classConfig.*.fromRow")
+      .isInt({ gt: 0 })
+      .withMessage("Starting row must be a positive integer"),
+    body("classConfig.*.toRow")
+      .isInt({ gt: 0 })
+      .withMessage("Ending row must be a positive integer"),
+    body("classConfig.*.columns")
       .isInt({ gt: 0, lt: 27 })
       .withMessage("Seat columns must be a positive integer between 1 and 26"),
-    body("seatConfig.classes")
-      .isArray({ min: 1 })
-      .withMessage("Seat classes must be a non-empty array"),
-    body("seatConfig.classes.*.class")
-      .isIn(["first", "business", "economy"])
-      .withMessage("Seat class must be first, business, or economy"),
-    body("seatConfig.classes.*.fromRow")
-      .isInt({ min: 1 })
-      .withMessage("Starting row must be a positive integer"),
-    body("seatConfig.classes.*.toRow")
-      .isInt({ min: 1 })
-      .withMessage("Ending row must be a positive integer"),
-    body("priceConfig")
-      .isObject()
-      .withMessage("Price configuration is required"),
-    body("priceConfig.first")
+    body("classConfig.*.price")
       .isFloat({ gt: 0 })
-      .withMessage("First-class price must be positive"),
-    body("priceConfig.business")
-      .isFloat({ gt: 0 })
-      .withMessage("Business-class price must be positive"),
-    body("priceConfig.economy")
-      .isFloat({ gt: 0 })
-      .withMessage("Economy-class price must be positive")
+      .withMessage("Price must be a positive number"),
   ],
   validateRequest,
   createFlightController

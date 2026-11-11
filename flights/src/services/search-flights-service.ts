@@ -9,7 +9,9 @@ export const searchFlights = async (
   departureDate: string | undefined,
   flightNumber: string | undefined,
   status: FlightStatus | undefined,
-  maxPrice: number | undefined
+  maxPrice: number | undefined,
+  page: number,
+  limit: number
 ) => {
   const query: QueryFilter<FlightDoc> = {}
 
@@ -36,10 +38,20 @@ export const searchFlights = async (
     query.status = FlightStatus.Available
 
   if (maxPrice)
-    query["priceConfig.economy?"] = { $lte: Number(maxPrice) }
+    query["classConfig.price"] = { $lte: Number(maxPrice) }
 
-  // filter by query
-  const flights = await Flight.find(query).sort({ "departure.date": 1 })
+  // fetch flights in the page scope
+  limit = Math.max(0, limit)
+  const skip = (page - 1) * limit
 
-  return flights
+  const [flights, total] = await Promise.all([
+    Flight.find(query)
+      .sort({ "departure.date": -1 })
+      .skip(skip)
+      .limit(limit)
+    ,
+    Flight.countDocuments(query)
+  ])
+
+  return { flights, total }
 }

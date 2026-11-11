@@ -37,7 +37,9 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
         class: ticket.class,
         status: ticket.status,
         seat: ticket.seat,
-        departureDate: ticket.flight.departure.date
+        departureDate: ticket.flight.departure.date,
+        departureAirport: ticket.flight.departure.airport,
+        arrivalAirport: ticket.flight.arrival.airport,
       })
       await outboxEvent.save({ session })
 

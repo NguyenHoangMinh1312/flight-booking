@@ -37,8 +37,9 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
         class: ticket.class,
         status: ticket.status,
         seat: ticket.seat,
-        orderId: ticket.orderId!,
-        departureDate: ticket.flight.departure.date
+        departureDate: ticket.flight.departure.date,
+        departureAirport: ticket.flight.departure.airport,
+        arrivalAirport: ticket.flight.arrival.airport,
       })
       await outboxEvent.save({ session })
 

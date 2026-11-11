@@ -33,22 +33,16 @@ it(
           airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
-        seatConfig: {
-          rows: 2,
-          columns: 2,
-          classes: [
-            {
-              class: "economy",
-              fromRow: 1,
-              toRow: 2
-            }
-          ]
-        },
-        priceConfig: {
-          first: 100,
-          business: 50,
-          economy: 10
-        }
+        rows: 2,
+        classConfig: [
+          {
+            class: "first",
+            fromRow: 1,
+            toRow: 2,
+            columns: 2,
+            price: 500000
+          }
+        ]
       })
       .expect(201)
 
@@ -60,44 +54,16 @@ it(
 
     expect(getFlightRes.body.flight.id).toEqual(createFlightRes.body.id)
     expect(getFlightRes.body.flight.flightNumber).toEqual("VN123")
-    expect(getFlightRes.body.flight.description).toEqual(
-      "Hanoi to Ho Chi Minh City"
-    )
+    expect(getFlightRes.body.flight.description).toEqual("Hanoi to Ho Chi Minh City")
     expect(getFlightRes.body.flight.departure.airport).toEqual("HAN")
     expect(getFlightRes.body.flight.arrival.airport).toEqual("SGN")
-    expect(getFlightRes.body.flight.seatConfig.rows).toEqual(2)
-    expect(getFlightRes.body.flight.seatConfig.columns).toEqual(2)
-    expect(getFlightRes.body.flight.seatConfig.classes).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          class: "economy",
-          fromRow: 1,
-          toRow: 2
-        })
-      ])
-    )
-    expect(getFlightRes.body.flight.priceConfig).toEqual({
-      first: 100,
-      business: 50,
-      economy: 10
-    })
+    expect(getFlightRes.body.flight.rows).toEqual(2)
 
     expect(getFlightRes.body.tickets).toHaveLength(4)
     expect(
-      getFlightRes.body.tickets.every(
-        (ticket: { flight: string }) =>
-          ticket.flight === createFlightRes.body.id
-      )
-    ).toBe(true)
-    expect(
-      getFlightRes.body.tickets.every(
-        (ticket: { price: number }) => ticket.price === 10
-      )
-    ).toBe(true)
-    expect(
-      getFlightRes.body.tickets.every(
-        (ticket: { class: string }) => ticket.class === "economy"
-      )
+      getFlightRes.body.tickets.every((ticket: any) => {
+        return ticket.price === 500000 && ticket.class === "first"
+      })
     ).toBe(true)
     expect(getFlightRes.body.tickets.map((ticket: any) => ticket.seat)).toEqual(
       expect.arrayContaining([

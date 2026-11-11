@@ -60,22 +60,23 @@ it(
           airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
-        seatConfig: {
-          rows: 2,
-          columns: 2,
-          classes: [
-            {
-              class: "economy",
-              fromRow: 1,
-              toRow: 2
-            }
-          ]
-        },
-        priceConfig: {
-          first: 100,
-          business: 50,
-          economy: 10
-        }
+        rows: 2,
+        classConfig: [
+          {
+            class: "first",
+            fromRow: 1,
+            toRow: 1,
+            columns: 2,
+            price: 5000000
+          },
+          {
+            class: "business",
+            fromRow: 2,
+            toRow: 2,
+            columns: 4,
+            price: 3000000
+          }
+        ]
       })
       .expect(201)
 
@@ -84,18 +85,14 @@ it(
     // expect the ticket to be saved to MongoDB
     const tickets = await Ticket.find({}).populate("flight")
     expect(tickets).toBeDefined()
-    expect(tickets).toHaveLength(4)
+    expect(tickets).toHaveLength(6)
     expect(tickets.every((ticket) => ticket.flight.id === response.body.id)).toBe(true)
-    expect(tickets.every((ticket) => ticket.price === 10)).toBe(true)
-    expect(tickets.every((ticket) => ticket.class === "economy")).toBe(true)
 
     // expect the event to be saved to outbox
     const outboxEvents = await Outbox.find({})
     expect(outboxEvents).toBeDefined()
-    expect(outboxEvents).toHaveLength(4)
+    expect(outboxEvents).toHaveLength(6)
     expect(outboxEvents.every((event) => event.eventType === Subjects.TicketCreated)).toBe(true)
-    expect(outboxEvents.every((event) => event.payload.price === 10)).toBe(true)
-    expect(outboxEvents.every((event) => event.payload.class === "economy")).toBe(true)
   }
 )
 

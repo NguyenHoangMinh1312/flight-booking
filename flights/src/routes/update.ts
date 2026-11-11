@@ -2,6 +2,7 @@ import express from "express"
 import { body } from "express-validator"
 import { requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
 import { updateFlightController } from "../controllers/update-flight-controller"
+import { FlightClass } from "../models/flight"
 
 const router = express.Router()
 
@@ -16,17 +17,14 @@ router.put(
       .isString()
       .withMessage("Description must be a string"),
     body("priceConfig")
-      .isObject()
-      .withMessage("Price configuration is required"),
-    body("priceConfig.first")
+      .isArray({ min: 1 })
+      .withMessage("Class configuration must be a non-empty array"),
+    body("priceConfig.*.class")
+      .isIn(Object.values(FlightClass))
+      .withMessage("Class name must be 'first', 'business' or 'economy'."),
+    body("priceConfig.*.price")
       .isFloat({ gt: 0 })
-      .withMessage("First-class price must be positive"),
-    body("priceConfig.business")
-      .isFloat({ gt: 0 })
-      .withMessage("Business-class price must be positive"),
-    body("priceConfig.economy")
-      .isFloat({ gt: 0 })
-      .withMessage("Economy-class price must be positive")
+      .withMessage("Price must be a positive number")
   ],
   validateRequest,
   updateFlightController

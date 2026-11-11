@@ -26,22 +26,16 @@ it("Returns the flight if ticket is found", async () => {
         airport: "SGN",
         date: "2026-09-04T19:39:50"
       },
-      seatConfig: {
-        rows: 2,
-        columns: 2,
-        classes: [
-          {
-            class: "economy",
-            fromRow: 1,
-            toRow: 2
-          }
-        ]
-      },
-      priceConfig: {
-        first: 100,
-        business: 50,
-        economy: 10
-      }
+      rows: 2,
+      classConfig: [
+        {
+          class: "first",
+          fromRow: 1,
+          toRow: 2,
+          columns: 2,
+          price: 5000000,
+        }
+      ]
     })
     .expect(201)
 

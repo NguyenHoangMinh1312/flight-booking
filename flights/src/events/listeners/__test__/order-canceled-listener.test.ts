@@ -19,22 +19,16 @@ const buildTicket = async () => {
       airport: "Tan Son Nhat",
       date: new Date()
     },
-    seatConfig: {
-      rows: 2,
-      columns: 2,
-      classes: [
-        {
-          class: FlightClass.Economy,
-          fromRow: 1,
-          toRow: 2
-        }
-      ]
-    },
-    priceConfig: {
-      "first": 1000000,
-      "business": 500000,
-      "economy": 200000
-    }
+    rows: 2,
+    classConfig: [
+      {
+        class: FlightClass.Economy,
+        fromRow: 1,
+        toRow: 2,
+        columns: 2,
+        price: 200000
+      }
+    ]
   })
   await flight.save()
 
@@ -69,8 +63,7 @@ it(
       version: 1,
       ticket: {
         id: ticket.id
-      },
-      userId: new mongoose.Types.ObjectId().toHexString()
+      }
     }
 
     // fake the ack function

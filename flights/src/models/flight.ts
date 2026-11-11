@@ -19,16 +19,14 @@ interface FlightAttrs {
     airport: string,
     date: Date
   },
-  seatConfig: {
-    rows: number,
+  rows: number,
+  classConfig: {
+    class: FlightClass,
+    fromRow: number,
+    toRow: number,
     columns: number,
-    classes: {
-      class: FlightClass,
-      fromRow: number,
-      toRow: number
-    }[]
-  },
-  priceConfig: Record<FlightClass, number>,
+    price: number,
+  }[],
   status?: FlightStatus
 }
 
@@ -50,16 +48,14 @@ export interface FlightDoc extends mongoose.Document {
     airport: string,
     date: Date
   },
-  seatConfig: {
-    rows: number,
+  rows: number,
+  classConfig: {
+    class: FlightClass,
+    fromRow: number,
+    toRow: number,
     columns: number,
-    classes: {
-      class: FlightClass,
-      fromRow: number,
-      toRow: number
-    }[]
-  },
-  priceConfig: Record<FlightClass, number>,
+    price: number
+  }[],
   status: FlightStatus
 }
 
@@ -93,47 +89,35 @@ const flightSchema = new mongoose.Schema(
         required: true,
       },
     },
-    seatConfig: {
-      rows: {
-        type: Number,
-        required: true,
-      },
-      columns: {
-        type: Number,
-        required: true,
-      },
-      classes: [
-        {
-          class: {
-            type: String,
-            enum: Object.values(FlightClass),
-            required: true,
-          },
-          fromRow: {
-            type: Number,
-            required: true,
-          },
-          toRow: {
-            type: Number,
-            required: true,
-          },
+    rows: {
+      type: Number,
+      required: true,
+    },
+    classConfig: [
+      {
+        class: {
+          type: String,
+          enum: Object.values(FlightClass),
+          required: true
         },
-      ],
-    },
-    priceConfig: {
-      first: {
-        type: Number,
-        required: true,
-      },
-      business: {
-        type: Number,
-        required: true,
-      },
-      economy: {
-        type: Number,
-        required: true,
-      },
-    },
+        fromRow: {
+          type: Number,
+          required: true
+        },
+        toRow: {
+          type: Number,
+          required: true
+        },
+        columns: {
+          type: Number,
+          required: true
+        },
+        price: {
+          type: Number,
+          required: true
+        }
+      }
+    ],
     status: {
       type: String,
       enum: Object.values(FlightStatus),
@@ -150,8 +134,8 @@ const flightSchema = new mongoose.Schema(
           description: ret.description,
           departure: ret.departure,
           arrival: ret.arrival,
-          seatConfig: ret.seatConfig,
-          priceConfig: ret.priceConfig,
+          rows: ret.rows,
+          classConfig: ret.classConfig,
           status: ret.status
         }
       }

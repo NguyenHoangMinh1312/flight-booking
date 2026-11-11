@@ -59,32 +59,30 @@ it(
           airport: "SGN",
           date: "2026-09-04T19:39:50"
         },
-        seatConfig: {
-          rows: 3,
-          columns: 1,
-          classes: [
-            {
-              class: "economy",
-              fromRow: 1,
-              toRow: 1
-            },
-            {
-              class: "business",
-              fromRow: 2,
-              toRow: 2
-            },
-            {
-              class: "first",
-              fromRow: 3,
-              toRow: 3
-            }
-          ]
-        },
-        priceConfig: {
-          first: 100,
-          business: 50,
-          economy: 10
-        }
+        rows: 3,
+        classConfig: [
+          {
+            class: "first",
+            fromRow: 1,
+            toRow: 1,
+            columns: 2,
+            price: 500000
+          },
+          {
+            class: "business",
+            fromRow: 2,
+            toRow: 2,
+            columns: 4,
+            price: 2000000
+          },
+          {
+            class: "economy",
+            fromRow: 3,
+            toRow: 3,
+            columns: 6,
+            price: 5000000
+          }
+        ]
       })
       .expect(201)
 
@@ -97,6 +95,6 @@ it(
     // expect the event to be saved to outbox
     const outboxEvents = await Outbox.find({})
     expect(outboxEvents).toBeDefined()
-    expect(outboxEvents).toHaveLength(3 + 3)
+    expect(outboxEvents).toHaveLength(12 + 12)
   }
 )

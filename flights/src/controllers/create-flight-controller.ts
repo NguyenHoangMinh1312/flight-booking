@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { FlightDoc } from "../models/flight";
+import { FlightClass, FlightDoc } from "../models/flight";
 import { createFlight } from "../services/create-flight-service";
 import { BadRequestError } from "@mint1312-flight-booking/common";
 
@@ -8,8 +8,8 @@ type ReqBody = {
   description: string,
   departure: FlightDoc["departure"],
   arrival: FlightDoc["arrival"],
-  seatConfig: FlightDoc["seatConfig"],
-  priceConfig: FlightDoc["priceConfig"]
+  rows: number,
+  classConfig: FlightDoc["classConfig"]
 }
 
 export const createFlightController = async (
@@ -21,30 +21,34 @@ export const createFlightController = async (
     description,
     departure,
     arrival,
-    seatConfig,
-    priceConfig
+    rows,
+    classConfig
   } = req.body
 
   // input validation
   if (departure.date >= arrival.date)
     throw new BadRequestError("Departure date must be earlier than arrival date")
 
-  for (const classConfig of seatConfig.classes) {
-    if (classConfig.fromRow > classConfig.toRow)
+  // check for class config
+  for (const config of classConfig) {
+    if (config.fromRow > config.toRow)
       throw new BadRequestError(
-        `Starting row (${classConfig.fromRow}) cannot be greater than ending row (${classConfig.toRow}) for ${classConfig.class} class`
+        `Starting row (${config.fromRow}) cannot be greater than ending row (${config.toRow}) for ${config.class} class`
       )
 
-    if (classConfig.toRow > seatConfig.rows)
+    if (config.toRow > rows)
       throw new BadRequestError(
-        `Ending row (${classConfig.toRow}) for ${classConfig.class} class exceeds total rows (${seatConfig.rows})`
+        `Ending row (${config.toRow}) for ${config.class} class exceeds total rows (${rows})`
       )
   }
 
-  for (let i = 0; i < seatConfig.classes.length; i++) {
-    for (let j = i + 1; j < seatConfig.classes.length; j++) {
-      const a = seatConfig.classes[i]
-      const b = seatConfig.classes[j]
+  // check the overlap between seat config
+  const configSorted = classConfig.toSorted((a, b) => a.fromRow - b.fromRow)
+
+  for (let i = 0; i < configSorted.length; i++) {
+    for (let j = i + 1; j < configSorted.length; j++) {
+      const a = configSorted[i]
+      const b = configSorted[j]
 
       if (!a || !b)
         continue
@@ -62,8 +66,8 @@ export const createFlightController = async (
     description,
     departure,
     arrival,
-    seatConfig,
-    priceConfig
+    rows,
+    classConfig
   )
 
   res.status(201).send(flight)
