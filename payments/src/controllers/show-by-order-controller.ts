@@ -20,9 +20,6 @@ export const showByOrderController = async (
   if (!userRole)
     throw new BadRequestError("User role not provided")
 
-  console.log(userId)
-  console.log(userRole)
-
   const payment = await Payment.findOne({ order: orderId }).populate("order")
 
   if (!payment)
