@@ -3,14 +3,15 @@ import { beforeAll, beforeEach, afterAll } from "@jest/globals"
 import jwt from "jsonwebtoken"
 import { jest } from "@jest/globals"
 import mongoose from "mongoose"
+import { UserRole } from "@mint1312-flight-booking/common"
 
 declare global {
-  var signin: (id?: string) => string[]
+  var signin: (role: UserRole, id?: string) => string[]
 }
 
 jest.mock("../nats-wrapper")
-jest.mock("../queues/refund-queue")
-jest.mock("../stripe")
+jest.mock("../workers/refund-worker")
+jest.mock("../services/payment-clients/stripe-client")
 
 let mongo: MongoMemoryReplSet
 
@@ -44,11 +45,12 @@ afterAll(async () => {
 }, 30000)
 
 // global helper function for testing 
-global.signin = (id?: string) => {
+global.signin = (role: UserRole, id?: string) => {
   // Build a JWT payload
   const payload = {
     id: id || new mongoose.Types.ObjectId().toHexString(),
-    email: "test@test.com"
+    email: "test@test.com",
+    role
   }
 
   // Create the JWT

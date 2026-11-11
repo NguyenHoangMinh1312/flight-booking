@@ -4,10 +4,8 @@ import mongoose from "mongoose"
 import { JsMsg } from "nats"
 import { Order } from "../../../models/order"
 import { OrderAwaitingRefundEvent, OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
-import { Payment } from "../../../models/payment"
-import { refundQueue } from "../../../queues/refund-queue"
-
-jest.mock("../../../stripe")
+import { Payment, PaymentProvider } from "../../../models/payment"
+import { refundWorker } from "../../../workers/refund-worker"
 
 it(
   "Checks if the listener handles event order:awating-refund successfully",
@@ -27,8 +25,9 @@ it(
 
     // create a new payment
     const payment = Payment.build({
-      orderId: order.id,
-      stripeId: "pi_test"
+      order,
+      transactionId: "123",
+      provider: PaymentProvider.Stripe
     })
     await payment.save()
 
@@ -36,9 +35,6 @@ it(
     const data: OrderAwaitingRefundEvent["data"] = {
       id: order.id,
       version: order.version + 1,
-      ticket: {
-        id: new mongoose.Types.ObjectId().toHexString(),
-      },
       reason: RefundReason.FlightCanceled
     }
 
@@ -51,7 +47,7 @@ it(
     await listener.onMessage(data, msg)
 
     // check if the refund request sent to queue
-    expect(refundQueue.add).toHaveBeenCalledTimes(1)
+    expect(refundWorker.add).toHaveBeenCalledTimes(1)
 
     // check if the ack is called
     expect(msg.ack).toHaveBeenCalledTimes(1)

@@ -4,7 +4,7 @@ import { queueGroupName } from "./queue-group-name"
 import { Order } from "../../models/order"
 import { Payment } from "../../models/payment"
 import mongoose from "mongoose"
-import { refundQueue } from "../../queues/refund-queue"
+import { refundWorker } from "../../workers/refund-worker"
 
 export class OrderAwaitingRefundListener extends Listener<OrderAwaitingRefundEvent> {
   readonly subject = Subjects.OrderAwaitingRefund
@@ -24,7 +24,7 @@ export class OrderAwaitingRefundListener extends Listener<OrderAwaitingRefundEve
       throw new Error("Out of order event received")
 
     // find the payment
-    const payment = await Payment.findOne({ orderId: order.id })
+    const payment = await Payment.findOne({ order })
     if (!payment)
       throw Error("Payment not found")
 
@@ -42,9 +42,9 @@ export class OrderAwaitingRefundListener extends Listener<OrderAwaitingRefundEve
       await order.save({ session })
 
       // send the refund request to queue
-      refundQueue.add({
+      refundWorker.add({
         orderId: order.id,
-        stripeId: payment.stripeId,
+        transactionId: payment.transactionId,
         price: order.price,
         reason: data.reason
       })

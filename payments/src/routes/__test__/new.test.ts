@@ -3,12 +3,13 @@ import { app } from "../../app"
 import mongoose from "mongoose"
 import { Order } from "../../models/order"
 import { OrderStatus } from "@mint1312-flight-booking/common"
-import { stripe } from "../../stripe"
+import { stripeClient } from "../../services/payment-clients/stripe-client"
+import { UserRole } from "@mint1312-flight-booking/common"
 
 it("Returns 404 when order does not exist", async () => {
   await request(app)
-    .post("/api/payments/create-intent")
-    .set("Cookie", global.signin())
+    .post("/api/payments")
+    .set("Cookie", global.signin(UserRole.Customer))
     .send({
       orderId: new mongoose.Types.ObjectId().toHexString(),
     })
@@ -26,8 +27,8 @@ it("Returns 401 when order does not belong to user", async () => {
   await order.save()
 
   await request(app)
-    .post("/api/payments/create-intent")
-    .set("Cookie", global.signin())
+    .post("/api/payments")
+    .set("Cookie", global.signin(UserRole.Customer))
     .send({
       orderId: order.id,
     })
@@ -46,8 +47,8 @@ it("Returns 400 when order is canceled", async () => {
   await order.save()
 
   await request(app)
-    .post("/api/payments/create-intent")
-    .set("Cookie", global.signin(userId))
+    .post("/api/payments")
+    .set("Cookie", global.signin(UserRole.Customer, userId))
     .send({
       orderId: order.id,
     })
@@ -65,14 +66,14 @@ it("Returns 201 with clientSecret when creating payment intent successfully", as
   })
   await order.save()
 
-  jest.mocked(stripe.paymentIntents.create).mockResolvedValue({
+  jest.mocked(stripeClient.pay).mockResolvedValue({
     id: "pi_test_123",
     client_secret: "pi_test_123_secret_xyz",
   } as any)
 
   const response = await request(app)
-    .post("/api/payments/create-intent")
-    .set("Cookie", global.signin(userId))
+    .post("/api/payments")
+    .set("Cookie", global.signin(UserRole.Customer, userId))
     .send({
       orderId: order.id,
     })
@@ -80,13 +81,5 @@ it("Returns 201 with clientSecret when creating payment intent successfully", as
 
   expect(response.body.clientSecret).toEqual("pi_test_123_secret_xyz")
   expect(response.body.paymentIntentId).toEqual("pi_test_123")
-  expect(stripe.paymentIntents.create).toHaveBeenCalledWith(
-    expect.objectContaining({
-      amount: 1500000,
-      currency: "vnd",
-      metadata: expect.objectContaining({
-        orderId: order.id,
-      }),
-    })
-  )
+  expect(stripeClient.pay).toHaveBeenCalledWith(order.price, "vnd", order.id, { userId })
 })

@@ -1,10 +1,15 @@
 import mongoose from "mongoose"
+import { OrderDoc } from "./order"
+
+export enum PaymentProvider {
+  Stripe = "Stripe",
+}
 
 // interface that describes the properties to create a new payment
 interface PaymentAttrs {
-  orderId: string,
-  stripeId: string,
-  isRefund?: boolean
+  order: OrderDoc,
+  provider: PaymentProvider,
+  transactionId: string,
 }
 
 // interface that describes the properties that a payment model has
@@ -16,26 +21,27 @@ interface PaymentModel extends mongoose.Model<PaymentDoc> {
 interface PaymentDoc extends mongoose.Document {
   id: string,
   version: number,
-  orderId: string,
-  stripeId: string,
-  isRefund: boolean
+  order: OrderDoc,
+  provider: PaymentProvider,
+  transactionId: string,
 }
 
 // payment model schema
 const paymentSchema = new mongoose.Schema(
   {
-    orderId: {
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order"
+    },
+    provider: {
+      type: String,
+      enum: Object.values(PaymentProvider),
+      required: true
+    },
+    transactionId: {
       type: String,
       required: true
     },
-    stripeId: {
-      type: String,
-      required: true
-    },
-    isRefund: {
-      type: Boolean,
-      default: false
-    }
   },
   {
     versionKey: "version",
@@ -45,9 +51,9 @@ const paymentSchema = new mongoose.Schema(
         return {
           id: ret._id,
           version: ret.__v,
-          orderId: ret.orderId,
-          stripeId: ret.stripeId,
-          isRefund: ret.isRefund
+          order: ret.order,
+          provider: ret.provider,
+          transactionId: ret.transactionId
         }
       }
     }

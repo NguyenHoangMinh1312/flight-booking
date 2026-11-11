@@ -18,7 +18,6 @@ it(
       version: 0,
       status: OrderStatus.Created,
       userId: new mongoose.Types.ObjectId().toHexString(),
-      expiresAt: new Date().toISOString(),
       ticket: {
         id: new mongoose.Types.ObjectId().toHexString(),
         price: 10

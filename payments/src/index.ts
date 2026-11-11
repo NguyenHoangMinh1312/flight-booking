@@ -5,8 +5,8 @@ import { OrderCreatedListener } from "./events/listeners/order-created-listener"
 import { OrderCanceledListener } from "./events/listeners/order-canceled-listener"
 import { OrderCompleteListener } from "./events/listeners/order-complete-listener"
 import { OrderAwaitingRefundListener } from "./events/listeners/order-awaiting-refund-listener"
-import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
-import "./queues/refund-queue"
+import { outboxPublisherWorker } from "./workers/outbox-publisher-worker"
+import "./workers/refund-worker"
 
 const start = async () => {
   if (!process.env.JWT_KEY)

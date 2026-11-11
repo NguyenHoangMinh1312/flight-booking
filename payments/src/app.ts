@@ -2,8 +2,9 @@ import express from "express"
 import { json } from "body-parser"
 import cookieSession from "cookie-session"
 import { errorHandler, NotFoundError, currentUser } from "@mint1312-flight-booking/common"
-import { createPaymentIntentRouter } from "./routes/create-intent"
+import { createPaymentRouter } from "./routes/new"
 import { stripeWebhookRouter } from "./routes/stripe-webhook"
+import { showByOrderRouter } from "./routes/show-by-order"
 
 const app = express()
 app.set("trust proxy", true)
@@ -28,7 +29,8 @@ app.use(currentUser)
 
 // routers
 app.use(stripeWebhookRouter)
-app.use(createPaymentIntentRouter)
+app.use(createPaymentRouter)
+app.use(showByOrderRouter)
 
 app.all("/{*splat}", () => { throw new NotFoundError() })
 

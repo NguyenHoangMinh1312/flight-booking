@@ -29,7 +29,6 @@ it(
       ticket: {
         id: new mongoose.Types.ObjectId().toHexString(),
       },
-      userId: new mongoose.Types.ObjectId().toHexString()
     }
 
     // fake the ack function
