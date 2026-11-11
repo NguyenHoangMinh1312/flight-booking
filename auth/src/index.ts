@@ -3,7 +3,7 @@ import { app } from "./app"
 import { User } from "./models/user"
 import { UserRole } from "@mint1312-flight-booking/common"
 import { natsWrapper } from "./nats-wrapper"
-import { outboxPublisherWorker } from "./events/publishers/outbox-publisher-worker"
+import { outboxPublisherWorker } from "./workers/outbox-publisher-worker"
 
 const start = async () => {
 
