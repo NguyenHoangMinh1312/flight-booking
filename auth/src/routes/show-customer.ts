@@ -1,6 +1,6 @@
 import express from "express"
 import { currentUser, requireAuth, requireManager } from "@mint1312-flight-booking/common"
-import { showController } from "../controllers/show-controller"
+import { showCustomerController } from "../controllers/show-customer-controller"
 
 const router = express.Router()
 
@@ -9,7 +9,7 @@ router.get(
   currentUser,
   requireAuth,
   requireManager,
-  showController
+  showCustomerController
 )
 
-export { router as showUserRouter }
+export { router as showCustomerRouter }

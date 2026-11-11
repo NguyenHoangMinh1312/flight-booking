@@ -6,7 +6,7 @@ import { signinRouter } from "./routes/signin"
 import { signoutRouter } from "./routes/signout"
 import { signupRouter } from "./routes/signup"
 import { errorHandler, NotFoundError } from "@mint1312-flight-booking/common"
-import { showUserRouter } from "./routes/show"
+import { showCustomerRouter } from "./routes/show-customer"
 import { verifyOtpRouter } from "./routes/verify-otp"
 import { resendOtpRouter } from "./routes/resend-otp"
 
@@ -24,7 +24,7 @@ app.use(currentUserRouter)
 app.use(signinRouter)
 app.use(signoutRouter)
 app.use(signupRouter)
-app.use(showUserRouter)
+app.use(showCustomerRouter)
 app.use(verifyOtpRouter)
 app.use(resendOtpRouter)
 

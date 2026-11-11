@@ -6,7 +6,7 @@ type ReqParams = {
   id: string
 }
 
-export const showController = async (
+export const showCustomerController = async (
   req: Request<ReqParams>,
   res: Response
 ) => {
