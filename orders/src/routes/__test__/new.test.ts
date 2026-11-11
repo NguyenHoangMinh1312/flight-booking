@@ -17,7 +17,9 @@ const buildTicket = async (departureDate?: Date) => {
       row: 1,
       column: 1
     },
-    departureDate: departureDate || new Date()
+    departureDate: departureDate || new Date(),
+    departureAirport: "HAN",
+    arrivalAirport: "SGN"
   })
   await ticket.save()
 

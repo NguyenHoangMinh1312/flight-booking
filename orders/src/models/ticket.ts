@@ -14,7 +14,9 @@ interface TicketAttrs {
     row: number;
     column: number;
   },
-  departureDate: Date
+  departureDate: Date,
+  departureAirport: string,
+  arrivalAirport: string
 }
 
 // interface that describes the properties that a User model has
@@ -35,6 +37,8 @@ export interface TicketDoc extends mongoose.Document {
     column: number;
   },
   departureDate: Date,
+  departureAirport: string,
+  arrivalAirport: string
   isReserved(): Promise<boolean>
 }
 
@@ -67,6 +71,14 @@ const ticketSchema = new mongoose.Schema(
     departureDate: {
       type: Date,
       required: true
+    },
+    departureAirport: {
+      type: String,
+      required: true,
+    },
+    arrivalAirport: {
+      type: String,
+      required: true,
     }
   },
   {
@@ -80,7 +92,9 @@ const ticketSchema = new mongoose.Schema(
           class: ret.class,
           status: ret.status,
           seat: ret.seat,
-          departureDate: ret.departureDate
+          departureDate: ret.departureDate,
+          departureAirport: ret.departureAirport,
+          arrivalAirport: ret.arrivalAirport
         }
       }
     }
@@ -96,7 +110,9 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
     class: attrs.class,
     status: attrs.status,
     seat: attrs.seat,
-    departureDate: attrs.departureDate
+    departureDate: attrs.departureDate,
+    departureAirport: attrs.departureAirport,
+    arrivalAirport: attrs.arrivalAirport
   })
 }
 

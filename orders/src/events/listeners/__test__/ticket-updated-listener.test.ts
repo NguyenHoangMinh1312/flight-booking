@@ -16,7 +16,9 @@ const buildTicket = async (ticketId?: string) => {
       row: 1,
       column: 1
     },
-    departureDate: new Date()
+    departureDate: new Date(),
+    departureAirport: "HAN",
+    arrivalAirport: "SGN"
   })
   await ticket.save()
 
@@ -43,8 +45,9 @@ it(
         row: 1,
         column: 1
       },
-      orderId: new mongoose.Types.ObjectId().toHexString(),
-      departureDate: new Date()
+      departureDate: new Date(),
+      departureAirport: "HAN",
+      arrivalAirport: "SGN"
     }
 
     // fake the ack function
@@ -85,8 +88,9 @@ it(
         row: 10,
         column: 10
       },
-      orderId: new mongoose.Types.ObjectId().toHexString(),
-      departureDate: new Date()
+      departureDate: new Date(),
+      departureAirport: "HAN",
+      arrivalAirport: "SGN"
     }
 
     // fake the ack function
@@ -104,6 +108,9 @@ it(
     expect(updatedTicket!.price).toEqual(data.price)
     expect(updatedTicket!.class).toEqual(data.class)
     expect(updatedTicket!.seat).toEqual(data.seat)
+    expect(updatedTicket!.departureDate).toEqual(data.departureDate)
+    expect(updatedTicket!.departureAirport).toEqual(data.departureAirport)
+    expect(updatedTicket!.arrivalAirport).toEqual(data.arrivalAirport)
 
     // check if the ack is called
     expect(msg.ack).toHaveBeenCalled()

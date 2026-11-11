@@ -47,8 +47,7 @@ export const cancelOrder = async (
         version: order.version,
         ticket: {
           id: order.ticket.id
-        },
-        userId: order.userId
+        }
       })
       await outboxEvent.save({ session })
     }
@@ -65,9 +64,6 @@ export const cancelOrder = async (
       const outboxEvent = OrderAwaitingRefundPublisher.buildOutboxEvent({
         id: order.id,
         version: order.version,
-        ticket: {
-          id: order.ticket.id
-        },
         reason: refundReason
       })
       await outboxEvent.save({ session })

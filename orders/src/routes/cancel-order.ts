@@ -18,4 +18,4 @@ router.delete(
   cancelOrderController
 )
 
-export { router as deleteOrderRouter }
+export { router as cancelOrderRouter }

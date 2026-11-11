@@ -33,10 +33,6 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
       const outboxEvent = OrderCompletePublisher.buildOutboxEvent({
         id: order.id,
         version: order.version,
-        ticket: {
-          id: order.ticket.id
-        },
-        userId: order.userId
       })
       await outboxEvent.save({ session })
 

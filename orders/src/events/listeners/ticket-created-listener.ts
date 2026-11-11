@@ -19,7 +19,9 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
       class: data.class,
       status: data.status as FlightStatus,
       seat: data.seat,
-      departureDate: data.departureDate
+      departureDate: data.departureDate,
+      departureAirport: data.departureAirport,
+      arrivalAirport: data.arrivalAirport
     })
     await ticket.save()
 

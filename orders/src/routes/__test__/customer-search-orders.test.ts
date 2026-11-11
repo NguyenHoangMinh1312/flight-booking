@@ -15,7 +15,9 @@ const buildTicket = async () => {
       row: 1,
       column: 1
     },
-    departureDate: new Date(Date.now() + 5 * 60 * 60 * 1000)
+    departureDate: new Date(Date.now() + 5 * 60 * 60 * 1000),
+    departureAirport: "HAN",
+    arrivalAirport: "SGN"
   })
   await ticket.save()
 
@@ -60,14 +62,14 @@ it(
 
     // Make request to get order from user 2
     const response = await request(app)
-      .get("/api/orders")
+      .get(`/api/orders`)
       .set("Cookie", user_2)
       .expect(200)
 
     // Make sure we only get orders from user 2
-    expect(response.body.length).toEqual(2)
-    expect(response.body[0].id).toEqual(order_3.body.id)
-    expect(response.body[1].id).toEqual(order_2.body.id)
-    console.log(response.body[0])
+    expect(response.body.orders).toHaveLength(2)
+    expect(response.body.total).toEqual(2)
+    expect(response.body.orders[0].id).toEqual(order_3.body.id)
+    expect(response.body.orders[1].id).toEqual(order_2.body.id)
   }
 )

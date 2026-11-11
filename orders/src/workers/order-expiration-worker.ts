@@ -41,8 +41,7 @@ class OrderExpirationWorker {
           version: order.version,
           ticket: {
             id: order.ticket.id
-          },
-          userId: order.userId
+          }
         })
         await outboxEvent.save({ session })
 

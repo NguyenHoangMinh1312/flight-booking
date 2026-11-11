@@ -35,8 +35,7 @@ export class RefundCompleteListener extends Listener<RefundCompleteEvent> {
         version: order.version,
         ticket: {
           id: order.ticket.id
-        },
-        userId: order.userId
+        }
       })
       await outboxEvent.save({ session })
 

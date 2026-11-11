@@ -53,7 +53,6 @@ export const createOrder = async (
       version: order.version,
       status: order.status,
       userId: order.userId,
-      expiresAt: order.expiresAt.toISOString(),
       ticket: {
         id: ticket.id,
         price: ticket.price

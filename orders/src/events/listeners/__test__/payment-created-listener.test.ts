@@ -24,7 +24,9 @@ it(
         row: 1,
         column: 1
       },
-      departureDate: new Date()
+      departureDate: new Date(),
+      departureAirport: "HAN",
+      arrivalAirport: "SGN"
     })
     await ticket.save()
 
@@ -42,7 +44,6 @@ it(
       id: new mongoose.Types.ObjectId().toHexString(),
       version: 0,
       orderId: order.id,
-      stripeId: new mongoose.Types.ObjectId().toHexString()
     }
 
     // fake the ack function

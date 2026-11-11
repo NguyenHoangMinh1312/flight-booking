@@ -6,7 +6,7 @@ import { UserRole } from "@mint1312-flight-booking/common"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 
 declare global {
-  var signin: () => string[]
+  var signin: (role?: UserRole) => string[]
 }
 
 jest.mock("../nats-wrapper")
@@ -44,12 +44,12 @@ afterAll(async () => {
 })
 
 // global helper function for testing 
-global.signin = () => {
+global.signin = (role = UserRole.Customer) => {
   // Build a JWT payload
   const payload = {
     id: new mongoose.Types.ObjectId().toHexString(),
     email: "test@test.com",
-    role: UserRole.Customer
+    role
   }
 
   // Create the JWT

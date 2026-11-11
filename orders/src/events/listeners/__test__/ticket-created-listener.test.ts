@@ -22,7 +22,9 @@ it(
         row: 1,
         column: 1
       },
-      departureDate: new Date()
+      departureDate: new Date(),
+      departureAirport: "HAN",
+      arrivalAirport: "SGN"
     }
 
     // fake the ack function
@@ -40,6 +42,9 @@ it(
     expect(ticket!.price).toEqual(data.price)
     expect(ticket!.class).toEqual(data.class)
     expect(ticket!.seat).toEqual(data.seat)
+    expect(ticket!.departureDate).toEqual(data.departureDate)
+    expect(ticket!.departureAirport).toEqual(data.departureAirport)
+    expect(ticket!.arrivalAirport).toEqual(data.arrivalAirport)
 
     // check if the ack is called
     expect(msg.ack).toHaveBeenCalled()

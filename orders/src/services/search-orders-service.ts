@@ -3,12 +3,18 @@ import { QueryFilter } from "mongoose"
 import { Order, OrderDoc } from "../models/order"
 
 export const searchOrders = async (
-  userId: string,
+  userId: string | undefined,
   createdDate: string | undefined,
-  status: OrderStatus | undefined
+  status: OrderStatus | undefined,
+  page: number,
+  limit: number
 ) => {
   // build the filter query
   const query: QueryFilter<OrderDoc> = {}
+
+  if (userId) {
+    query.userId = userId
+  }
 
   if (createdDate) {
     const startOfDay = new Date(createdDate)
@@ -24,12 +30,18 @@ export const searchOrders = async (
     query.status = status
 
   // search orders
-  const orders = await Order.find({
-    userId,
-    ...query
-  })
-    .populate("ticket")
-    .sort({ "createdAt": -1 })
+  limit = Math.max(0, limit)
+  const skip = (page - 1) * limit
 
-  return orders
+  const [orders, total] = await Promise.all([
+    Order.find(query)
+      .populate("ticket")
+      .sort({ "createdAt": -1 })
+      .skip(skip)
+      .limit(limit)
+    ,
+    Order.countDocuments(query)
+  ])
+
+  return { orders, total }
 }

@@ -60,8 +60,7 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
               version: order.version,
               ticket: {
                 id: ticket.id
-              },
-              userId: order.userId
+              }
             })
           )
           continue
@@ -80,9 +79,6 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
             OrderAwaitingRefundPublisher.buildOutboxEvent({
               id: order.id,
               version: order.version,
-              ticket: {
-                id: ticket.id
-              },
               reason: RefundReason.FlightCanceled
             })
           )

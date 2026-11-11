@@ -2,10 +2,11 @@ import express from "express"
 import { json } from "body-parser"
 import cookieSession from "cookie-session"
 import { errorHandler, NotFoundError, currentUser } from "@mint1312-flight-booking/common"
-import { indexOrderRouter } from "./routes"
+import { customerSearchOrderRouter } from "./routes/customer-search-orders"
 import { newOrderRouter } from "./routes/new"
-import { deleteOrderRouter } from "./routes/delete"
+import { cancelOrderRouter } from "./routes/cancel-order"
 import { showOrderRouter } from "./routes/show"
+import { managerSearchOrderRouter } from "./routes/manager-search-orders"
 
 
 const app = express()
@@ -20,9 +21,10 @@ app.use(cookieSession({
 
 app.use(currentUser)
 
-app.use(indexOrderRouter)
+app.use(customerSearchOrderRouter)
+app.use(managerSearchOrderRouter)
 app.use(newOrderRouter)
-app.use(deleteOrderRouter)
+app.use(cancelOrderRouter)
 app.use(showOrderRouter)
 
 
