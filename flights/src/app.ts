@@ -22,13 +22,13 @@ app.use(cookieSession({
 
 app.use(currentUser)
 
+app.use(getAirportsRouter)
 app.use(createFlightRouter)
 app.use(showByTicketRouter)
 app.use(showFlightRouter)
 app.use(searchFlightsRouter)
 app.use(updateFlightRouter)
 app.use(cancelFlightRouter)
-app.use(getAirportsRouter)
 
 app.all("/{*splat}", () => { throw new NotFoundError() })
 
