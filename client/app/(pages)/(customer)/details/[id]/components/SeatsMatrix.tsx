@@ -1,6 +1,7 @@
 import { useMemo, Fragment } from "react";
 import { Ticket, SeatClass } from "@/app/types/ticket";
 import { ClassConfig } from "@/app/types/flight";
+import { currencyFormatter } from "@/app/utils/format-currency";
 
 type Props = {
   rows?: number;
@@ -204,7 +205,7 @@ export default function SeatsMatrix({
                     <span className="text-xs font-medium text-slate-500">
                       From{" "}
                       <span className="font-bold text-slate-900">
-                        ${section.price}
+                        {currencyFormatter.format(section.price)}
                       </span>
                     </span>
                   )}
@@ -267,16 +268,13 @@ export default function SeatsMatrix({
                                   disabled={unavailable}
                                   onClick={() => onSelect(ticket)}
                                   aria-pressed={selected}
-                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
-                                    unavailable ? ", unavailable" : ""
-                                  }`}
-                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:blur-[1.5px] disabled:opacity-45 ${
-                                    classStyles[ticket.class]
-                                  } ${
-                                    selected
+                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${unavailable ? ", unavailable" : ""
+                                    }`}
+                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:blur-[1.5px] disabled:opacity-45 ${classStyles[ticket.class]
+                                    } ${selected
                                       ? "ring-2 ring-slate-900 ring-offset-2"
                                       : ""
-                                  }`}
+                                    }`}
                                 >
                                   {row}
                                   {columnLabel(column)}

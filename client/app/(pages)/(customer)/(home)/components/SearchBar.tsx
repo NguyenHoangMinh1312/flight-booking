@@ -184,7 +184,7 @@ export default function SearchBar({
               className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600"
             >
               <FaDollarSign className="text-sky-600" />
-              Max Economy Price
+              Max Price
             </label>
             <input
               id="maxPrice"

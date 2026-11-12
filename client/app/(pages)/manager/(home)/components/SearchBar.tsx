@@ -45,11 +45,11 @@ export default function SearchBar({
 
   const hasActiveFilters = Boolean(
     departureAirport.trim() ||
-      arrivalAirport.trim() ||
-      departureDate ||
-      flightNumber.trim() ||
-      status.trim() ||
-      maxPrice.trim()
+    arrivalAirport.trim() ||
+    departureDate ||
+    flightNumber.trim() ||
+    status.trim() ||
+    maxPrice.trim()
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -198,7 +198,7 @@ export default function SearchBar({
               className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600"
             >
               <FaDollarSign className="text-sky-600" />
-              Max Economy Price
+              Max Price
             </label>
             <input
               id="managerMaxPrice"

@@ -1,6 +1,7 @@
 import { useMemo, Fragment } from "react";
 import { Ticket, SeatClass } from "@/app/types/ticket";
 import { ClassConfig } from "@/app/types/flight";
+import { currencyFormatter } from "@/app/utils/format-currency";
 
 type Props = {
   rows?: number;
@@ -200,7 +201,7 @@ export default function SeatsMatrix({
                     <span className="text-xs font-medium text-slate-500">
                       From{" "}
                       <span className="font-bold text-slate-900">
-                        ${section.price}
+                        {currencyFormatter.format(section.price)}
                       </span>
                     </span>
                   )}
@@ -262,20 +263,16 @@ export default function SeatsMatrix({
                                   type="button"
                                   onClick={() => onSelect(ticket)}
                                   aria-pressed={selected}
-                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
-                                    isOrdered ? ", Ordered" : ""
-                                  }`}
-                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${
-                                    classStyles[ticket.class]
-                                  } ${
-                                    isOrdered
+                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${isOrdered ? ", Ordered" : ""
+                                    }`}
+                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${classStyles[ticket.class]
+                                    } ${isOrdered
                                       ? "opacity-45 blur-[1px] hover:opacity-75 hover:blur-none"
                                       : ""
-                                  } ${
-                                    selected
+                                    } ${selected
                                       ? "ring-2 ring-slate-900 ring-offset-2 opacity-90 blur-none"
                                       : ""
-                                  }`}
+                                    }`}
                                 >
                                   {row}
                                   {columnLabel(column)}
