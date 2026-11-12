@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import {
   FaCalendarAlt,
-  FaEnvelope,
+  FaIdCard,
   FaSearch,
   FaTag,
   FaUndoAlt,
@@ -11,7 +11,7 @@ import {
 import { OrderStatus } from "@/app/types/order";
 
 export type SearchFilters = {
-  userEmail?: string;
+  userId?: string;
   createdDate?: string;
   status?: string;
 };
@@ -27,26 +27,27 @@ export default function SearchBar({
   onReset,
   isLoading = false,
 }: SearchBarProps) {
-  const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [createdDate, setCreatedDate] = useState("");
   const [status, setStatus] = useState("");
 
-  const hasActiveFilters = Boolean(userEmail.trim() || createdDate || status.trim());
+  const hasActiveFilters = Boolean(
+    userId.trim() || createdDate || status.trim()
+  );
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSearch({
-      userEmail: userEmail.trim(),
+      userId: userId.trim(),
       createdDate,
       status: status.trim(),
     });
   };
 
   const handleReset = () => {
+    setUserId("");
     setCreatedDate("");
     setStatus("");
-    setUserEmail("");
-
     onReset();
   };
 
@@ -54,22 +55,22 @@ export default function SearchBar({
     <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* User Email */}
+          {/* User ID */}
           <div>
             <label
-              htmlFor="userEmail"
+              htmlFor="userId"
               className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600"
             >
-              <FaEnvelope className="text-sky-600" />
-              User Email
+              <FaIdCard className="text-sky-600" />
+              User ID
             </label>
             <input
-              id="userEmail"
-              name="userEmail"
+              id="userId"
+              name="userId"
               type="text"
-              placeholder="e.g. user@example.com"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="Enter customer user ID"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
             />
           </div>
