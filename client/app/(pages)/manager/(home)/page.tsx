@@ -88,7 +88,11 @@ export default function HomePage() {
 
   // initial load of flights
   useEffect(() => {
-    fetchFlights(1, DEFAULT_PAGE_SIZE);
+    const loadInitialFlights = async () => {
+      await fetchFlights(1, DEFAULT_PAGE_SIZE);
+    };
+
+    loadInitialFlights();
   }, []);
 
   const handleSearch = (filters: SearchFilters) => {

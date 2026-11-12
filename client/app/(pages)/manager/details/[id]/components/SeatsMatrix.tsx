@@ -1,8 +1,11 @@
+import { useMemo, Fragment } from "react";
 import { Ticket, SeatClass } from "@/app/types/ticket";
+import { ClassConfig } from "@/app/types/flight";
 
 type Props = {
-  rows: number;
-  columns: number;
+  rows?: number;
+  columns?: number;
+  classConfig?: ClassConfig[];
   tickets: Ticket[];
   selectedTicketId: string | null;
   onSelect: (ticket: Ticket) => void;
@@ -14,25 +17,114 @@ const classStyles: Record<SeatClass, string> = {
   economy: "border-sky-300 bg-sky-300 text-sky-950 hover:bg-sky-400",
 };
 
-const orderedStyle =
-  "border-slate-400 bg-slate-300 text-slate-700 hover:bg-slate-400";
+const classLabels: Record<SeatClass, string> = {
+  first: "First Class",
+  business: "Business Class",
+  economy: "Economy Class",
+};
+
+const classBadgeStyles: Record<SeatClass, string> = {
+  first: "border-amber-200 bg-amber-50 text-amber-900",
+  business: "border-orange-200 bg-orange-50 text-orange-900",
+  economy: "border-sky-200 bg-sky-50 text-sky-900",
+};
 
 const columnLabel = (column: number) =>
   String.fromCharCode(64 + column);
 
+interface SectionConfig {
+  class: SeatClass;
+  fromRow: number;
+  toRow: number;
+  columns: number;
+  price?: number;
+}
+
 export default function SeatsMatrix({
   rows,
   columns,
+  classConfig,
   tickets,
   selectedTicketId,
   onSelect,
 }: Props) {
-  const ticketsBySeat = new Map(
-    tickets.map((ticket) => [
-      `${ticket.seat.row}-${ticket.seat.column}`,
-      ticket,
-    ]),
-  );
+  const ticketsBySeat = useMemo(() => {
+    return new Map(
+      tickets.map((ticket) => [
+        `${ticket.seat.row}-${ticket.seat.column}`,
+        ticket,
+      ]),
+    );
+  }, [tickets]);
+
+  const sections: SectionConfig[] = useMemo(() => {
+    // 1. If classConfig is provided and not empty, use it
+    if (classConfig && classConfig.length > 0) {
+      return [...classConfig]
+        .sort((a, b) => a.fromRow - b.fromRow)
+        .map((cfg) => {
+          let cols = cfg.columns;
+          if (!cols || cols <= 0) {
+            const rowTickets = tickets.filter(
+              (t) => t.seat.row >= cfg.fromRow && t.seat.row <= cfg.toRow,
+            );
+            cols =
+              rowTickets.length > 0
+                ? Math.max(...rowTickets.map((t) => t.seat.column))
+                : (columns ?? 6);
+          }
+          return {
+            class: cfg.class,
+            fromRow: cfg.fromRow,
+            toRow: cfg.toRow,
+            columns: cols,
+            price: cfg.price,
+          };
+        });
+    }
+
+    // 2. Otherwise derive sections from tickets if available
+    const classSet = new Set(tickets.map((t) => t.class));
+    const knownOrder: SeatClass[] = ["first", "business", "economy"];
+    const presentClasses = knownOrder.filter((c) => classSet.has(c));
+    tickets.forEach((t) => {
+      if (!presentClasses.includes(t.class)) {
+        presentClasses.push(t.class);
+      }
+    });
+
+    if (presentClasses.length > 0) {
+      return presentClasses
+        .map((cls) => {
+          const classTickets = tickets.filter((t) => t.class === cls);
+          const fromRow = Math.min(...classTickets.map((t) => t.seat.row));
+          const toRow = Math.max(...classTickets.map((t) => t.seat.row));
+          const maxCol = Math.max(...classTickets.map((t) => t.seat.column));
+          return {
+            class: cls,
+            fromRow,
+            toRow,
+            columns: maxCol,
+            price: classTickets[0]?.price,
+          };
+        })
+        .sort((a, b) => a.fromRow - b.fromRow);
+    }
+
+    // 3. Fallback when only rows/columns are passed
+    if (rows && rows > 0) {
+      return [
+        {
+          class: "economy" as SeatClass,
+          fromRow: 1,
+          toRow: rows,
+          columns: columns ?? 6,
+        },
+      ];
+    }
+
+    return [];
+  }, [classConfig, tickets, rows, columns]);
 
   return (
     <section
@@ -69,89 +161,137 @@ export default function SeatsMatrix({
           </span>
 
           <span className="flex items-center gap-1.5">
-            <i className="h-3 w-3 rounded bg-slate-300" />
-            Ordered
+            <i className="h-3 w-3 rounded bg-slate-300 opacity-60" />
+            Ordered (Faded)
           </span>
         </div>
       </div>
 
       <div className="mt-7 overflow-x-auto pb-2">
-        <div
-          className="mx-auto grid min-w-max gap-2"
-          style={{
-            gridTemplateColumns: `2.5rem repeat(${columns}, minmax(3.25rem, 1fr))`,
-          }}
-        >
-          <span />
-
-          {Array.from({ length: columns }, (_, index) => (
-            <span
-              key={index}
-              className="text-center text-xs font-bold text-slate-400"
-            >
-              {columnLabel(index + 1)}
-            </span>
-          ))}
-
-          {Array.from({ length: rows }, (_, rowIndex) => {
-            const row = rowIndex + 1;
-
-            return [
-              <span
-                key={`row-${row}`}
-                className="flex items-center justify-center text-sm font-bold text-slate-500"
+        {sections.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-500">
+            No seats available for this flight.
+          </p>
+        ) : (
+          <div className="flex flex-col items-center gap-8 min-w-max">
+            {sections.map((section, sectionIdx) => (
+              <div
+                key={`${section.class}-${section.fromRow}-${sectionIdx}`}
+                className="w-fit space-y-3"
               >
-                {row}
-              </span>,
-
-              ...Array.from(
-                { length: columns },
-                (_, columnIndex) => {
-                  const column = columnIndex + 1;
-
-                  const ticket = ticketsBySeat.get(
-                    `${row}-${column}`,
-                  );
-
-                  if (!ticket) {
-                    return (
-                      <span
-                        key={`${row}-${column}`}
-                        className="h-12 rounded-lg border border-dashed border-slate-200"
-                        aria-label={`Seat ${row}${columnLabel(column)} unavailable`}
-                      />
-                    );
-                  }
-
-                  const isOrdered = ticket.orderId !== undefined;
-                  const selected = ticket.id === selectedTicketId;
-
-                  return (
-                    <button
-                      key={ticket.id}
-                      type="button"
-                      onClick={() => onSelect(ticket)}
-                      aria-pressed={selected}
-                      aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
-                        isOrdered ? ", Ordered" : ""
-                      }`}
-                      className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${
-                        isOrdered ? orderedStyle : classStyles[ticket.class]
-                      } ${
-                        selected
-                          ? "ring-2 ring-slate-900 ring-offset-2"
-                          : ""
-                      }`}
+                {/* Cabin Class Header */}
+                <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`rounded-md border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${classBadgeStyles[section.class]}`}
                     >
-                      {row}
-                      {columnLabel(column)}
-                    </button>
-                  );
-                },
-              ),
-            ];
-          })}
-        </div>
+                      {classLabels[section.class]}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {section.fromRow === section.toRow
+                        ? `Row ${section.fromRow}`
+                        : `Rows ${section.fromRow}–${section.toRow}`}{" "}
+                      • {section.columns}{" "}
+                      {section.columns === 1 ? "seat" : "seats"} per row
+                    </span>
+                  </div>
+
+                  {section.price !== undefined && (
+                    <span className="text-xs font-medium text-slate-500">
+                      From{" "}
+                      <span className="font-bold text-slate-900">
+                        ${section.price}
+                      </span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Seats Grid */}
+                <div
+                  className="grid gap-2"
+                  style={{
+                    gridTemplateColumns: `2.5rem repeat(${section.columns}, minmax(3.25rem, 1fr))`,
+                  }}
+                >
+                  <span />
+
+                  {Array.from({ length: section.columns }, (_, index) => (
+                    <span
+                      key={index}
+                      className="text-center text-xs font-bold text-slate-400"
+                    >
+                      {columnLabel(index + 1)}
+                    </span>
+                  ))}
+
+                  {Array.from(
+                    { length: section.toRow - section.fromRow + 1 },
+                    (_, rowIndex) => {
+                      const row = section.fromRow + rowIndex;
+
+                      return (
+                        <Fragment key={`row-${row}`}>
+                          <span className="flex items-center justify-center text-sm font-bold text-slate-500">
+                            {row}
+                          </span>
+
+                          {Array.from(
+                            { length: section.columns },
+                            (_, columnIndex) => {
+                              const column = columnIndex + 1;
+                              const ticket = ticketsBySeat.get(
+                                `${row}-${column}`,
+                              );
+
+                              if (!ticket) {
+                                return (
+                                  <span
+                                    key={`${row}-${column}`}
+                                    className="h-12 rounded-lg border border-dashed border-slate-200"
+                                    aria-label={`Seat ${row}${columnLabel(column)} unavailable`}
+                                  />
+                                );
+                              }
+
+                              const isOrdered = Boolean(ticket.orderId);
+                              const selected = ticket.id === selectedTicketId;
+
+                              return (
+                                <button
+                                  key={ticket.id}
+                                  type="button"
+                                  onClick={() => onSelect(ticket)}
+                                  aria-pressed={selected}
+                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
+                                    isOrdered ? ", Ordered" : ""
+                                  }`}
+                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${
+                                    classStyles[ticket.class]
+                                  } ${
+                                    isOrdered
+                                      ? "opacity-45 blur-[1px] hover:opacity-75 hover:blur-none"
+                                      : ""
+                                  } ${
+                                    selected
+                                      ? "ring-2 ring-slate-900 ring-offset-2 opacity-90 blur-none"
+                                      : ""
+                                  }`}
+                                >
+                                  {row}
+                                  {columnLabel(column)}
+                                </button>
+                              );
+                            },
+                          )}
+                        </Fragment>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

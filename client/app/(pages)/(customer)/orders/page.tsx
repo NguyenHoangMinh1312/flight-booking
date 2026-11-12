@@ -61,7 +61,11 @@ export default function OrdersPage() {
 
   // initial load of orders
   useEffect(() => {
-    fetchOrders(1, DEFAULT_PAGE_SIZE);
+    const loadInitialOrders = async () => {
+      await fetchOrders(1, DEFAULT_PAGE_SIZE);
+    };
+
+    loadInitialOrders();
   }, []);
 
   const handleSearch = (filters: SearchFilters) => {
