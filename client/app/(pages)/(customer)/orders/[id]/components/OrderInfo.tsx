@@ -7,40 +7,47 @@ import {
   FaUser,
   FaHourglassEnd,
 } from "react-icons/fa";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus } from "@/app/types/order";
 import { formatDateTime } from "@/app/utils/format-datetime";
 
 type OrderInfoProps = {
   order: Order;
 };
 
-function getOrderStatusConfig(status: string) {
-  switch (status.toLowerCase()) {
-    case "complete":
+function getOrderStatusConfig(status: OrderStatus) {
+  switch (status) {
+    case OrderStatus.Complete:
       return {
         label: "Complete",
         description: "Payment has been processed successfully.",
         badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
         icon: <FaCheckCircle className="text-emerald-500" />,
       };
-    case "created":
+    case OrderStatus.Created:
       return {
         label: "Created",
         description: "Order placed. Awaiting customer payment.",
         badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
         icon: <FaClock className="text-amber-500" />,
       };
-    case "awaiting-refund":
+    case OrderStatus.AwaitingRefund:
       return {
         label: "Awaiting Refund",
         description: "Your refund request is being processed.",
         badgeClass: "bg-purple-50 text-purple-700 border-purple-200",
         icon: <FaUndoAlt className="text-purple-500" />,
       };
-    case "canceled":
+    case OrderStatus.Canceled:
       return {
         label: "Canceled",
         description: "This order has been canceled.",
+        badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
+        icon: <FaTimesCircle className="text-rose-500" />,
+      };
+    case OrderStatus.RefundFailed:
+      return {
+        label: "Refund Failed",
+        description: "Your refund request failed to process.",
         badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
         icon: <FaTimesCircle className="text-rose-500" />,
       };

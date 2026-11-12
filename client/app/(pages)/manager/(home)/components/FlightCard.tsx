@@ -1,14 +1,14 @@
 import { FaCheckCircle, FaPlane, FaTimesCircle } from "react-icons/fa";
 import Link from "next/link";
-import { Flight } from "@/app/types/flight";
+import { Flight, FlightStatus } from "@/app/types/flight";
 import { formatDateTime } from "@/app/utils/format-datetime";
 import { currencyFormatter } from "@/app/utils/format-currency";
 
 type FlightCardProps = { flight: Flight };
 
 // get the corresponding style base on the flight status
-function getStatusDetails(status?: string) {
-  const isCanceled = status?.toLowerCase() === "canceled"
+function getStatusDetails(status?: FlightStatus) {
+  const isCanceled = status === FlightStatus.Canceled
 
   if (isCanceled) {
     return {

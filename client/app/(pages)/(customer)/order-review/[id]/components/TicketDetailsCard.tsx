@@ -1,11 +1,12 @@
 import { FaTicketAlt, FaTag } from "react-icons/fa";
 import { Ticket } from "@/app/types/ticket";
+import { OrderStatus } from "@/app/types/order";
 import { columnLabel } from "@/app/utils/column-label";
 import { currencyFormatter } from "@/app/utils/format-currency";
 
 type Props = {
   ticket: Ticket;
-  status: string;
+  status: OrderStatus;
 };
 
 export default function TicketDetailsCard({ ticket, status }: Props) {

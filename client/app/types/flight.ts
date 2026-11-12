@@ -1,5 +1,9 @@
-export type FlightStatus = "available" | "canceled"
 import { SeatClass } from "./ticket";
+
+export enum FlightStatus {
+  Available = "available",
+  Canceled = "canceled"
+}
 
 export type ClassConfig = {
   class: SeatClass,

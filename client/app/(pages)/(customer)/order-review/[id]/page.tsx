@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FaExclamationTriangle, FaArrowLeft } from "react-icons/fa";
 import StripePayment from "./components/StripePayment";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
 import OrderHeaderBanner from "./components/OrderHeaderBanner";
 import FlightDetailsCard from "./components/FlightDetailsCard";
@@ -66,7 +66,7 @@ export default function OrderReviewPage() {
 
   // Reservation timer countdown loop
   useEffect(() => {
-    if (!order?.expiresAt || order?.status === "complete")
+    if (!order?.expiresAt || order?.status === OrderStatus.Complete)
       return;
 
     const updateTimer = () => {
@@ -82,10 +82,10 @@ export default function OrderReviewPage() {
     return () => clearInterval(interval);
   }, [order?.expiresAt, order?.status]);
 
-  const isComplete = order?.status === "complete";
+  const isComplete = order?.status === OrderStatus.Complete;
   const isExpired =
     !isComplete &&
-    ((timeLeft !== null && timeLeft <= 0) || order?.status === "canceled");
+    ((timeLeft !== null && timeLeft <= 0) || order?.status === OrderStatus.Canceled);
 
 
   if (isLoading) {

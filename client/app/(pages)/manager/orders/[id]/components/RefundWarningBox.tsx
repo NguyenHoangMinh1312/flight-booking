@@ -12,10 +12,10 @@ type RefundWarningBoxProps = {
 };
 
 const refundReasons: { value: RefundReason; label: string }[] = [
-  { value: "flight-canceled", label: "Flight was canceled" },
-  { value: "emergency", label: "Personal emergency" },
-  { value: "incorrect-booking-info", label: "Incorrect booking information" },
-  { value: "other", label: "Other reasons" },
+  { value: RefundReason.FlightCanceled, label: "Flight was canceled" },
+  { value: RefundReason.Emergency, label: "Personal emergency" },
+  { value: RefundReason.IncorrectBookingInfo, label: "Incorrect booking information" },
+  { value: RefundReason.Other, label: "Other reasons" },
 ];
 
 export default function RefundWarningBox({
@@ -24,7 +24,7 @@ export default function RefundWarningBox({
   onConfirm,
   isLoading = false,
 }: RefundWarningBoxProps) {
-  const [refundReason, setRefundReason] = useState<RefundReason>("emergency");
+  const [refundReason, setRefundReason] = useState<RefundReason>(RefundReason.Emergency);
 
   if (!isOpen) {
     return null;

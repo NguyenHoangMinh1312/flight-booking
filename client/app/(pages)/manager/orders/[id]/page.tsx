@@ -10,7 +10,7 @@ import OrderInfo from "@/app/(pages)/(customer)/orders/[id]/components/OrderInfo
 import CustomerInfo from "./components/CustomerInfo";
 import PaymentInfo from "@/app/(pages)/(customer)/orders/[id]/components/PaymentInfo";
 import Footer from "./components/Footer";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
 import { User } from "@/app/types/user";
 import { Payment } from "@/app/types/payment";
@@ -85,7 +85,7 @@ export default function OrderDetailsPage() {
   // fetch the payment details
   useEffect(() => {
     async function fetchPayment() {
-      if (order?.status !== "complete" || !order.id)
+      if (order?.status !== OrderStatus.Complete || !order.id)
         return
       try {
         const data = await apiFetch<Payment>(
@@ -110,7 +110,7 @@ export default function OrderDetailsPage() {
     if (order) {
       setOrder({
         ...order,
-        status: "awaiting-refund",
+        status: OrderStatus.AwaitingRefund,
       });
     }
   };

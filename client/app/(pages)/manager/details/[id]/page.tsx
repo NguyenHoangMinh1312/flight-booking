@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 
-import { Flight } from "@/app/types/flight";
+import { Flight, FlightStatus } from "@/app/types/flight";
 import FlightInfo from "@/app/(pages)/(customer)/details/[id]/components/FlightInfo";
 import SeatsMatrix from "./components/SeatsMatrix";
 import TicketInfo from "./components/TicketInfo";
@@ -127,7 +127,7 @@ export default function FlightDetailsPage() {
               <button
                 type="button"
                 onClick={() => setShowCancelWarning(true)}
-                disabled={isCanceling || details.flight.status === "canceled"}
+                disabled={isCanceling || details.flight.status === FlightStatus.Canceled}
                 className="w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {isCanceling ? "Canceling..." : "Cancel flight"}
