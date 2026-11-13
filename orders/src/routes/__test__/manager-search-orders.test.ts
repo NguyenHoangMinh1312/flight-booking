@@ -41,7 +41,7 @@ it(
 
     // Make request to get order from manager
     const response = await request(app)
-      .get(`/api/manager/orders?orderId=${newOrderResponse.body.orderId}`)
+      .get(`/api/orders/all?orderId=${newOrderResponse.body.orderId}`)
       .set("Cookie", global.signin(UserRole.Manager))
       .expect(200)
 

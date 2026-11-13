@@ -4,7 +4,7 @@ import { managerSearchOrdersController } from "../controllers/manager-search-ord
 const router = express.Router()
 
 router.get(
-  "/api/manager/orders",
+  "/api/orders/all",
   requireAuth,
   requireManager,
   managerSearchOrdersController
