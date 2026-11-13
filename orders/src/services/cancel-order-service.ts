@@ -45,6 +45,7 @@ export const cancelOrder = async (
       const outboxEvent = OrderCanceledPublisher.buildOutboxEvent({
         id: order.id,
         version: order.version,
+        userId: order.userId,
         ticket: {
           id: order.ticket.id
         }

@@ -4,6 +4,7 @@ import { Order } from "../../models/order"
 import { queueGroupName } from "./queue-group-name"
 import mongoose from "mongoose"
 import { OrderCompletePublisher } from "../publishers/order-complete-publisher"
+import { Ticket } from "../../models/ticket"
 
 export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
   readonly subject = Subjects.PaymentCreated
@@ -33,6 +34,10 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
       const outboxEvent = OrderCompletePublisher.buildOutboxEvent({
         id: order.id,
         version: order.version,
+        userId: order.userId,
+        ticket: {
+          id: order.ticket.id
+        }
       })
       await outboxEvent.save({ session })
 

@@ -58,6 +58,7 @@ export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
             OrderCanceledPublisher.buildOutboxEvent({
               id: order.id,
               version: order.version,
+              userId: order.userId,
               ticket: {
                 id: ticket.id
               }

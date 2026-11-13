@@ -39,6 +39,7 @@ class OrderExpirationWorker {
         const outboxEvent = OrderCanceledPublisher.buildOutboxEvent({
           id: order.id,
           version: order.version,
+          userId: order.userId,
           ticket: {
             id: order.ticket.id
           }
