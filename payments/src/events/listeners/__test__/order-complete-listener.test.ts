@@ -26,6 +26,10 @@ it(
     const data: OrderCompleteEvent["data"] = {
       id: order.id,
       version: order.version + 1,
+      userId: new mongoose.Types.ObjectId().toHexString(),
+      ticket: {
+        id: new mongoose.Types.ObjectId().toHexString(),
+      }
     }
 
     // fake the ack function

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { stripeClient } from "../services/payment-clients/stripe-client";
-import { handleStripeWebhook } from "../services/stripe-webhook-service";
+import { confirmPayment } from "../services/confirm-payment-service";
+import { PaymentProvider } from "../models/payment";
 
 export const stripeWebhookController = async (
   req: Request,
@@ -12,17 +13,26 @@ export const stripeWebhookController = async (
   if (!sig)
     return res.status(400).send({ error: "Missing stripe-signature header" })
 
-  let event
-  try {
-    event = stripeClient.getWebhooks(req.body, sig)
-  } catch (err: any) {
-    return res.status(400).send({ error: err.message || "Invalid signature" })
+  const event = stripeClient.constructEvent(req.body, sig)
+
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object
+    const orderId = paymentIntent.metadata?.orderId
+    const userId = paymentIntent.metadata?.userId
+
+    if (!orderId) {
+      console.log(`PaymentIntent ${paymentIntent.id} missing orderId in metadata`)
+      return res.send({ received: true })
+    }
+
+    if (!userId) {
+      console.log(`PaymentIntent ${paymentIntent.id} missing userId in metadata`)
+      return res.send({ received: true })
+    }
+
+    // save the payment info
+    await confirmPayment(orderId, userId, paymentIntent.id, PaymentProvider.Stripe)
   }
 
-  const { status, error } = await handleStripeWebhook(event)
-
-  if (error)
-    res.status(status).send({ error })
-  else
-    res.status(status).send({ received: true })
+  res.send({ received: true })
 }

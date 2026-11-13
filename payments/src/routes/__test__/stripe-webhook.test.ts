@@ -21,7 +21,7 @@ it(
   "returns 400 when signature verification fails",
   async () => {
     // mock the stripe webhook 
-    (stripeClient.getWebhooks as jest.Mock).mockImplementationOnce(() => {
+    (stripeClient.constructEvent as jest.Mock).mockImplementationOnce(() => {
       throw new Error("Invalid signature")
     })
 
@@ -48,12 +48,12 @@ it(
 
     const stripeId = "pi_test_123";
 
-    (stripeClient.getWebhooks as jest.Mock).mockReturnValueOnce({
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
       type: "payment_intent.succeeded",
       data: {
         object: {
           id: stripeId,
-          metadata: { orderId: order.id },
+          metadata: { orderId: order.id, userId: order.userId },
         },
       },
     })

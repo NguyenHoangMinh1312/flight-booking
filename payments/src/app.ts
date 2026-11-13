@@ -5,6 +5,7 @@ import { errorHandler, NotFoundError, currentUser } from "@mint1312-flight-booki
 import { createPaymentRouter } from "./routes/new"
 import { stripeWebhookRouter } from "./routes/stripe-webhook"
 import { showByOrderRouter } from "./routes/show-by-order"
+import { confirmStripePaymentRouter } from "./routes/confirm-stripe-payment"
 
 const app = express()
 app.set("trust proxy", true)
@@ -28,6 +29,7 @@ app.use(cookieSession({
 app.use(currentUser)
 
 // routers
+app.use(confirmStripePaymentRouter)
 app.use(stripeWebhookRouter)
 app.use(createPaymentRouter)
 app.use(showByOrderRouter)

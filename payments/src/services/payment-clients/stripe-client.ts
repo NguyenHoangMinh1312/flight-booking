@@ -35,8 +35,12 @@ export class StripeClient implements IPaymentClient {
     return refund.status === "succeeded" ? true : false
   }
 
-  public getWebhooks(payload: any, header: any): Event {
+  public constructEvent(payload: any, header: any): Event {
     return this.api.webhooks.constructEvent(payload, header, this.webhookSecret)
+  }
+
+  public async retrievePaymentIntent(paymentIntentId: string): Promise<Response<PaymentIntent>> {
+    return this.api.paymentIntents.retrieve(paymentIntentId);
   }
 }
 

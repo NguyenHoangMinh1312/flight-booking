@@ -26,6 +26,7 @@ it(
     const data: OrderCanceledEvent["data"] = {
       id: order.id,
       version: order.version + 1,
+      userId: new mongoose.Types.ObjectId().toHexString(),
       ticket: {
         id: new mongoose.Types.ObjectId().toHexString(),
       },
