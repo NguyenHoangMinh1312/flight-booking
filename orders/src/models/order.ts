@@ -11,11 +11,6 @@ interface OrderAttrs {
   refundReason?: RefundReason
 }
 
-// interface that describes the properties that a Order model has
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc
-}
-
 // interface that describes the properties that User document has
 export interface OrderDoc extends mongoose.Document {
   id: string,
@@ -91,6 +86,11 @@ orderSchema.index(
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs)
+}
+
+// interface that describes the properties that a Order model has
+interface OrderModel extends mongoose.Model<OrderDoc> {
+  build(attrs: OrderAttrs): OrderDoc
 }
 
 const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema)

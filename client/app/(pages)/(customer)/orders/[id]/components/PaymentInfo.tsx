@@ -67,20 +67,6 @@ export default function PaymentInfo({ payment }: PaymentInfoProps) {
             {payment.transactionId}
           </p>
         </div>
-
-        {/* Payment Verification / Status */}
-        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-5 sm:col-span-2 lg:col-span-1">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            <FaShieldAlt className="text-slate-400" />
-            <span>Security & Verification</span>
-          </div>
-          <p className="mt-2 text-sm font-bold text-slate-900">
-            Encrypted & Verified
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Transaction processed securely with 256-bit SSL encryption
-          </p>
-        </div>
       </div>
     </section>
   );

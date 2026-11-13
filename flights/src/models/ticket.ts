@@ -15,11 +15,6 @@ interface TicketAttrs {
   orderId?: string
 }
 
-// interface that describes the properties that a Ticket model has
-interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc
-}
-
 // interface that describes the properties that Ticket document has
 export interface TicketDoc extends mongoose.Document {
   id: string,
@@ -35,7 +30,7 @@ export interface TicketDoc extends mongoose.Document {
   orderId?: string
 }
 
-// User model schema
+// Ticket model schema
 const ticketSchema = new mongoose.Schema(
   {
     flight: {
@@ -92,6 +87,11 @@ const ticketSchema = new mongoose.Schema(
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
   return new Ticket(attrs)
+}
+
+// interface that describes the properties that a Ticket model has
+interface TicketModel extends mongoose.Model<TicketDoc> {
+  build(attrs: TicketAttrs): TicketDoc
 }
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema)

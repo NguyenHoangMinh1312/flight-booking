@@ -6,6 +6,7 @@ export interface OrderCanceledEvent {
   data: {
     id: string,
     version: number,
+    userId: string,
     ticket: {
       id: string,
     }

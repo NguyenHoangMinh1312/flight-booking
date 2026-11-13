@@ -8,11 +8,6 @@ export interface AirportAttrs {
   country: string;
 }
 
-// Interface describing the Airport model static methods
-interface AirportModel extends mongoose.Model<AirportDoc> {
-  build(attrs: AirportAttrs): AirportDoc;
-}
-
 // Interface describing the Airport document
 export interface AirportDoc extends mongoose.Document {
   code: string;
@@ -45,6 +40,18 @@ const airportSchema = new mongoose.Schema(
       trim: true,
     },
   },
+  {
+    toJSON: {
+      transform(_doc, ret) {
+        return {
+          code: ret.code,
+          name: ret.name,
+          city: ret.city,
+          country: ret.country,
+        };
+      }
+    }
+  }
 );
 
 airportSchema.index({ code: 1 }, { unique: true });
@@ -53,6 +60,11 @@ airportSchema.statics.build = (attrs: AirportAttrs) => {
   return new Airport(attrs);
 };
 
+// Interface describing the Airport model static methods
+interface AirportModel extends mongoose.Model<AirportDoc> {
+  build(attrs: AirportAttrs): AirportDoc;
+}
+
 const Airport = mongoose.model<AirportDoc, AirportModel>("Airport", airportSchema);
 
-export { Airport, airportSchema };
+export { Airport };

@@ -10,11 +10,6 @@ interface UserAttrs {
   isVerified?: boolean
 }
 
-// interface that describes the properties that a User model has
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: UserAttrs): UserDoc
-}
-
 // interface that describes the properties that User document has
 export interface UserDoc extends mongoose.Document {
   id: string
@@ -68,6 +63,11 @@ userSchema.pre("save", async function () {
 
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs)
+}
+
+// interface that describes the properties that a User model has
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(attrs: UserAttrs): UserDoc
 }
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema)

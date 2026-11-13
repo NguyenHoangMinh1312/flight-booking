@@ -16,13 +16,13 @@ spec:
         - name: orders
           image: mint1312/orders
           # image: asia.gcr.io/ticketing-dev-508215/orders
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "200m"
-              memory: "512Mi"
+          # resources:
+          #   requests:
+          #     cpu: "100m"
+          #     memory: "128Mi"
+          #   limits:
+          #     cpu: "200m"
+          #     memory: "512Mi"
           env:
             - name: NATS_URL
               value: "nats://nats-srv:4222"

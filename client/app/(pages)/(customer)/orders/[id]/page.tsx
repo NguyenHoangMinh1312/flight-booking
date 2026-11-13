@@ -113,11 +113,6 @@ export default function OrderDetailsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
               Order Details
             </h1>
-            {order?.id && (
-              <span className="rounded-full bg-slate-200/80 px-3 py-1 font-mono text-xs font-semibold text-slate-700">
-                #{order.id.slice(-8)}
-              </span>
-            )}
           </div>
         </div>
 

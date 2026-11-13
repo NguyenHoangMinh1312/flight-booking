@@ -12,11 +12,6 @@ interface PaymentAttrs {
   transactionId: string,
 }
 
-// interface that describes the properties that a payment model has
-interface PaymentModel extends mongoose.Model<PaymentDoc> {
-  build(attrs: PaymentAttrs): PaymentDoc
-}
-
 // interface that describes the properties that payment document has
 interface PaymentDoc extends mongoose.Document {
   id: string,
@@ -62,6 +57,11 @@ const paymentSchema = new mongoose.Schema(
 
 paymentSchema.statics.build = (attrs: PaymentAttrs) => {
   return new Payment(attrs)
+}
+
+// interface that describes the properties that a payment model has
+interface PaymentModel extends mongoose.Model<PaymentDoc> {
+  build(attrs: PaymentAttrs): PaymentDoc
 }
 
 const Payment = mongoose.model<PaymentDoc, PaymentModel>("Payment", paymentSchema)

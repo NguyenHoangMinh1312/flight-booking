@@ -6,11 +6,6 @@ interface OutboxAttrs {
   payload: Record<string, any>
 }
 
-// interface that describes the properties that a Outbox model has
-interface OutboxModel extends mongoose.Model<OutboxDoc> {
-  build(attrs: OutboxAttrs): OutboxDoc
-}
-
 // interface that describes the properties that Outbox document has
 export interface OutboxDoc extends mongoose.Document {
   eventType: string,
@@ -40,6 +35,11 @@ outboxSchema.index({ createdAt: 1 })
 
 outboxSchema.statics.build = (attrs: OutboxAttrs) => {
   return new Outbox(attrs)
+}
+
+// interface that describes the properties that a Outbox model has
+interface OutboxModel extends mongoose.Model<OutboxDoc> {
+  build(attrs: OutboxAttrs): OutboxDoc
 }
 
 const Outbox = mongoose.model<OutboxDoc, OutboxModel>("Outbox", outboxSchema)

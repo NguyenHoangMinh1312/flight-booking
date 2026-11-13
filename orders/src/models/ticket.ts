@@ -19,12 +19,6 @@ interface TicketAttrs {
   arrivalAirport: string
 }
 
-// interface that describes the properties that a User model has
-interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc
-  findByEvent(event: { id: string, version: number }): Promise<TicketDoc | null>
-}
-
 // interface that describes the properties that User document has
 export interface TicketDoc extends mongoose.Document {
   id: string,
@@ -134,6 +128,12 @@ ticketSchema.statics.findByEvent = (event: { id: string, version: number }) => {
     _id: event.id,
     version: event.version - 1
   })
+}
+
+// interface that describes the properties that a User model has
+interface TicketModel extends mongoose.Model<TicketDoc> {
+  build(attrs: TicketAttrs): TicketDoc
+  findByEvent(event: { id: string, version: number }): Promise<TicketDoc | null>
 }
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema)

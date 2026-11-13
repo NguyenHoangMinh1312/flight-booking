@@ -10,12 +10,6 @@ interface OrderAttrs {
   price: number
 }
 
-// interface that describes the properties that a Order model has
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc
-  findByEvent(event: { id: string, version: number }): Promise<OrderDoc | null>
-}
-
 // interface that describes the properties that User document has
 export interface OrderDoc extends mongoose.Document {
   id: string,
@@ -76,6 +70,12 @@ orderSchema.statics.findByEvent = (event: { id: string, version: number }) => {
     _id: event.id,
     version: event.version - 1
   })
+}
+
+// interface that describes the properties that a Order model has
+interface OrderModel extends mongoose.Model<OrderDoc> {
+  build(attrs: OrderAttrs): OrderDoc
+  findByEvent(event: { id: string, version: number }): Promise<OrderDoc | null>
 }
 
 const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema)

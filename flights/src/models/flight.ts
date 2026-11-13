@@ -30,11 +30,6 @@ interface FlightAttrs {
   status?: FlightStatus
 }
 
-// interface that describes the properties that a Flight model has
-interface FlightModel extends mongoose.Model<FlightDoc> {
-  build(attrs: FlightAttrs): FlightDoc
-}
-
 // interface that describes the properties that Flight document has
 export interface FlightDoc extends mongoose.Document {
   id: string,
@@ -73,6 +68,7 @@ const flightSchema = new mongoose.Schema(
       airport: {
         type: String,
         required: true,
+        ref: "Airport"
       },
       date: {
         type: Date,
@@ -83,6 +79,7 @@ const flightSchema = new mongoose.Schema(
       airport: {
         type: String,
         required: true,
+        ref: "Airport"
       },
       date: {
         type: Date,
@@ -145,6 +142,11 @@ const flightSchema = new mongoose.Schema(
 
 flightSchema.statics.build = (attrs: FlightAttrs) => {
   return new Flight(attrs)
+}
+
+// interface that describes the properties that a Flight model has
+interface FlightModel extends mongoose.Model<FlightDoc> {
+  build(attrs: FlightAttrs): FlightDoc
 }
 
 const Flight = mongoose.model<FlightDoc, FlightModel>("Flight", flightSchema)

@@ -8,12 +8,7 @@ interface OtpAttrs {
   lastSentAt: Date,
 }
 
-// interface that describes the properties that a Otp model has
-interface OtpModel extends mongoose.Model<OtpDoc> {
-  build(attrs: OtpAttrs): OtpDoc
-}
-
-// interface that describes the properties that User document has
+// interface that describes the properties that Otp document has
 interface OtpDoc extends mongoose.Document {
   id: string
   email: string,
@@ -57,6 +52,11 @@ otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
 
 otpSchema.statics.build = (attrs: OtpAttrs) => {
   return new Otp(attrs)
+}
+
+// interface that describes the properties that a Otp model has
+interface OtpModel extends mongoose.Model<OtpDoc> {
+  build(attrs: OtpAttrs): OtpDoc
 }
 
 const Otp = mongoose.model<OtpDoc, OtpModel>("Otp", otpSchema)

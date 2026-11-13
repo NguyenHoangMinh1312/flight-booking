@@ -6,5 +6,9 @@ export interface OrderCompleteEvent {
   data: {
     id: string,
     version: number,
+    userId: string,
+    ticket: {
+      id: string
+    }
   }
 }

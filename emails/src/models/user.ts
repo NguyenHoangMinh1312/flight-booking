@@ -6,11 +6,6 @@ interface UserAttrs {
   email: string
 }
 
-// interface that describes the properties that a User model has
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: UserAttrs): UserDoc
-}
-
 // interface that describes the properties that User document has
 interface UserDoc extends mongoose.Document {
   id: string
@@ -32,6 +27,11 @@ userSchema.statics.build = (attrs: UserAttrs) => {
     _id: attrs.id,
     email: attrs.email
   })
+}
+
+// interface that describes the properties that a User model has
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(attrs: UserAttrs): UserDoc
 }
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema)
