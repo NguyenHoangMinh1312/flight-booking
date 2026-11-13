@@ -6,7 +6,7 @@ import { createFlightRouter } from "./routes/new"
 import { showFlightRouter } from "./routes/show"
 import { searchFlightsRouter } from "./routes/search-flights"
 import { updateFlightRouter } from "./routes/update"
-import { showByTicketRouter } from "./routes/show-by-ticket"
+import { showByTicketRouter } from "./routes/show-flight-by-ticket"
 import { cancelFlightRouter } from "./routes/cancel-flight"
 import { getAirportsRouter } from "./routes/get-airports"
 

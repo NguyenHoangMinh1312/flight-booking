@@ -55,8 +55,8 @@ it(
     expect(getFlightRes.body.flight.id).toEqual(createFlightRes.body.id)
     expect(getFlightRes.body.flight.flightNumber).toEqual("VN123")
     expect(getFlightRes.body.flight.description).toEqual("Hanoi to Ho Chi Minh City")
-    expect(getFlightRes.body.flight.departure.airport).toEqual("HAN")
-    expect(getFlightRes.body.flight.arrival.airport).toEqual("SGN")
+    expect(getFlightRes.body.flight.departure.airport.code).toEqual("HAN")
+    expect(getFlightRes.body.flight.arrival.airport.code).toEqual("SGN")
     expect(getFlightRes.body.flight.rows).toEqual(2)
 
     expect(getFlightRes.body.tickets).toHaveLength(4)

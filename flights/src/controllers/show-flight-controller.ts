@@ -12,7 +12,16 @@ export const showFlightController = async (
   res: Response
 ) => {
   // find the flight
-  const flight = await Flight.findById(req.params.id)
+  const flight = await Flight.findById(req.params.id).populate([
+    {
+      path: "arrival.airport",
+      foreignField: "code"
+    },
+    {
+      path: "departure.airport",
+      foreignField: "code"
+    }
+  ]);
 
   if (!flight)
     throw new NotFoundError()

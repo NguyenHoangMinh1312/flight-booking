@@ -1,11 +1,11 @@
 import express from "express"
-import { showByTicketController } from "../controllers/show-by-ticket-controller"
+import { showFlightByTicketController } from "../controllers/show-flight-by-ticket-controller"
 
 const router = express.Router()
 
 router.get(
   "/api/flights/tickets/:ticketId",
-  showByTicketController
+  showFlightByTicketController
 )
 
 export { router as showByTicketRouter }

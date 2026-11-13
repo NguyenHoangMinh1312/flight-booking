@@ -6,7 +6,7 @@ type ReqParams = {
   ticketId: string
 }
 
-export const showByTicketController = async (
+export const showFlightByTicketController = async (
   req: Request<ReqParams>,
   res: Response
 ) => {
@@ -15,5 +15,16 @@ export const showByTicketController = async (
   if (!ticket)
     throw new NotFoundError()
 
-  res.send(ticket.flight)
+  const flight = await ticket.flight.populate([
+    {
+      path: "arrival.airport",
+      foreignField: "code"
+    },
+    {
+      path: "departure.airport",
+      foreignField: "code"
+    }
+  ])
+
+  res.send(flight)
 }

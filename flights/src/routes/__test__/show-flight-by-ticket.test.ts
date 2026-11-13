@@ -52,4 +52,6 @@ it("Returns the flight if ticket is found", async () => {
     .expect(200)
 
   expect(res.body.flightNumber).toEqual("VN123")
+  expect(res.body.departure.airport.code).toEqual("HAN")
+  expect(res.body.arrival.airport.code).toEqual("SGN")
 })

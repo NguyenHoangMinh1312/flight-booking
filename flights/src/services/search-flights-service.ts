@@ -19,10 +19,10 @@ export const searchFlights = async (
     query.flightNumber = { $regex: flightNumber.trim(), $options: "i" }
 
   if (departureAirport)
-    query["departure.airport"] = { $regex: departureAirport.trim(), $options: "i" }
+    query["departure.airport.code"] = { $regex: departureAirport.trim(), $options: "i" }
 
   if (arrivalAirport)
-    query["arrival.airport"] = { $regex: arrivalAirport.trim(), $options: "i" }
+    query["arrival.airport.code"] = { $regex: arrivalAirport.trim(), $options: "i" }
 
   if (departureDate) {
     const startOfDay = new Date(departureDate)
@@ -46,6 +46,16 @@ export const searchFlights = async (
 
   const [flights, total] = await Promise.all([
     Flight.find(query)
+      .populate([
+        {
+          path: "arrival.airport",
+          foreignField: "code"
+        },
+        {
+          path: "departure.airport",
+          foreignField: "code"
+        }
+      ])
       .sort({ "departure.date": -1 })
       .skip(skip)
       .limit(limit)
