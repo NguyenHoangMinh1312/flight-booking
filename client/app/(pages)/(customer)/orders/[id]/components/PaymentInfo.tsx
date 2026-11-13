@@ -1,7 +1,6 @@
 import {
   FaCreditCard,
   FaReceipt,
-  FaShieldAlt,
   FaCheckCircle,
 } from "react-icons/fa";
 import { Payment } from "@/app/types/payment";
@@ -42,7 +41,7 @@ export default function PaymentInfo({ payment }: PaymentInfoProps) {
       </div>
 
       {/* Details Grid */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid gap-4 grid-cols-2">
         {/* Payment Provider / Method */}
         <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-5">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">

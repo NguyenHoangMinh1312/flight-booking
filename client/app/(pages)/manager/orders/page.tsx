@@ -46,7 +46,7 @@ export default function ManagerOrdersPage() {
       }
 
       const queryString = params.toString();
-      const endpoint = `/api/manager/orders?${queryString}`;
+      const endpoint = `/api/orders/all?${queryString}`;
 
       const data = await apiFetch<{ orders: Order[]; total: number }>(endpoint, {
         credentials: "include",

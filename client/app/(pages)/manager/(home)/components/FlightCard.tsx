@@ -55,7 +55,7 @@ export default function FlightCard({ flight }: FlightCardProps) {
       <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div>
           <p className="font-semibold text-slate-900">
-            {flight.departure.airport}
+            {flight.departure.airport.code}
           </p>
           <p className="mt-1 text-sm text-slate-500">
             <span className="block">
@@ -74,7 +74,7 @@ export default function FlightCard({ flight }: FlightCardProps) {
         </div>
         <div className="text-right">
           <p className="font-semibold text-slate-900">
-            {flight.arrival.airport}
+            {flight.arrival.airport.code}
           </p>
           <p className="mt-1 text-sm text-slate-500">
             <span className="block">{arrival.date}</span>

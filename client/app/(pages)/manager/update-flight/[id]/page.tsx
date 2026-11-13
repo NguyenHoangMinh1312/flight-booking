@@ -169,9 +169,9 @@ export default function UpdateFlightPage() {
             />
 
             <RouteAndScheduleCard
-              departureAirport={flight.departure?.airport}
+              departureAirport={flight.departure?.airport.code}
               departureDate={formatToDateTimeLocal(flight.departure?.date)}
-              arrivalAirport={flight.arrival?.airport}
+              arrivalAirport={flight.arrival?.airport.code}
               arrivalDate={formatToDateTimeLocal(flight.arrival?.date)}
             />
 

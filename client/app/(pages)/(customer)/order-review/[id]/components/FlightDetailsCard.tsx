@@ -48,9 +48,19 @@ export default function FlightDetailsCard({ flight, ticket }: Props) {
             Departure
           </p>
           <p className="mt-2 text-xl font-bold text-slate-900">
-            {flight?.departure?.airport || "Origin Airport"}
+            {flight?.departure?.airport.code || "Origin Airport"}
           </p>
-          <p className="mt-1 text-sm text-slate-600">
+          {flight?.departure?.airport.name && (
+            <p className="text-sm font-medium text-slate-700">
+              {flight.departure.airport.name}
+            </p>
+          )}
+          {flight?.departure?.airport.city && flight?.departure?.airport.country && (
+            <p className="text-xs text-slate-500">
+              {flight.departure.airport.city}, {flight.departure.airport.country}
+            </p>
+          )}
+          <p className="mt-2 text-sm text-slate-600">
             <span>{departure.date}</span>
             {departure.time && <span className="ml-2">{departure.time}</span>}
           </p>
@@ -61,9 +71,19 @@ export default function FlightDetailsCard({ flight, ticket }: Props) {
             Arrival
           </p>
           <p className="mt-2 text-xl font-bold text-slate-900">
-            {flight?.arrival?.airport || "Destination Airport"}
+            {flight?.arrival?.airport.code || "Destination Airport"}
           </p>
-          <p className="mt-1 text-sm text-slate-600">
+          {flight?.arrival?.airport.name && (
+            <p className="text-sm font-medium text-slate-700">
+              {flight.arrival.airport.name}
+            </p>
+          )}
+          {flight?.arrival?.airport.city && flight?.arrival?.airport.country && (
+            <p className="text-xs text-slate-500">
+              {flight.arrival.airport.city}, {flight.arrival.airport.country}
+            </p>
+          )}
+          <p className="mt-2 text-sm text-slate-600">
             <span>{arrival.date}</span>
             {arrival.time && <span className="ml-2">{arrival.time}</span>}
           </p>

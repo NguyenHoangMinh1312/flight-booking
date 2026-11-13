@@ -36,10 +36,18 @@ export default function FlightInfo({ flight }: Props) {
           </p>
 
           <p className="mt-2 text-lg font-semibold text-slate-900">
-            {flight.departure.airport}
+            {flight.departure.airport.code}
           </p>
 
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="text-sm font-medium text-slate-700">
+            {flight.departure.airport.name}
+          </p>
+
+          <p className="text-xs text-slate-500">
+            {flight.departure.airport.city}, {flight.departure.airport.country}
+          </p>
+
+          <p className="mt-2 text-sm text-slate-600">
             <span className="block">{departure.date}</span>
             <span className="block">{departure.time}</span>
           </p>
@@ -51,10 +59,18 @@ export default function FlightInfo({ flight }: Props) {
           </p>
 
           <p className="mt-2 text-lg font-semibold text-slate-900">
-            {flight.arrival.airport}
+            {flight.arrival.airport.code}
           </p>
 
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="text-sm font-medium text-slate-700">
+            {flight.arrival.airport.name}
+          </p>
+
+          <p className="text-xs text-slate-500">
+            {flight.arrival.airport.city}, {flight.arrival.airport.country}
+          </p>
+
+          <p className="mt-2 text-sm text-slate-600">
             <span className="block">{arrival.date}</span>
             <span className="block">{arrival.time}</span>
           </p>

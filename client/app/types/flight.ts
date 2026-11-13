@@ -1,4 +1,5 @@
 import { SeatClass } from "./ticket";
+import { Airport } from "./airport";
 
 export enum FlightStatus {
   Available = "available",
@@ -19,11 +20,11 @@ export type Flight = {
   flightNumber: string;
   description: string;
   departure: {
-    airport: string;
+    airport: Airport;
     date: string;
   };
   arrival: {
-    airport: string;
+    airport: Airport;
     date: string;
   };
   rows: number;

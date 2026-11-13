@@ -62,6 +62,12 @@ export default function Header() {
                   >
                     Create a flight
                   </Link>
+                  <Link
+                    href="/manager/orders"
+                    className="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-sky-600"
+                  >
+                    Manage Orders
+                  </Link>
                   <div className="my-1 border-t border-slate-100" />
                   <button
                     type="button"

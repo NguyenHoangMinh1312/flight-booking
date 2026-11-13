@@ -46,8 +46,18 @@ export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfo
             </div>
 
             <p className="mt-2 text-xl font-bold text-slate-900">
-              {flight?.departure?.airport || "Departure Airport"}
+              {flight?.departure?.airport.code || "Departure Airport"}
             </p>
+            {flight?.departure?.airport.name && (
+              <p className="text-sm font-medium text-slate-700">
+                {flight.departure.airport.name}
+              </p>
+            )}
+            {flight?.departure?.airport.city && flight?.departure?.airport.country && (
+              <p className="text-xs text-slate-500">
+                {flight.departure.airport.city}, {flight.departure.airport.country}
+              </p>
+            )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1.5">
@@ -71,8 +81,18 @@ export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfo
             </div>
 
             <p className="mt-2 text-xl font-bold text-slate-900">
-              {flight?.arrival?.airport || "Arrival Airport"}
+              {flight?.arrival?.airport.code || "Arrival Airport"}
             </p>
+            {flight?.arrival?.airport.name && (
+              <p className="text-sm font-medium text-slate-700">
+                {flight.arrival.airport.name}
+              </p>
+            )}
+            {flight?.arrival?.airport.city && flight?.arrival?.airport.country && (
+              <p className="text-xs text-slate-500">
+                {flight.arrival.airport.city}, {flight.arrival.airport.country}
+              </p>
+            )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1.5">
