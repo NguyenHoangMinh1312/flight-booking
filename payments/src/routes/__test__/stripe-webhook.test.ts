@@ -2,10 +2,27 @@ import request from "supertest"
 import mongoose from "mongoose"
 import { app } from "../../app"
 import { Order } from "../../models/order"
-import { Payment } from "../../models/payment"
+import { Payment, PaymentProvider } from "../../models/payment"
 import { OrderStatus, Subjects } from "@mint1312-flight-booking/common"
 import { stripeClient } from "../../services/payment-clients/stripe-client"
 import { Outbox } from "../../models/outbox"
+
+const setup = async (status: OrderStatus = OrderStatus.Created) => {
+  jest.clearAllMocks()
+
+  const order = Order.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
+    version: 0,
+    userId: new mongoose.Types.ObjectId().toHexString(),
+    status,
+    price: 150000,
+  })
+  await order.save()
+
+  const stripeId = "pi_test_123"
+
+  return { order, stripeId }
+}
 
 it(
   "returns 400 when stripe-signature header is missing",
@@ -35,18 +52,146 @@ it(
 )
 
 it(
+  "returns 200 and does not create payment for unhandled event types",
+  async () => {
+    const { order, stripeId } = await setup();
+
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
+      type: "payment_intent.created",
+      data: {
+        object: {
+          id: stripeId,
+          metadata: { orderId: order.id, userId: order.userId },
+        },
+      },
+    })
+
+    const response = await request(app)
+      .post("/api/payments/stripe-webhook")
+      .set("stripe-signature", "valid_sig")
+      .expect(200)
+
+    expect(response.body).toEqual({ received: true })
+    expect(await Payment.find({})).toHaveLength(0)
+    expect(await Outbox.find({})).toHaveLength(0)
+  }
+)
+
+it(
+  "returns 200 and does not create payment when orderId is missing in metadata",
+  async () => {
+    const { order, stripeId } = await setup();
+
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: stripeId,
+          metadata: { userId: order.userId },
+        },
+      },
+    })
+
+    const response = await request(app)
+      .post("/api/payments/stripe-webhook")
+      .set("stripe-signature", "valid_sig")
+      .expect(200)
+
+    expect(response.body).toEqual({ received: true })
+    expect(await Payment.find({})).toHaveLength(0)
+    expect(await Outbox.find({})).toHaveLength(0)
+  }
+)
+
+it(
+  "returns 200 and does not create payment when userId is missing in metadata",
+  async () => {
+    const { order, stripeId } = await setup();
+
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: stripeId,
+          metadata: { orderId: order.id },
+        },
+      },
+    })
+
+    const response = await request(app)
+      .post("/api/payments/stripe-webhook")
+      .set("stripe-signature", "valid_sig")
+      .expect(200)
+
+    expect(response.body).toEqual({ received: true })
+    expect(await Payment.find({})).toHaveLength(0)
+    expect(await Outbox.find({})).toHaveLength(0)
+  }
+)
+
+it(
+  "returns 200 and does not create payment when order is not in Created status",
+  async () => {
+    const { order, stripeId } = await setup(OrderStatus.Canceled);
+
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: stripeId,
+          metadata: { orderId: order.id, userId: order.userId },
+        },
+      },
+    })
+
+    const response = await request(app)
+      .post("/api/payments/stripe-webhook")
+      .set("stripe-signature", "valid_sig")
+      .expect(200)
+
+    expect(response.body).toEqual({ received: true })
+    expect(await Payment.find({})).toHaveLength(0)
+    expect(await Outbox.find({})).toHaveLength(0)
+  }
+)
+
+it(
+  "returns 200 and does not create duplicate payment if payment was already processed",
+  async () => {
+    const { order, stripeId } = await setup()
+
+    const existingPayment = Payment.build({
+      order,
+      provider: PaymentProvider.Stripe,
+      transactionId: stripeId,
+    })
+    await existingPayment.save();
+
+    (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: stripeId,
+          metadata: { orderId: order.id, userId: order.userId },
+        },
+      },
+    })
+
+    const response = await request(app)
+      .post("/api/payments/stripe-webhook")
+      .set("stripe-signature", "valid_sig")
+      .expect(200)
+
+    expect(response.body).toEqual({ received: true })
+    expect(await Payment.find({})).toHaveLength(1)
+    expect(await Outbox.find({})).toHaveLength(0)
+  }
+)
+
+it(
   "creates a payment and save payment:created event when payment_intent.succeeded",
   async () => {
-    const order = Order.build({
-      id: new mongoose.Types.ObjectId().toHexString(),
-      version: 0,
-      userId: new mongoose.Types.ObjectId().toHexString(),
-      status: OrderStatus.Created,
-      price: 150000,
-    })
-    await order.save()
-
-    const stripeId = "pi_test_123";
+    const { order, stripeId } = await setup();
 
     (stripeClient.constructEvent as jest.Mock).mockReturnValueOnce({
       type: "payment_intent.succeeded",
