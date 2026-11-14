@@ -1,22 +1,22 @@
-import express, { Request, Response } from "express"
-import { currentUser, requireAuth } from "@mint1312-flight-booking/common"
+import express from "express"
+import { currentUser, requireAuth, validateRequest } from "@mint1312-flight-booking/common"
 import { body } from "express-validator"
+import { chatController } from "../controllers/chat-controller"
 
 const router = express.Router()
 
 router.post(
-  "/api/agents/:id",
+  "/api/agents/:chatSessionId",
   [
-    body("message")
+    body("userMessage")
       .trim()
       .notEmpty()
       .withMessage("You must supply the message content")
   ],
+  validateRequest,
   currentUser,
   requireAuth,
-  async (req: Request, res: Response) => {
-    const { message } = req.body
-  }
+  chatController
 )
 
 export { router as chatRouter }

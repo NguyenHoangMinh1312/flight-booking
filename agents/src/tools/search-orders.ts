@@ -1,89 +1,87 @@
-import { tool } from "@openai/agents"
+import { OrderStatus } from "@mint1312-flight-booking/common"
+import { RunContext, tool } from "@openai/agents"
 import { z } from "zod"
 
-export const searchOrderTool = tool({
-  name: "searchOrder",
-  description:
-    "Search for order of a particular user based on created date and status",
-  parameters:
-    z.object({
-      departureAirport: z
-        .string()
-        .optional()
-        .describe("Departure airport code or name (e.g., 'SGN', 'HAN', 'JFK')"),
-      arrivalAirport: z
-        .string()
-        .optional()
-        .describe("Arrival airport code or name (e.g., 'DAD', 'LAX', 'LHR')"),
-      departureDate: z
-        .string()
-        .optional()
-        .describe("Departure date in YYYY-MM-DD or ISO 8601 format (e.g., '2026-10-15')"),
-      flightNumber: z
-        .string()
-        .optional()
-        .describe("Flight number (e.g., 'VN123')"),
-      status: z
-        .string()
-        .optional()
-        .describe("Flight status filter (e.g., 'Available', 'Canceled'). Defaults to 'Available'"),
-      maxPrice: z
-        .number()
-        .optional()
-        .describe("Maximum economy class price to filter flights"),
-    }),
-  execute:
-    async ({
-      departureAirport,
-      arrivalAirport,
-      departureDate,
-      flightNumber,
-      status,
-      maxPrice,
-    }) => {
-      try {
-        const url = new URL(`${process.env.FLIGHTS_SRV_URL}/api/flights`)
+export type AgentCookieContext = {
+  cookie?: string
+}
 
-        if (departureAirport) {
-          url.searchParams.set("departureAirport", departureAirport)
-        }
-        if (arrivalAirport) {
-          url.searchParams.set("arrivalAirport", arrivalAirport)
-        }
-        if (departureDate) {
-          url.searchParams.set("departureDate", departureDate)
-        }
-        if (flightNumber) {
-          url.searchParams.set("flightNumber", flightNumber)
-        }
-        if (status) {
+export const createSearchOrderTool = (cookie?: string) =>
+  tool({
+    name: "searchOrders",
+    description:
+      "Search for the current customer's flight booking orders based on order creation date, order status, page, or limit.",
+    parameters: z.object({
+      createdDate: z
+        .string()
+        .optional()
+        .describe("Filter orders by creation date in YYYY-MM-DD or ISO 8601 format (e.g., '2026-10-15')"),
+      status: z
+        .enum(Object.values(OrderStatus))
+        .optional()
+        .describe("Filter orders by status ('created', 'canceled', 'awaiting-refund', 'complete', or 'refund-failed')"),
+      page: z
+        .int()
+        .positive()
+        .optional()
+        .describe("Page number for pagination (starts at 1, defaults to 1)"),
+      limit: z
+        .int()
+        .positive()
+        .optional()
+        .describe("Maximum number of order results to return per page (defaults to 10)"),
+    }),
+    execute: async (
+      { createdDate, status, page, limit },
+      runContext?: RunContext<AgentCookieContext>
+    ) => {
+      try {
+        const url = new URL(`${process.env.ORDERS_SRV_URL}/api/orders`)
+
+        if (createdDate)
+          url.searchParams.set("createdDate", createdDate)
+
+        if (status)
           url.searchParams.set("status", status)
+
+        if (page !== undefined)
+          url.searchParams.set("page", page.toString())
+
+        if (limit !== undefined)
+          url.searchParams.set("limit", limit.toString())
+
+        const customerCookie = cookie ?? runContext?.context?.cookie
+
+        const headers: Record<string, string> = {
+          Accept: "application/json",
         }
-        if (maxPrice !== undefined) {
-          url.searchParams.set("maxPrice", maxPrice.toString())
+
+        if (customerCookie) {
+          headers.Cookie = customerCookie
         }
 
         const response = await fetch(url.toString(), {
           method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
+          headers,
         })
 
         if (!response.ok) {
           const errorText = await response.text().catch(() => "")
           return {
-            error: `Flights service responded with HTTP ${response.status}: ${errorText || response.statusText
+            error: `Orders service responded with HTTP ${response.status}: ${errorText || response.statusText
               }`,
           }
         }
 
-        const flights = await response.json()
-        return flights
+        const orders = await response.json()
+        return orders
       } catch (err: any) {
         return {
-          error: `Failed to query flights service: ${err.message || String(err)}`,
+          error: `Failed to query orders service: ${err.message || String(err)
+            }`,
         }
       }
     },
-})
+  })
+
+export const searchOrderTool = createSearchOrderTool()

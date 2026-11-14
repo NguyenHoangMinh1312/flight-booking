@@ -1,3 +1,4 @@
+import { FlightStatus } from "@mint1312-flight-booking/common"
 import { tool } from "@openai/agents"
 import { z } from "zod"
 
@@ -24,13 +25,24 @@ export const searchFlightTool = tool({
         .optional()
         .describe("Flight number (e.g., 'VN123')"),
       status: z
-        .string()
+        .enum(Object.values(FlightStatus))
         .optional()
-        .describe("Flight status filter (e.g., 'Available', 'Canceled'). Defaults to 'Available'"),
+        .describe("Flight status filter ('Available' or 'Canceled'). Defaults to 'Available'"),
       maxPrice: z
         .number()
+        .nonnegative()
         .optional()
-        .describe("Maximum economy class price to filter flights"),
+        .describe("Filter flights that have at least one ticket class with a price lower than or equal to this value"),
+      page: z
+        .int()
+        .positive()
+        .optional()
+        .describe("Page number for pagination (starts at 1)"),
+      limit: z
+        .int()
+        .positive()
+        .optional()
+        .describe("Maximum number of flight results to return per page")
     }),
   execute:
     async ({
@@ -40,28 +52,35 @@ export const searchFlightTool = tool({
       flightNumber,
       status,
       maxPrice,
+      page,
+      limit
     }) => {
       try {
         const url = new URL(`${process.env.FLIGHTS_SRV_URL}/api/flights`)
 
-        if (departureAirport) {
+        if (departureAirport)
           url.searchParams.set("departureAirport", departureAirport)
-        }
-        if (arrivalAirport) {
+
+        if (arrivalAirport)
           url.searchParams.set("arrivalAirport", arrivalAirport)
-        }
-        if (departureDate) {
+
+        if (departureDate)
           url.searchParams.set("departureDate", departureDate)
-        }
-        if (flightNumber) {
+
+        if (flightNumber)
           url.searchParams.set("flightNumber", flightNumber)
-        }
-        if (status) {
+
+        if (status)
           url.searchParams.set("status", status)
-        }
-        if (maxPrice !== undefined) {
+
+        if (maxPrice !== undefined)
           url.searchParams.set("maxPrice", maxPrice.toString())
-        }
+
+        if (page !== undefined)
+          url.searchParams.set("page", page.toString())
+
+        if (limit !== undefined)
+          url.searchParams.set("limit", limit.toString())
 
         const response = await fetch(url.toString(), {
           method: "GET",
