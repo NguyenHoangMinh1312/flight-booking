@@ -155,3 +155,65 @@ it(
     expect(response.get("Set-Cookie")).toBeDefined()
   }
 )
+
+it(
+  "Returns 400 when the user is already verified",
+  async () => {
+    const user = User.build({
+      email: "test@test.com",
+      password: "password",
+      role: UserRole.Customer,
+      isVerified: true,
+    })
+    await user.save()
+
+    await Otp.build({
+      email: "test@test.com",
+      otp: "123456",
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      lastSentAt: new Date()
+    }).save()
+
+    await request(app)
+      .post("/api/users/verify-otp")
+      .send({
+        email: "test@test.com",
+        otp: "123456"
+      })
+      .expect(400)
+  }
+)
+
+it(
+  "Returns 400 when email is invalid",
+  async () => {
+    await request(app)
+      .post("/api/users/verify-otp")
+      .send({
+        email: "invalid-email",
+        otp: "123456"
+      })
+      .expect(400)
+  }
+)
+
+it(
+  "Returns 400 when OTP is not 6 digits",
+  async () => {
+    await request(app)
+      .post("/api/users/verify-otp")
+      .send({
+        email: "test@test.com",
+        otp: "123"
+      })
+      .expect(400)
+
+    await request(app)
+      .post("/api/users/verify-otp")
+      .send({
+        email: "test@test.com",
+        otp: "1234567"
+      })
+      .expect(400)
+  }
+)

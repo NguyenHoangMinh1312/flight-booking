@@ -66,3 +66,46 @@ it("Returns 400 on incorrect role", async () => {
     })
     .expect(400)
 })
+
+it("Returns 400 when signing in with an unverified account", async () => {
+  const user = User.build({
+    email: "unverified@test.com",
+    password: "password",
+    role: UserRole.Customer,
+    isVerified: false
+  })
+  await user.save()
+
+  await request(app)
+    .post("/api/users/signin")
+    .send({
+      email: "unverified@test.com",
+      password: "password",
+      role: UserRole.Customer
+    })
+    .expect(400)
+})
+
+it("Returns 200 on successful manager signin", async () => {
+  const manager = User.build({
+    email: "manager@test.com",
+    password: "password",
+    role: UserRole.Manager,
+    isVerified: true
+  })
+  await manager.save()
+
+  const response = await request(app)
+    .post("/api/users/signin")
+    .send({
+      email: "manager@test.com",
+      password: "password",
+      role: UserRole.Manager
+    })
+    .expect(200)
+
+  expect(response.get("Set-Cookie")).toBeDefined()
+  expect(response.body.email).toEqual("manager@test.com")
+  expect(response.body.role).toEqual(UserRole.Manager)
+})
+

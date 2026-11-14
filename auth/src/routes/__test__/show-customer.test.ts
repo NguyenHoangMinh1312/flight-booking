@@ -27,7 +27,7 @@ it(
 )
 
 it(
-  "Returns 403 when a customer get user account infomation",
+  "Returns 403 when a customer get other user account infomation",
   async () => {
     const customer = User.build({
       email: "customer@test.com",
@@ -53,6 +53,37 @@ it(
 
     await request(app)
       .get(`/api/users/${id}`)
+      .set("Cookie", cookie)
+      .expect(404)
+  }
+)
+
+it(
+  "Returns 401 when user is not signed in",
+  async () => {
+    const id = new mongoose.Types.ObjectId().toHexString()
+
+    await request(app)
+      .get(`/api/users/${id}`)
+      .expect(401)
+  }
+)
+
+it(
+  "Returns 404 when the customer account is not verified",
+  async () => {
+    const unverifiedCustomer = User.build({
+      email: "unverified@test.com",
+      password: "password",
+      role: UserRole.Customer,
+      isVerified: false
+    })
+    await unverifiedCustomer.save()
+
+    const cookie = await global.signin("manager@test.com", UserRole.Manager)
+
+    await request(app)
+      .get(`/api/users/${unverifiedCustomer.id}`)
       .set("Cookie", cookie)
       .expect(404)
   }
