@@ -75,6 +75,13 @@ kubectl create secret generic manager-secret \
   --from-literal=MANAGER_PASSWORD=<your-manager-password>
 ```
 
+**OpenAI Secret**
+
+```bash
+kubectl create secret generic openai-secret \
+  --from-literal=OPENAI_API_KEY=<your-openai-api-key> \
+```
+
 Replace all placeholders with your actual credentials. Do not commit secrets or expose them in version control.
 
 ### Step 6: Deploy the Application
@@ -165,6 +172,13 @@ kubectl create secret generic resend-secret \
 kubectl create secret generic manager-secret \
   --from-literal=MANAGER_EMAIL=<your-manager-email> \
   --from-literal=MANAGER_PASSWORD=<your-manager-password>
+```
+
+**OpenAI Secret**
+
+```bash
+kubectl create secret generic openai-secret \
+  --from-literal=OPENAI_API_KEY=<your-openai-api-key> \
 ```
 
 Use production credentials and keep all sensitive values secure. For Stripe, configure the appropriate production API key and webhook signing secret.
