@@ -5,32 +5,38 @@ import mongoose from "mongoose"
 import { JsMsg } from "nats"
 import { Ticket } from "../../../models/ticket"
 
+const setup = async () => {
+  // create an event listener
+  const listener = new TicketCreatedListener(natsWrapper.nc)
+
+  // create a fake event
+  const data: TicketCreatedEvent["data"] = {
+    id: new mongoose.Types.ObjectId().toHexString(),
+    version: 0,
+    price: 10,
+    class: "business",
+    status: FlightStatus.Available,
+    seat: {
+      row: 1,
+      column: 1
+    },
+    departureDate: new Date(),
+    departureAirport: "HAN",
+    arrivalAirport: "SGN"
+  }
+
+  // fake the ack function
+  const msg = {
+    ack: jest.fn()
+  } as unknown as JsMsg
+
+  return { listener, data, msg }
+}
+
 it(
   "Checks if the listener handles event ticket:created successfully",
   async () => {
-    // create an event listener
-    const listener = new TicketCreatedListener(natsWrapper.nc)
-
-    // create a fake event
-    const data: TicketCreatedEvent["data"] = {
-      id: new mongoose.Types.ObjectId().toHexString(),
-      version: 0,
-      price: 10,
-      class: "business",
-      status: FlightStatus.Available,
-      seat: {
-        row: 1,
-        column: 1
-      },
-      departureDate: new Date(),
-      departureAirport: "HAN",
-      arrivalAirport: "SGN"
-    }
-
-    // fake the ack function
-    const msg = {
-      ack: jest.fn()
-    } as unknown as JsMsg
+    const { listener, data, msg } = await setup()
 
     // call the listener
     await listener.onMessage(data, msg)
@@ -48,5 +54,26 @@ it(
 
     // check if the ack is called
     expect(msg.ack).toHaveBeenCalled()
+  }
+)
+
+it(
+  "Acks the message and does not overwrite an existing ticket if duplicate ticket:created event is received",
+  async () => {
+    const { listener, data, msg } = await setup()
+
+    // process the event the first time
+    await listener.onMessage(data, msg)
+
+    // send a duplicate event with different price
+    const duplicateMsg = {
+      ack: jest.fn()
+    } as unknown as JsMsg
+    await listener.onMessage({ ...data, price: 999 }, duplicateMsg)
+
+    const tickets = await Ticket.find({})
+    expect(tickets).toHaveLength(1)
+    expect(tickets[0]!.price).toEqual(data.price)
+    expect(duplicateMsg.ack).toHaveBeenCalled()
   }
 )

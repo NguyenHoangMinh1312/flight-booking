@@ -2,53 +2,89 @@ import request from "supertest"
 import { app } from "../../app"
 import mongoose from "mongoose"
 import { Ticket } from "../../models/ticket"
+import { Order } from "../../models/order"
 import { Outbox } from "../../models/outbox"
-import { Subjects, FlightStatus } from "@mint1312-flight-booking/common"
+import { Subjects, FlightStatus, OrderStatus } from "@mint1312-flight-booking/common"
 import { orderExpirationWorker } from "../../workers/order-expiration-worker"
 
-const buildTicket = async (departureDate?: Date) => {
+const setup = async (
+  departureDate: Date = new Date(Date.now() + 5 * 60 * 60 * 1000),
+  status: FlightStatus = FlightStatus.Available
+) => {
   const ticket = Ticket.build({
     id: new mongoose.Types.ObjectId().toHexString(),
     version: 0,
     price: 10,
     class: "business",
-    status: FlightStatus.Available,
+    status,
     seat: {
       row: 1,
       column: 1
     },
-    departureDate: departureDate || new Date(),
+    departureDate,
     departureAirport: "HAN",
     arrivalAirport: "SGN"
   })
   await ticket.save()
 
-  return ticket
+  const user = global.signin()
+
+  return { ticket, user }
 }
 
 it(
-  "Returns an error if the tickets does not exists",
+  "Returns 401 if the user is not authenticated",
   async () => {
+    const { ticket } = await setup()
+
     await request(app)
       .post("/api/orders")
-      .set("Cookie", global.signin())
       .send({
-        ticketId: new mongoose.Types.ObjectId()
+        ticketId: ticket.id
+      })
+      .expect(401)
+  }
+)
+
+it(
+  "Returns 400 if ticketId is not provided",
+  async () => {
+    const { user } = await setup()
+
+    await request(app)
+      .post("/api/orders")
+      .set("Cookie", user)
+      .send({})
+      .expect(400)
+  }
+)
+
+it(
+  "Returns an error if the ticket does not exist",
+  async () => {
+    const { user } = await setup()
+
+    await request(app)
+      .post("/api/orders")
+      .set("Cookie", user)
+      .send({
+        ticketId: new mongoose.Types.ObjectId().toHexString()
       })
       .expect(404)
   }
 )
 
 it(
-  "Return 404 if the user order a ticket late",
+  "Returns 400 if the flight associated with the ticket is canceled",
   async () => {
-    // create a new ticket
-    const ticket = await buildTicket()
+    const { ticket, user } = await setup(
+      new Date(Date.now() + 5 * 60 * 60 * 1000),
+      FlightStatus.Canceled
+    )
 
-    // order the ticket
-    const response = await request(app)
+    await request(app)
       .post("/api/orders")
-      .set("Cookie", global.signin())
+      .set("Cookie", user)
       .send({
         ticketId: ticket.id
       })
@@ -57,15 +93,29 @@ it(
 )
 
 it(
-  "Returns an error if the tickets is already reserved",
+  "Returns 400 if the user orders a ticket less than 3 hours before departure",
   async () => {
-    // create a new ticket
-    const ticket = await buildTicket(new Date(Date.now() + 5 * 60 * 60 * 1000))
+    const { ticket, user } = await setup(new Date())
+
+    await request(app)
+      .post("/api/orders")
+      .set("Cookie", user)
+      .send({
+        ticketId: ticket.id
+      })
+      .expect(400)
+  }
+)
+
+it(
+  "Returns an error if the ticket is already reserved",
+  async () => {
+    const { ticket, user } = await setup()
 
     // order the ticket
     await request(app)
       .post("/api/orders")
-      .set("Cookie", global.signin())
+      .set("Cookie", user)
       .send({
         ticketId: ticket.id
       })
@@ -83,15 +133,14 @@ it(
 )
 
 it(
-  "Returns 201 if the tickets is reserved successfully",
+  "Returns 201 if the ticket is reserved successfully",
   async () => {
-    // create a new ticket
-    const ticket = await buildTicket(new Date(Date.now() + 5 * 60 * 60 * 1000))
+    const { ticket, user } = await setup()
 
     // order the ticket
     const response = await request(app)
       .post("/api/orders")
-      .set("Cookie", global.signin())
+      .set("Cookie", user)
       .send({
         ticketId: ticket.id
       })
@@ -100,7 +149,7 @@ it(
     // check if the order is sent to expiration queue
     expect(orderExpirationWorker.add).toHaveBeenCalledTimes(1)
 
-    // check if the ticket id in the response match the ticket
+    // check if the ticket id in the response matches the ticket
     expect(response.body.ticket.id).toEqual(ticket.id)
 
     // check if the event is saved to outbox
@@ -111,4 +160,29 @@ it(
   }
 )
 
+it(
+  "Allows reserving a ticket if its previous order was canceled",
+  async () => {
+    const { ticket, user } = await setup()
 
+    const firstOrderRes = await request(app)
+      .post("/api/orders")
+      .set("Cookie", user)
+      .send({
+        ticketId: ticket.id
+      })
+      .expect(201)
+
+    await Order.findByIdAndUpdate(firstOrderRes.body.id, { status: OrderStatus.Canceled })
+
+    const secondOrderRes = await request(app)
+      .post("/api/orders")
+      .set("Cookie", global.signin())
+      .send({
+        ticketId: ticket.id
+      })
+      .expect(201)
+
+    expect(secondOrderRes.body.ticket.id).toEqual(ticket.id)
+  }
+)
