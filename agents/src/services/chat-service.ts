@@ -3,6 +3,7 @@ import { ChatSession } from "../models/chat-session"
 import { FlightBookingAgent } from "../flight-booking-agent"
 import { User } from "../models/user"
 import { ForbiddenError, NotFoundError } from "@mint1312-flight-booking/common"
+import { sliceChatHistory } from "../utils/slice-chat-history"
 
 export const chat = async (
   chatSessionId: string,
@@ -26,13 +27,18 @@ export const chat = async (
   if (!user)
     throw new NotFoundError()
 
+  // get the recent chat history to avoid context overflow
+  const recentHistory = sliceChatHistory(chatSession.history, 10)
+
   // call the agent
   const agent = new FlightBookingAgent(user.email, user.id)
+  const { response, conversation } = await agent.chat(recentHistory, userMessage, cookie)
 
-  const { response, history } = await agent.chat(chatSession.history, userMessage, cookie)
+  // extract only the new items from this turn (user message + tool calls + assistant reply)
+  const newTurnItems = conversation.slice(recentHistory.length)
 
   // save the chat
-  chatSession.set({ history })
+  chatSession.set({ history: [...chatSession.history, ...newTurnItems] })
   chatSession.markModified("history")
   await chatSession.save()
 
