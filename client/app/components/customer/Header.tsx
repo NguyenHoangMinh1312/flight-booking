@@ -45,6 +45,7 @@ export default function Header() {
         }
       )
       setCurrentUser(null)
+      window.dispatchEvent(new Event("auth-change"))
       router.push("/")
     } catch {
       toast.error("Failed to sign out")
