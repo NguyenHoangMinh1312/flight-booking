@@ -78,12 +78,12 @@ it("Filters flights by departureDate", async () => {
 
   const response = await request(app)
     .get("/api/flights")
-    .query({ departureDate: "2026-09-04" })
+    .query({ departureDate: "2026-09-01" })
     .expect(200)
 
   expect(response.body.total).toEqual(1)
   expect(response.body.flights).toHaveLength(1)
-  expect(response.body.flights[0].flightNumber).toEqual("VN200")
+  expect(response.body.flights[0].flightNumber).toEqual("VN100")
 })
 
 it("Excludes canceled flights by default and filters by status when provided", async () => {

@@ -19,17 +19,20 @@ export const searchFlights = async (
     query.flightNumber = { $regex: flightNumber.trim(), $options: "i" }
 
   if (departureAirport)
-    query["departure.airport.code"] = { $regex: departureAirport.trim(), $options: "i" }
+    query["departure.airport"] = { $regex: departureAirport.trim(), $options: "i" }
 
   if (arrivalAirport)
-    query["arrival.airport.code"] = { $regex: arrivalAirport.trim(), $options: "i" }
+    query["arrival.airport"] = { $regex: arrivalAirport.trim(), $options: "i" }
 
   if (departureDate) {
     const startOfDay = new Date(departureDate)
     startOfDay.setUTCHours(0, 0, 0, 0)
 
+    const endOfDay = new Date(departureDate)
+    endOfDay.setUTCHours(23, 59, 59, 999)
+
     if (!isNaN(startOfDay.getTime()))
-      query["departure.date"] = { $gte: startOfDay }
+      query["departure.date"] = { $gte: startOfDay, $lte: endOfDay }
   }
 
   if (status)
