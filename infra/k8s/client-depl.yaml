@@ -15,7 +15,6 @@ spec:
       containers:
         - name: client
           image: mint1312/client
-          # image: asia.gcr.io/ticketing-dev-508215/client
           # resources:
           #   requests:
           #     cpu: "100m"

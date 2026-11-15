@@ -15,7 +15,6 @@ spec:
       containers:
         - name: orders
           image: mint1312/orders
-          # image: asia.gcr.io/ticketing-dev-508215/orders
           # resources:
           #   requests:
           #     cpu: "100m"

@@ -15,7 +15,6 @@ spec:
       containers:
         - name: emails
           image: mint1312/emails
-          # image: asia.gcr.io/ticketing-dev-508215/emails
           # resources:
           #   requests:
           #     cpu: "100m"

@@ -15,7 +15,6 @@ spec:
       containers:
         - name: agents
           image: mint1312/agents
-          # image: asia.gcr.io/ticketing-dev-508215/agents
           # resources:
           #   requests:
           #     cpu: "100m"
@@ -23,7 +22,7 @@ spec:
           #   limits:
           #     cpu: "200m"
           #     memory: "512Mi"
-          env: 
+          env:
             - name: NATS_URL
               value: "nats://nats-srv:4222"
             - name: MONGO_URI
@@ -36,12 +35,13 @@ spec:
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agents-secret
+                  name: openai-secret
                   key: OPENAI_API_KEY
             - name: FLIGHTS_SRV_URL
               value: "http://flights-srv:3000"
             - name: ORDERS_SRV_URL
               value: "http://orders-srv:3000"
+---
 apiVersion: v1
 kind: Service
 metadata:

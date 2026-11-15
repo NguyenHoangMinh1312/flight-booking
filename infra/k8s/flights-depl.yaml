@@ -15,7 +15,6 @@ spec:
       containers:
         - name: flights
           image: mint1312/flights
-          # image: asia.gcr.io/ticketing-dev-508215/flights
           # resources:
           #   requests:
           #     cpu: "100m"

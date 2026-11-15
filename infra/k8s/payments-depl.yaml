@@ -15,7 +15,6 @@ spec:
       containers:
         - name: payments
           image: mint1312/payments
-          # image: asia.gcr.io/ticketing-dev-508215/payments
           # resources:
           #   requests:
           #     cpu: "100m"
