@@ -7,7 +7,8 @@ type ReqParams = {
 }
 
 type ReqBody = {
-  userMessage: string
+  userMessage: string,
+  timezone: string
 }
 
 export const chatController = async (
@@ -15,14 +16,14 @@ export const chatController = async (
   res: Response
 ) => {
   const { chatSessionId } = req.params
-  const { userMessage } = req.body
+  const { userMessage, timezone } = req.body
   const userId = req.currentUser?.id
   const cookie = req.headers.cookie
 
   if (!userId)
     throw new BadRequestError("User ID not provided")
 
-  const response = await chat(chatSessionId, userId, userMessage, cookie)
+  const response = await chat(chatSessionId, userId, userMessage, timezone, cookie)
 
   res.send({ response })
 }

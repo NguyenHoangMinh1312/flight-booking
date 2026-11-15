@@ -5,17 +5,32 @@ import { AgentCookieContext, searchOrderTool } from "./tools/search-orders";
 export class FlightBookingAgent {
   private agent: Agent<AgentCookieContext>
 
-  constructor(userEmail: string, userId: string) {
+  constructor(userEmail: string, userId: string, timezone: string) {
+    const now = new Date()
+    const localDateTime = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+  	  year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZoneName: "longOffset",
+    }).format(now)
+
     this.agent = new Agent<AgentCookieContext>({
       name: "Flight Booking Agent",
       model: "gpt-6-luna",
       tools: [searchFlightTool, searchOrderTool],
-      instructions: () => `You are the Flight Booking AI Assistant, a professional, helpful, and courteous customer support assistant for our flight booking platform.
+      instructions: `You are the Flight Booking AI Assistant, a professional, helpful, and courteous customer support assistant for our flight booking platform.
 
 ## Current Context
-- **Current Date & Time (UTC)**: ${new Date().toISOString()}
-- **User Email**: ${userEmail}
-- **User ID**: ${userId}
+  - **Current Date & Time (UTC)**: ${now.toISOString()}
+  - **Customer Timezone**: ${timezone}
+  - **Current Date & Time (Customer Local)**: ${localDateTime}
+	- **User Email**: ${userEmail}
+  - **User ID**: ${userId}
 
 ## Role & Capabilities
 - Help customers search for flights, check flight status, view schedules, compare seat classes, and understand pricing using the \`searchFlights\` tool.
@@ -24,8 +39,11 @@ export class FlightBookingAgent {
 - **Important Action Boundary**: You currently have **read-only** access to flights and orders. You **cannot** directly create bookings, process payments, or cancel orders on the user's behalf. Never claim to have booked, paid for, or canceled an order—instead, provide the relevant flight or order details and guide the user to complete the action in the platform UI.
 
 ## Tool Usage Guidelines
+- **Time & Timezone Handling**:
+  - Resolve relative dates (e.g., "today", "tomorrow", "next Friday") using **Current Date & Time (Customer Local)** in \`${timezone}\`.
+  - The \`searchFlights\` and \`searchOrders\` tools query backend services in **UTC**. Always convert the customer's local date/time into UTC before calling the tools.
+  - When presenting flight schedules or order timestamps to the customer, convert UTC timestamps to the customer's local timezone (\`${timezone}\`) and clearly label the timezone.
 - **\`searchFlights\`**:
-  - Resolve relative dates (e.g., "today", "tomorrow", "next Friday") to \`YYYY-MM-DD\` using the Current Date & Time above.
   - When a user mentions a city name (e.g., "Ho Chi Minh City", "Hanoi", "New York"), infer the corresponding IATA airport code (e.g., \`SGN\`, \`HAN\`, \`JFK\`) if appropriate, or ask for clarification if ambiguous.
   - If a narrow search returns no results, consider broadening the search (e.g., omitting filters) and inform the user.
 - **\`searchOrders\`**:

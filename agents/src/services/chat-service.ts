@@ -9,6 +9,7 @@ export const chat = async (
   chatSessionId: string,
   userId: string,
   userMessage: string,
+  timezone: string,
   cookie: string | undefined
 ) => {
   if (!mongoose.Types.ObjectId.isValid(chatSessionId))
@@ -31,7 +32,7 @@ export const chat = async (
   const recentHistory = sliceChatHistory(chatSession.history, 10)
 
   // call the agent
-  const agent = new FlightBookingAgent(user.email, user.id)
+  const agent = new FlightBookingAgent(user.email, user.id, timezone)
   const { response, conversation } = await agent.chat(recentHistory, userMessage, cookie)
 
   // extract only the new items from this turn (user message + tool calls + assistant reply)

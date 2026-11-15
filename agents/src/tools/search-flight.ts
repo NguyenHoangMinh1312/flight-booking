@@ -19,7 +19,7 @@ export const searchFlightTool = tool({
       departureDate: z
         .string()
         .optional()
-        .describe("Departure date in YYYY-MM-DD or ISO 8601 format (e.g., '2026-10-15')"),
+        .describe("Departure date in UTC in YYYY-MM-DD format, e.g., '2026-11-15'"),
       flightNumber: z
         .string()
         .optional()

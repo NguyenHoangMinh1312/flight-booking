@@ -15,7 +15,7 @@ export const createSearchOrderTool = (cookie?: string) =>
       createdDate: z
         .string()
         .optional()
-        .describe("Filter orders by creation date in YYYY-MM-DD or ISO 8601 format (e.g., '2026-10-15')"),
+        .describe("Filter orders by creation date in UTC in YYYY-MM-DD format, e.g., '2026-10-15'"),
       status: z
         .enum(Object.values(OrderStatus))
         .optional()

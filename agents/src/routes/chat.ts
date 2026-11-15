@@ -11,7 +11,16 @@ router.post(
     body("userMessage")
       .trim()
       .notEmpty()
-      .withMessage("You must supply the message content")
+      .withMessage("You must supply the message content"),
+    body("timezone")
+      .trim()
+      .notEmpty()
+      .withMessage("You must supply your timezone")
+      .custom((value) => {
+        Intl.DateTimeFormat(undefined, { timeZone: value })
+        return true
+      })
+      .withMessage("Invalid IANA timezone")
   ],
   validateRequest,
   currentUser,
