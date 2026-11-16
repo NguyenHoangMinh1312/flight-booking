@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: mint1312/auth
+          image: mint1312/auth:latest
           # image: asia.gcr.io/ticketing-dev-508215/auth
           # resources:
           #   requests:
@@ -23,7 +23,7 @@ spec:
           #   limits:
           #     cpu: "200m"
           #     memory: "512Mi"
-          env: 
+          env:
             - name: NATS_URL
               value: "nats://nats-srv:4222"
             - name: MONGO_URI

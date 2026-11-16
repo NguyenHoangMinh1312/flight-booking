@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: agents
-          image: mint1312/agents
+          image: mint1312/agents:latest
           # resources:
           #   requests:
           #     cpu: "100m"

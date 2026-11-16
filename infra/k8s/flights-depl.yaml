@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: flights
-          image: mint1312/flights
+          image: mint1312/flights:latest
           # resources:
           #   requests:
           #     cpu: "100m"

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth-mongo
-          image: bitnami/mongodb
+          image: bitnami/mongodb:latest
           env:
             - name: MONGODB_REPLICA_SET_MODE
               value: primary

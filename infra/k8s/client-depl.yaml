@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: mint1312/client
+          image: mint1312/client:latest
           # resources:
           #   requests:
           #     cpu: "100m"

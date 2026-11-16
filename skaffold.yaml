@@ -7,6 +7,8 @@ manifests:
 build:
   local:
     push: false
+  tagPolicy:
+    sha256: {}
 
   artifacts:
     - image: mint1312/auth
