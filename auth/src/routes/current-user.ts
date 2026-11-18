@@ -1,14 +1,14 @@
-import express, { Request, Response } from "express"
-import { currentUser } from "@mint1312-flight-booking/common"
+import express, { Request, Response } from "express";
+import { currentUser } from "@mint1312-flight-booking/common";
 
-const router = express.Router()
+const router = express.Router();
 
 router.get(
   "/api/users/currentuser",
   currentUser,
   (req: Request, res: Response) => {
-    res.send({ currentUser: req.currentUser || null })
-  }
-)
+    res.send({ currentUser: req.currentUser || null });
+  },
+);
 
-export { router as currentUserRouter }
+export { router as currentUserRouter };

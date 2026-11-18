@@ -31,45 +31,47 @@ export default function FlightDetailsPage() {
   useEffect(() => {
     async function fetchFlightDetails() {
       try {
-        const data = await apiFetch<FlightDetailsResponse>(`/api/flights/${id}`)
-        setDetails(data)
+        const data = await apiFetch<FlightDetailsResponse>(
+          `/api/flights/${id}`,
+        );
+        setDetails(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "We could not load this flight.")
+        setError(
+          err instanceof Error ? err.message : "We could not load this flight.",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightDetails()
-  }, [id])
+    fetchFlightDetails();
+  }, [id]);
 
-  // handle when user clicks "Order"
+  // handle when user presses Order
   const orderTicket = async () => {
-    if (!selectedTicket || selectedTicket.orderId || isOrdering)
-      return
+    if (!selectedTicket || selectedTicket.orderId || isOrdering) return;
 
-    setIsOrdering(true)
+    setIsOrdering(true);
 
     try {
-      const data = await apiFetch<{ id: string }>(
-        "/api/orders",
-        {
-          method: "POST",
-          credentials: "include",
-          body: JSON.stringify({
-            ticketId: selectedTicket.id,
-          })
-        }
-      )
+      const data = await apiFetch<{ id: string }>("/api/orders", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          ticketId: selectedTicket.id,
+        }),
+      });
 
-      setSelectedTicket(null)
-      router.push(`/order-review/${data.id}`)
+      setSelectedTicket(null);
+      router.push(`/order-review/${data.id}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "We cannot reserve the seat")
+      toast.error(
+        err instanceof Error ? err.message : "We cannot reserve the seat",
+      );
     } finally {
-      setIsOrdering(false)
+      setIsOrdering(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -104,8 +106,8 @@ export default function FlightDetailsPage() {
       <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 pb-28 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8">
         <div className="space-y-6">
           <SeatsMatrix
-            rows={details.flight.seatConfig?.rows ?? 0}
-            columns={details.flight.seatConfig?.columns ?? 0}
+            rows={details.flight.rows}
+            classConfig={details.flight.classConfig}
             tickets={details.tickets}
             selectedTicketId={selectedTicket?.id ?? null}
             onSelect={setSelectedTicket}

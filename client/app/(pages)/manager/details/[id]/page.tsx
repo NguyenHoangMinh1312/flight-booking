@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 
-import { Flight } from "@/app/types/flight";
+import { Flight, FlightStatus } from "@/app/types/flight";
 import FlightInfo from "@/app/(pages)/(customer)/details/[id]/components/FlightInfo";
 import SeatsMatrix from "./components/SeatsMatrix";
 import TicketInfo from "./components/TicketInfo";
@@ -33,21 +33,24 @@ export default function FlightDetailsPage() {
   useEffect(() => {
     async function fetchFlightDetails() {
       try {
-        const data = await apiFetch<FlightDetailsResponse>(`/api/flights/${id}`)
-        setDetails(data)
+        const data = await apiFetch<FlightDetailsResponse>(
+          `/api/flights/${id}`,
+        );
+        setDetails(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "We could not load this flight.")
+        setError(
+          err instanceof Error ? err.message : "We could not load this flight.",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightDetails()
-  }, [id])
+    fetchFlightDetails();
+  }, [id]);
 
   const handleCancelFlight = async () => {
-    if (!id)
-      return;
+    if (!id) return;
 
     setIsCanceling(true);
 
@@ -55,17 +58,19 @@ export default function FlightDetailsPage() {
       await apiFetch(`/api/flights/${id}`, {
         method: "DELETE",
         credentials: "include",
-      })
+      });
 
-      toast.success("Flight canceled successfully!")
-      setShowCancelWarning(false)
-      router.push("/manager")
+      toast.success("Flight canceled successfully!");
+      setShowCancelWarning(false);
+      router.push("/manager");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to cancel flight")
+      toast.error(
+        err instanceof Error ? err.message : "Failed to cancel flight",
+      );
     } finally {
-      setIsCanceling(false)
+      setIsCanceling(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -100,8 +105,8 @@ export default function FlightDetailsPage() {
       <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 pb-28 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8">
         <div className="space-y-6">
           <SeatsMatrix
-            rows={details.flight.seatConfig?.rows ?? 0}
-            columns={details.flight.seatConfig?.columns ?? 0}
+            rows={details.flight.rows}
+            classConfig={details.flight.classConfig}
             tickets={details.tickets}
             selectedTicketId={selectedTicket?.id ?? null}
             onSelect={setSelectedTicket}
@@ -127,7 +132,9 @@ export default function FlightDetailsPage() {
               <button
                 type="button"
                 onClick={() => setShowCancelWarning(true)}
-                disabled={isCanceling || details.flight.status === "canceled"}
+                disabled={
+                  isCanceling || details.flight.status === FlightStatus.Canceled
+                }
                 className="w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {isCanceling ? "Canceling..." : "Cancel flight"}

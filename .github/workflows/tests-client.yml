@@ -2,8 +2,8 @@ name: tests-client
 
 on:
   pull_request:
-    paths: 
-      - 'client/**'
+    paths:
+      - "client/**"
 
 jobs:
   build:

@@ -3,22 +3,20 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { FaUndoAlt, FaSpinner } from "react-icons/fa";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus, RefundReason } from "@/app/types/order";
 import RefundWarningBox from "./RefundWarningBox";
 import { apiFetch } from "@/app/utils/api-client";
-import { RefundReason } from "@/app/types/order";
 
 type FooterProps = {
   order: Order;
   onRefundSuccess?: () => void;
 };
 
-
 export default function Footer({ order, onRefundSuccess }: FooterProps) {
   const [isRefunding, setIsRefunding] = useState(false);
   const [isWarningBoxOpen, setIsWarningBoxOpen] = useState(false);
 
-  const status = order.status?.toLowerCase();
+  const status = order.status;
 
   const handleRefund = async (refundReason: RefundReason) => {
     try {
@@ -29,11 +27,13 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
         {
           method: "DELETE",
           credentials: "include",
-          body: JSON.stringify({ refundReason })
-        }
-      )
+          body: JSON.stringify({ refundReason }),
+        },
+      );
 
-      toast.success(data.message || "Your order cancel request is being processed");
+      toast.success(
+        data.message || "Your order cancel request is being processed",
+      );
 
       setIsWarningBoxOpen(false);
 
@@ -42,14 +42,16 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
       }
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "We could not process your refund request."
+        err instanceof Error
+          ? err.message
+          : "We could not process your refund request.",
       );
     } finally {
       setIsRefunding(false);
     }
   };
 
-  if (status === "complete" || status === "refund-failed") {
+  if (status === OrderStatus.Complete || status === OrderStatus.RefundFailed) {
     return (
       <>
         <footer className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs">

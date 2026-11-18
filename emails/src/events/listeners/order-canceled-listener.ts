@@ -1,20 +1,23 @@
-import { Listener, OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common"
-import { JsMsg } from "nats"
-import { queueGroupName } from "./queue-group-name"
-import { emailSendQueue } from "../../queues/email-send-queue"
-import { User } from "../../models/user"
+import {
+  Listener,
+  OrderCanceledEvent,
+  Subjects,
+} from "@mint1312-flight-booking/common";
+import { JsMsg } from "nats";
+import { queueGroupName } from "./queue-group-name";
+import { emailSendWorker } from "../../workers/email-send-worker";
+import { User } from "../../models/user";
 
 export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
-  readonly subject = Subjects.OrderCanceled
-  queueGroupName = queueGroupName
+  readonly subject = Subjects.OrderCanceled;
+  queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCanceledEvent["data"], msg: JsMsg) {
-    const user = await User.findById(data.userId)
+    const user = await User.findById(data.userId);
 
-    if (!user)
-      throw new Error("User not found")
+    if (!user) throw new Error("User not found");
 
-    await emailSendQueue.add({
+    await emailSendWorker.add({
       receiver: user.email,
       subject: `Your order ${data.id} has been canceled.`,
       content: `
@@ -41,9 +44,9 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
         </p>
       </body>
     </html>
-  `
-    })
+  `,
+    });
 
-    msg.ack()
+    msg.ack();
   }
 }

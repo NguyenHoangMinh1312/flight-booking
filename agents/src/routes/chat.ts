@@ -1,22 +1,35 @@
-import express, { Request, Response } from "express"
-import { currentUser, requireAuth } from "@mint1312-flight-booking/common"
-import { body } from "express-validator"
-
-const router = express.Router()
-
-router.post(
-  "/api/agents/:id",
-  [
-    body("message")
-      .trim()
-      .notEmpty()
-      .withMessage("You must supply the message content")
-  ],
+import express from "express";
+import {
   currentUser,
   requireAuth,
-  async (req: Request, res: Response) => {
-    const { message } = req.body
-  }
-)
+  validateRequest,
+} from "@mint1312-flight-booking/common";
+import { body } from "express-validator";
+import { chatController } from "../controllers/chat-controller";
 
-export { router as chatRouter }
+const router = express.Router();
+
+router.post(
+  "/api/agents/:chatSessionId",
+  [
+    body("userMessage")
+      .trim()
+      .notEmpty()
+      .withMessage("You must supply the message content"),
+    body("timezone")
+      .trim()
+      .notEmpty()
+      .withMessage("You must supply your timezone")
+      .custom((value) => {
+        Intl.DateTimeFormat(undefined, { timeZone: value });
+        return true;
+      })
+      .withMessage("Invalid IANA timezone"),
+  ],
+  validateRequest,
+  currentUser,
+  requireAuth,
+  chatController,
+);
+
+export { router as chatRouter };

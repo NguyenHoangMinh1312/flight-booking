@@ -8,4 +8,3 @@ export function formatDateTime(value?: string | null) {
     ? { date: value, time: "" }
     : { date: dateFormatter.format(date), time: timeFormatter.format(date) };
 }
-

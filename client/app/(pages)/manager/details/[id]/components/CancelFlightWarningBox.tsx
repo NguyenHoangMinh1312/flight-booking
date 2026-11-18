@@ -28,7 +28,8 @@ export default function CancelFlightWarningBox({
         </div>
 
         <p className="mt-4 text-sm text-slate-600">
-          Are you sure you want to cancel this flight? This action cannot be undone and will cancel all associated tickets.
+          Are you sure you want to cancel this flight? This action cannot be
+          undone and will cancel all associated tickets.
         </p>
 
         <div className="mt-6 flex justify-end gap-3">

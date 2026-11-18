@@ -1,12 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  FaCalendarAlt,
-  FaSearch,
-  FaTag,
-  FaUndoAlt,
-} from "react-icons/fa";
+import { FaCalendarAlt, FaSearch, FaTag, FaUndoAlt } from "react-icons/fa";
+import { OrderStatus } from "@/app/types/order";
 
 export type SearchFilters = {
   createdDate?: string;
@@ -15,8 +11,8 @@ export type SearchFilters = {
 
 type SearchBarProps = {
   onSearch: (filters: SearchFilters) => void;
-  onReset?: () => void;
-  isLoading?: boolean;
+  onReset: () => void;
+  isLoading: boolean;
 };
 
 export default function SearchBar({
@@ -29,7 +25,7 @@ export default function SearchBar({
 
   const hasActiveFilters = Boolean(createdDate || status.trim());
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSearch({
       createdDate,
@@ -40,9 +36,7 @@ export default function SearchBar({
   const handleReset = () => {
     setCreatedDate("");
     setStatus("");
-    if (onReset) {
-      onReset();
-    }
+    onReset();
   };
 
   return (
@@ -85,11 +79,13 @@ export default function SearchBar({
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100"
             >
               <option value="">All Statuses</option>
-              <option value="complete">Complete</option>
-              <option value="created">Created</option>
-              <option value="awaiting-refund">Awaiting Refund</option>
-              <option value="canceled">Canceled</option>
-              <option value="refund-failed">Refund Failed</option>
+              <option value={OrderStatus.Complete}>Complete</option>
+              <option value={OrderStatus.Created}>Created</option>
+              <option value={OrderStatus.AwaitingRefund}>
+                Awaiting Refund
+              </option>
+              <option value={OrderStatus.Canceled}>Canceled</option>
+              <option value={OrderStatus.RefundFailed}>Refund Failed</option>
             </select>
           </div>
         </div>

@@ -1,9 +1,9 @@
-import { Subjects } from "../subjects"
+import { Subjects } from "../subjects";
 
 // couple the data to be sent to ticket:created channel
 export interface RefundFailedEvent {
-  subject: Subjects.RefundFailed
+  subject: Subjects.RefundFailed;
   data: {
-    orderId: string
-  }
+    orderId: string;
+  };
 }

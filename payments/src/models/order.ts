@@ -1,28 +1,22 @@
-import mongoose from "mongoose"
-import { OrderStatus } from "@mint1312-flight-booking/common"
+import mongoose from "mongoose";
+import { OrderStatus } from "@mint1312-flight-booking/common";
 
 // interface that describes the properties to create a new order
 interface OrderAttrs {
-  id: string,
-  version: number,
-  userId: string,
-  status: OrderStatus,
-  price: number
-}
-
-// interface that describes the properties that a Order model has
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc
-  findByEvent(event: { id: string, version: number }): Promise<OrderDoc | null>
+  id: string;
+  version: number;
+  userId: string;
+  status: OrderStatus;
+  price: number;
 }
 
 // interface that describes the properties that User document has
-interface OrderDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  userId: string,
-  status: OrderStatus,
-  price: number
+export interface OrderDoc extends mongoose.Document {
+  id: string;
+  version: number;
+  userId: string;
+  status: OrderStatus;
+  price: number;
 }
 
 // User model schema
@@ -30,7 +24,7 @@ const orderSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      required: true
+      required: true,
     },
     status: {
       type: String,
@@ -39,7 +33,7 @@ const orderSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: true
+      required: true,
     },
   },
   {
@@ -51,12 +45,12 @@ const orderSchema = new mongoose.Schema(
           version: ret.__v,
           userId: ret.userId,
           status: ret.status,
-          price: ret.price
-        }
-      }
-    }
-  }
-)
+          price: ret.price,
+        };
+      },
+    },
+  },
+);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   const order = new Order({
@@ -64,20 +58,26 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
     __v: attrs.version,
     userId: attrs.userId,
     status: attrs.status,
-    price: attrs.price
-  })
+    price: attrs.price,
+  });
 
-  return order
-}
+  return order;
+};
 
 // find the previous version (used when receiving order:canceled event)
-orderSchema.statics.findByEvent = (event: { id: string, version: number }) => {
+orderSchema.statics.findByEvent = (event: { id: string; version: number }) => {
   return Order.findOne({
     _id: event.id,
-    version: event.version - 1
-  })
+    version: event.version - 1,
+  });
+};
+
+// interface that describes the properties that a Order model has
+interface OrderModel extends mongoose.Model<OrderDoc> {
+  build(attrs: OrderAttrs): OrderDoc;
+  findByEvent(event: { id: string; version: number }): Promise<OrderDoc | null>;
 }
 
-const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema)
+const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
 
-export { Order }
+export { Order };

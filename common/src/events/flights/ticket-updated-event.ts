@@ -1,19 +1,20 @@
-import { Subjects } from "../subjects"
+import { Subjects } from "../subjects";
 
 // couple the data to be sent to ticket:created channel
 export interface TicketUpdatedEvent {
-  subject: Subjects.TicketUpdated
+  subject: Subjects.TicketUpdated;
   data: {
-    id: string,
-    version: number,
-    price: number,
-    class: string,
-    status: string,
+    id: string;
+    version: number;
+    price: number;
+    class: string;
+    status: string;
     seat: {
-      row: number,
-      column: number
-    },
-    departureDate: Date
-    orderId?: string,
-  }
+      row: number;
+      column: number;
+    };
+    departureDate: Date;
+    departureAirport: string;
+    arrivalAirport: string;
+  };
 }

@@ -1,15 +1,14 @@
-import express, { Request, Response } from "express"
-import { body } from "express-validator"
-import { BadRequestError, requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
-import { Flight } from "../models/flight"
-import { Ticket } from "../models/ticket"
-import { TicketDoc } from "../models/ticket"
-import mongoose from "mongoose"
-import { TicketCreatedPublisher } from "../events/publishers/ticket-created-publisher"
-import { Airport } from "../models/airport"
-import { Outbox } from "../models/outbox"
+import express from "express";
+import { body } from "express-validator";
+import {
+  requireAuth,
+  requireManager,
+  validateRequest,
+} from "@mint1312-flight-booking/common";
+import { createFlightController } from "../controllers/create-flight-controller";
+import { FlightClass } from "../models/flight";
 
-const router = express.Router()
+const router = express.Router();
 
 router.post(
   "/api/flights",
@@ -24,9 +23,7 @@ router.post(
       .optional()
       .isString()
       .withMessage("Description must be a string"),
-    body("departure")
-      .isObject()
-      .withMessage("Departure is required"),
+    body("departure").isObject().withMessage("Departure is required"),
     body("departure.airport")
       .isString()
       .notEmpty()
@@ -35,9 +32,7 @@ router.post(
       .isISO8601()
       .toDate()
       .withMessage("Departure date must be a valid date"),
-    body("arrival")
-      .isObject()
-      .withMessage("Arrival is required"),
+    body("arrival").isObject().withMessage("Arrival is required"),
     body("arrival.airport")
       .isString()
       .notEmpty()
@@ -46,161 +41,30 @@ router.post(
       .isISO8601()
       .toDate()
       .withMessage("Arrival date must be a valid date"),
-    body("seatConfig")
-      .isObject()
-      .withMessage("Seat configuration is required"),
-    body("seatConfig.rows")
+    body("rows")
       .isInt({ gt: 0 })
       .withMessage("Seat rows must be a positive integer"),
-    body("seatConfig.columns")
+    body("classConfig")
+      .isArray({ min: 1 })
+      .withMessage("Class configuration must be a non-empty array"),
+    body("classConfig.*.class")
+      .isIn(Object.values(FlightClass))
+      .withMessage("Class name must be 'first', 'business' or 'economy'."),
+    body("classConfig.*.fromRow")
+      .isInt({ gt: 0 })
+      .withMessage("Starting row must be a positive integer"),
+    body("classConfig.*.toRow")
+      .isInt({ gt: 0 })
+      .withMessage("Ending row must be a positive integer"),
+    body("classConfig.*.columns")
       .isInt({ gt: 0, lt: 27 })
       .withMessage("Seat columns must be a positive integer between 1 and 26"),
-    body("seatConfig.classes")
-      .isArray({ min: 1 })
-      .withMessage("Seat classes must be a non-empty array"),
-    body("seatConfig.classes.*.class")
-      .isIn(["first", "business", "economy"])
-      .withMessage("Seat class must be first, business, or economy"),
-    body("seatConfig.classes.*.fromRow")
-      .isInt({ min: 1 })
-      .withMessage("Starting row must be a positive integer"),
-    body("seatConfig.classes.*.toRow")
-      .isInt({ min: 1 })
-      .withMessage("Ending row must be a positive integer"),
-    body("priceConfig")
-      .isObject()
-      .withMessage("Price configuration is required"),
-    body("priceConfig.first")
+    body("classConfig.*.price")
       .isFloat({ gt: 0 })
-      .withMessage("First-class price must be positive"),
-    body("priceConfig.business")
-      .isFloat({ gt: 0 })
-      .withMessage("Business-class price must be positive"),
-    body("priceConfig.economy")
-      .isFloat({ gt: 0 })
-      .withMessage("Economy-class price must be positive")
+      .withMessage("Price must be a positive number"),
   ],
   validateRequest,
-  async (req: Request, res: Response) => {
-    const {
-      flightNumber,
-      description,
-      departure,
-      arrival,
-      seatConfig,
-      priceConfig
-    } = req.body
+  createFlightController,
+);
 
-    // validate the airport code
-    const departureAirport = await Airport.findOne({ code: departure.airport })
-    if (!departureAirport)
-      throw new BadRequestError("Invalid departure airport code")
-
-    const arrivalAirport = await Airport.findOne({ code: arrival.airport })
-    if (!arrivalAirport)
-      throw new BadRequestError("Invalid arrival airport code")
-
-    // validate the departure and arrival time
-    if (departure.date >= arrival.date)
-      throw new BadRequestError("Departure date must be earlier than arrival date")
-
-    // validate the seat config
-    for (const classConfig of seatConfig.classes) {
-      if (classConfig.fromRow > classConfig.toRow) {
-        throw new BadRequestError(
-          `Starting row (${classConfig.fromRow}) cannot be greater than ending row (${classConfig.toRow}) for ${classConfig.class} class`
-        )
-      }
-
-      if (classConfig.toRow > seatConfig.rows) {
-        throw new BadRequestError(
-          `Ending row (${classConfig.toRow}) for ${classConfig.class} class exceeds total rows (${seatConfig.rows})`
-        )
-      }
-    }
-
-    for (let i = 0; i < seatConfig.classes.length; i++) {
-      for (let j = i + 1; j < seatConfig.classes.length; j++) {
-        const a = seatConfig.classes[i]
-        const b = seatConfig.classes[j]
-        if (a.fromRow <= b.toRow && b.fromRow <= a.toRow) {
-          throw new BadRequestError(
-            `Seat class row ranges overlap between ${a.class} (rows ${a.fromRow}-${a.toRow}) and ${b.class} (rows ${b.fromRow}-${b.toRow})`
-          )
-        }
-      }
-    }
-
-    // db transaction
-    const session = await mongoose.startSession()
-
-    try {
-      session.startTransaction();
-
-      // Save the flight 
-      const flight = Flight.build({
-        flightNumber,
-        description,
-        departure,
-        arrival,
-        seatConfig,
-        priceConfig
-      })
-      await flight.save({ session })
-
-      // Save the tickets
-      const tickets: TicketDoc[] = []
-
-      for (let r = 1; r <= seatConfig.rows; r++) {
-        const classConfig = seatConfig.classes.find(
-          ({ fromRow, toRow }: { fromRow: number; toRow: number }) => {
-            return r >= fromRow && r <= toRow
-          }
-        )
-        if (!classConfig)
-          continue
-
-        const price = priceConfig[classConfig.class]
-
-        for (let c = 1; c <= seatConfig.columns; c++) {
-          const ticket = Ticket.build({
-            flight,
-            price,
-            class: classConfig.class,
-            status: flight.status,
-            seat: { row: r, column: c }
-          })
-          tickets.push(ticket)
-        }
-      }
-      await Ticket.insertMany(tickets, { session })
-
-      // save events to outbox
-      const outboxEvents = tickets.map((ticket) => {
-        return TicketCreatedPublisher.buildOutboxEvent({
-          id: ticket.id,
-          version: ticket.version,
-          price: ticket.price,
-          class: ticket.class,
-          status: ticket.status,
-          seat: ticket.seat,
-          departureDate: ticket.flight.departure.date
-        })
-      })
-      await Outbox.insertMany(outboxEvents, { session })
-
-      // commit db transaction
-      await session.commitTransaction()
-
-      // response
-      res.status(201).send(flight)
-    } catch (err) {
-      await session.abortTransaction();
-      throw new Error("Something went wrong. Please try again")
-    } finally {
-      await session.endSession()
-    }
-  }
-)
-
-export { router as createFlightRouter }
+export { router as createFlightRouter };

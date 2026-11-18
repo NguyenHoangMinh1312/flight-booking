@@ -1,1 +1,1 @@
-export const streamName = "flight-booking"
+export const streamName = "flight-booking";

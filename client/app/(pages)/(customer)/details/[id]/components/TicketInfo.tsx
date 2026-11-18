@@ -5,8 +5,7 @@ type Props = {
   ticket: Ticket | null;
 };
 
-const columnLabel = (column: number) =>
-  String.fromCharCode(64 + column);
+const columnLabel = (column: number) => String.fromCharCode(64 + column);
 
 export default function TicketInfo({ ticket }: Props) {
   return (
@@ -20,8 +19,8 @@ export default function TicketInfo({ ticket }: Props) {
 
       {!ticket ? (
         <div className="mt-4 rounded-xl bg-slate-50 p-5 text-slate-600">
-          Select an available seat to see its ticket details and place
-          your order.
+          Select an available seat to see its ticket details and place your
+          order.
         </div>
       ) : (
         <div className="mt-4 grid gap-4 sm:grid-cols-3">

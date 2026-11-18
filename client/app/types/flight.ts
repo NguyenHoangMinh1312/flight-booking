@@ -1,22 +1,17 @@
-export type FlightStatus = "available" | "canceled"
+import { SeatClass } from "./ticket";
+import { Airport } from "./airport";
 
-export type SeatClass = {
-  class: string;
+export enum FlightStatus {
+  Available = "available",
+  Canceled = "canceled",
+}
+
+export type ClassConfig = {
+  class: SeatClass;
   fromRow: number;
   toRow: number;
-  _id?: string;
-};
-
-export type SeatConfig = {
-  rows: number;
   columns: number;
-  classes: SeatClass[];
-};
-
-export type PriceConfig = {
-  first?: number;
-  business?: number;
-  economy?: number;
+  price: number;
 };
 
 export type Flight = {
@@ -25,15 +20,14 @@ export type Flight = {
   flightNumber: string;
   description: string;
   departure: {
-    airport: string;
+    airport: Airport;
     date: string;
   };
   arrival: {
-    airport: string;
+    airport: Airport;
     date: string;
   };
-  seatConfig?: SeatConfig;
-  priceConfig?: PriceConfig;
+  rows: number;
+  classConfig: ClassConfig[];
   status: FlightStatus;
 };
-

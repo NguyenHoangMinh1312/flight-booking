@@ -1,47 +1,76 @@
-import { TicketCreatedListener } from "../ticket-created-listener"
-import { natsWrapper } from "../../../nats-wrapper"
-import { FlightStatus, TicketCreatedEvent } from "@mint1312-flight-booking/common"
-import mongoose from "mongoose"
-import { JsMsg } from "nats"
-import { Ticket } from "../../../models/ticket"
+import { TicketCreatedListener } from "../ticket-created-listener";
+import { natsWrapper } from "../../../nats-wrapper";
+import {
+  FlightStatus,
+  TicketCreatedEvent,
+} from "@mint1312-flight-booking/common";
+import mongoose from "mongoose";
+import { JsMsg } from "nats";
+import { Ticket } from "../../../models/ticket";
 
-it(
-  "Checks if the listener handles event ticket:created successfully",
-  async () => {
-    // create an event listener
-    const listener = new TicketCreatedListener(natsWrapper.nc)
+const setup = async () => {
+  // create an event listener
+  const listener = new TicketCreatedListener(natsWrapper.nc);
 
-    // create a fake event
-    const data: TicketCreatedEvent["data"] = {
-      id: new mongoose.Types.ObjectId().toHexString(),
-      version: 0,
-      price: 10,
-      class: "business",
-      status: FlightStatus.Available,
-      seat: {
-        row: 1,
-        column: 1
-      },
-      departureDate: new Date()
-    }
+  // create a fake event
+  const data: TicketCreatedEvent["data"] = {
+    id: new mongoose.Types.ObjectId().toHexString(),
+    version: 0,
+    price: 10,
+    class: "business",
+    status: FlightStatus.Available,
+    seat: {
+      row: 1,
+      column: 1,
+    },
+    departureDate: new Date(),
+    departureAirport: "HAN",
+    arrivalAirport: "SGN",
+  };
 
-    // fake the ack function
-    const msg = {
-      ack: jest.fn()
-    } as unknown as JsMsg
+  // fake the ack function
+  const msg = {
+    ack: jest.fn(),
+  } as unknown as JsMsg;
 
-    // call the listener
-    await listener.onMessage(data, msg)
+  return { listener, data, msg };
+};
 
-    // check if the ticket is created
-    const ticket = await Ticket.findById(data.id)
-    expect(ticket).toBeDefined()
-    expect(ticket!.version).toEqual(data.version)
-    expect(ticket!.price).toEqual(data.price)
-    expect(ticket!.class).toEqual(data.class)
-    expect(ticket!.seat).toEqual(data.seat)
+it("Checks if the listener handles event ticket:created successfully", async () => {
+  const { listener, data, msg } = await setup();
 
-    // check if the ack is called
-    expect(msg.ack).toHaveBeenCalled()
-  }
-)
+  // call the listener
+  await listener.onMessage(data, msg);
+
+  // check if the ticket is created
+  const ticket = await Ticket.findById(data.id);
+  expect(ticket).toBeDefined();
+  expect(ticket!.version).toEqual(data.version);
+  expect(ticket!.price).toEqual(data.price);
+  expect(ticket!.class).toEqual(data.class);
+  expect(ticket!.seat).toEqual(data.seat);
+  expect(ticket!.departureDate).toEqual(data.departureDate);
+  expect(ticket!.departureAirport).toEqual(data.departureAirport);
+  expect(ticket!.arrivalAirport).toEqual(data.arrivalAirport);
+
+  // check if the ack is called
+  expect(msg.ack).toHaveBeenCalled();
+});
+
+it("Acks the message and does not overwrite an existing ticket if duplicate ticket:created event is received", async () => {
+  const { listener, data, msg } = await setup();
+
+  // process the event the first time
+  await listener.onMessage(data, msg);
+
+  // send a duplicate event with different price
+  const duplicateMsg = {
+    ack: jest.fn(),
+  } as unknown as JsMsg;
+  await listener.onMessage({ ...data, price: 999 }, duplicateMsg);
+
+  const tickets = await Ticket.find({});
+  expect(tickets).toHaveLength(1);
+  expect(tickets[0]!.price).toEqual(data.price);
+  expect(duplicateMsg.ack).toHaveBeenCalled();
+});

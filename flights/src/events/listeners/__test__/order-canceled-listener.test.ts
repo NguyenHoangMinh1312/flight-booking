@@ -1,97 +1,134 @@
-import { OrderCanceledListener } from "../order-canceled-listener"
-import { natsWrapper } from "../../../nats-wrapper"
-import { OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common"
-import mongoose from "mongoose"
-import { JsMsg } from "nats"
-import { Ticket } from "../../../models/ticket"
-import { Flight, FlightClass } from "../../../models/flight"
-import { Outbox } from "../../../models/outbox"
+import { OrderCanceledListener } from "../order-canceled-listener";
+import { natsWrapper } from "../../../nats-wrapper";
+import { OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common";
+import mongoose from "mongoose";
+import { JsMsg } from "nats";
+import { Ticket } from "../../../models/ticket";
+import { Flight, FlightClass } from "../../../models/flight";
+import { Outbox } from "../../../models/outbox";
 
-const buildTicket = async () => {
+const setup = async () => {
+  const listener = new OrderCanceledListener(natsWrapper.nc);
+
   const flight = Flight.build({
     flightNumber: "VN123",
     description: "Hanoi to Ho Chi Minh City",
     departure: {
-      airport: "Noi Bai",
-      date: new Date()
+      airport: "HAN",
+      date: new Date("2026-09-04T17:39:50Z"),
     },
     arrival: {
-      airport: "Tan Son Nhat",
-      date: new Date()
+      airport: "SGN",
+      date: new Date("2026-09-04T19:39:50Z"),
     },
-    seatConfig: {
-      rows: 2,
-      columns: 2,
-      classes: [
-        {
-          class: FlightClass.Economy,
-          fromRow: 1,
-          toRow: 2
-        }
-      ]
-    },
-    priceConfig: {
-      "first": 1000000,
-      "business": 500000,
-      "economy": 200000
-    }
-  })
-  await flight.save()
+    rows: 2,
+    classConfig: [
+      {
+        class: FlightClass.Economy,
+        fromRow: 1,
+        toRow: 2,
+        columns: 2,
+        price: 200000,
+      },
+    ],
+  });
+  await flight.save();
 
+  const orderId = new mongoose.Types.ObjectId().toHexString();
   const ticket = Ticket.build({
     flight,
-    price: 10,
+    price: 200000,
     class: FlightClass.Economy,
     seat: {
-      row: 10,
-      column: 10
+      row: 1,
+      column: 1,
     },
-    orderId: new mongoose.Types.ObjectId().toHexString(),
-    status: flight.status
-  })
-  await ticket.save()
+    orderId,
+    status: flight.status,
+  });
+  await ticket.save();
 
-  return ticket
-}
+  const data: OrderCanceledEvent["data"] = {
+    id: orderId,
+    version: 1,
+    userId: new mongoose.Types.ObjectId().toHexString(),
+    ticket: {
+      id: ticket.id,
+    },
+  };
 
-it(
-  "Checks if the listener handles event order:canceled successfully",
-  async () => {
-    // create an event listener
-    const listener = new OrderCanceledListener(natsWrapper.nc)
+  const msg = {
+    ack: jest.fn(),
+  } as unknown as JsMsg;
 
-    // create a ticket
-    const ticket = await buildTicket()
+  return { listener, flight, ticket, orderId, data, msg };
+};
 
-    //Create a fake event
-    const data: OrderCanceledEvent["data"] = {
-      id: new mongoose.Types.ObjectId().toHexString(),
-      version: 1,
-      ticket: {
-        id: ticket.id
-      },
-      userId: new mongoose.Types.ObjectId().toHexString()
-    }
+it("Removes the orderId from the ticket when order:canceled event is received", async () => {
+  const { listener, ticket, data, msg } = await setup();
 
-    // fake the ack function
-    const msg = {
-      ack: jest.fn()
-    } as unknown as JsMsg
+  await listener.onMessage(data, msg);
 
-    // call the listener
-    await listener.onMessage(data, msg)
+  const updatedTicket = await Ticket.findById(ticket.id);
+  expect(updatedTicket).toBeDefined();
+  expect(updatedTicket!.orderId).toBeUndefined();
+  expect(updatedTicket!.version).toEqual(ticket.version + 1);
+});
 
-    // check if the orderId field is removed from the ticket
-    const updatedTicket = await Ticket.findById(ticket.id)
-    expect(updatedTicket!.orderId).toBeUndefined()
+it("Acks the message after successfully processing the event", async () => {
+  const { listener, data, msg } = await setup();
 
-    // check if the event is saved to outbox
-    const outboxEvent = await Outbox.find({})
-    expect(outboxEvent).toBeDefined()
-    expect(outboxEvent).toHaveLength(1)
-    expect(outboxEvent[0]?.eventType).toEqual(Subjects.TicketUpdated)
+  await listener.onMessage(data, msg);
 
-    // check if the ack is called
-    expect(msg.ack).toHaveBeenCalledTimes(1)
-  }
-)
+  expect(msg.ack).toHaveBeenCalledTimes(1);
+});
+
+it("Saves a TicketUpdated event to the outbox with correct payload", async () => {
+  const { listener, flight, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+
+  const outboxEvents = await Outbox.find({});
+  expect(outboxEvents).toHaveLength(1);
+  expect(outboxEvents[0]!.eventType).toEqual(Subjects.TicketUpdated);
+  expect(outboxEvents[0]!.payload).toMatchObject({
+    id: ticket.id,
+    version: ticket.version + 1,
+    price: ticket.price,
+    class: ticket.class,
+    status: ticket.status,
+    seat: ticket.seat,
+    departureAirport: flight.departure.airport,
+    arrivalAirport: flight.arrival.airport,
+  });
+});
+
+it("Throws an error and does not ack if the ticket is not found", async () => {
+  const { listener, data, msg } = await setup();
+  data.ticket.id = new mongoose.Types.ObjectId().toHexString();
+
+  await expect(listener.onMessage(data, msg)).rejects.toThrow(
+    "Ticket not found",
+  );
+
+  expect(msg.ack).not.toHaveBeenCalled();
+  const outboxEvents = await Outbox.find({});
+  expect(outboxEvents).toHaveLength(0);
+});
+
+it("Acks the message without updating the ticket or saving an outbox event if orderId is already undefined", async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  ticket.set({ orderId: undefined });
+  await ticket.save();
+  const currentVersion = ticket.version;
+
+  await listener.onMessage(data, msg);
+
+  const unchangedTicket = await Ticket.findById(ticket.id);
+  expect(unchangedTicket!.version).toEqual(currentVersion);
+
+  const outboxEvents = await Outbox.find({});
+  expect(outboxEvents).toHaveLength(0);
+  expect(msg.ack).toHaveBeenCalledTimes(1);
+});

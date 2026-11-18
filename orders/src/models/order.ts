@@ -1,31 +1,26 @@
-import mongoose from "mongoose"
-import { OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
-import { TicketDoc } from "./ticket"
+import mongoose from "mongoose";
+import { OrderStatus, RefundReason } from "@mint1312-flight-booking/common";
+import { TicketDoc } from "./ticket";
 
 // interface that describes the properties to create a new order
 interface OrderAttrs {
-  userId: string,
-  status: OrderStatus,
-  expiresAt: Date,
-  ticket: TicketDoc,
-  refundReason?: RefundReason
-}
-
-// interface that describes the properties that a Order model has
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc
+  userId: string;
+  status: OrderStatus;
+  expiresAt: Date;
+  ticket: TicketDoc;
+  refundReason?: RefundReason;
 }
 
 // interface that describes the properties that User document has
 export interface OrderDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  userId: string,
-  status: OrderStatus,
-  createdAt: Date,
-  expiresAt: Date,
-  ticket: TicketDoc,
-  refundReason?: RefundReason
+  id: string;
+  version: number;
+  userId: string;
+  status: OrderStatus;
+  createdAt: Date;
+  expiresAt: Date;
+  ticket: TicketDoc;
+  refundReason?: RefundReason;
 }
 
 // User model schema
@@ -33,25 +28,25 @@ const orderSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      required: true
+      required: true,
     },
     status: {
       type: String,
       required: true,
       enum: Object.values(OrderStatus),
-      default: OrderStatus.Created
+      default: OrderStatus.Created,
     },
     expiresAt: {
       type: mongoose.Schema.Types.Date,
     },
     ticket: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Ticket"
+      ref: "Ticket",
     },
     refundReason: {
       type: String,
-      enum: Object.values(RefundReason)
-    }
+      enum: Object.values(RefundReason),
+    },
   },
   {
     timestamps: true,
@@ -67,32 +62,42 @@ const orderSchema = new mongoose.Schema(
           expiresAt: ret.expiresAt,
           createdAt: ret.createdAt,
           ticket: ret.ticket,
-          refundReason: ret.refundReason
-        }
-      }
-    }
-  }
-)
+          refundReason: ret.refundReason,
+        };
+      },
+    },
+  },
+);
 
 // enforce only 1 order per ticket that in Created / Awaiting Refund / Complete / Refund failed status
 orderSchema.index(
   {
-    ticket: 1
+    ticket: 1,
   },
   {
     unique: true,
     partialFilterExpression: {
       status: {
-        $in: [OrderStatus.Created, OrderStatus.AwaitingRefund, OrderStatus.Complete, OrderStatus.RefundFailed]
-      }
-    }
-  }
-)
+        $in: [
+          OrderStatus.Created,
+          OrderStatus.AwaitingRefund,
+          OrderStatus.Complete,
+          OrderStatus.RefundFailed,
+        ],
+      },
+    },
+  },
+);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order(attrs)
+  return new Order(attrs);
+};
+
+// interface that describes the properties that a Order model has
+interface OrderModel extends mongoose.Model<OrderDoc> {
+  build(attrs: OrderAttrs): OrderDoc;
 }
 
-const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema)
+const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
 
-export { Order }
+export { Order };

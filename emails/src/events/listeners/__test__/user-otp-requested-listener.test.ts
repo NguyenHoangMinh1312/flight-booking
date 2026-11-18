@@ -1,39 +1,48 @@
-import { UserOtpRequestedEvent } from "@mint1312-flight-booking/common"
-import { JsMsg } from "nats"
-import { natsWrapper } from "../../../nats-wrapper"
-import { UserOtpRequestedListener } from "../user-otp-requested-listener"
-import { emailSendQueue } from "../../../queues/email-send-queue"
+import { UserOtpRequestedEvent } from "@mint1312-flight-booking/common";
+import { JsMsg } from "nats";
+import { natsWrapper } from "../../../nats-wrapper";
+import { UserOtpRequestedListener } from "../user-otp-requested-listener";
+import { emailSendWorker } from "../../../workers/email-send-worker";
 
-it(
-  "Checks if the listener handles the event user:otp-requested successfully",
-  async () => {
-    // create an event listener
-    const listener = new UserOtpRequestedListener(natsWrapper.nc)
+const setup = async () => {
+  const listener = new UserOtpRequestedListener(natsWrapper.nc);
 
-    // create a fake event
-    const data: UserOtpRequestedEvent["data"] = {
-      email: "test@test.com",
-      otp: "123456"
-    }
+  const data: UserOtpRequestedEvent["data"] = {
+    email: "test@test.com",
+    otp: "123456",
+  };
 
-    // fake the ack function
-    const msg = {
-      ack: jest.fn()
-    } as unknown as JsMsg
+  const msg = {
+    ack: jest.fn(),
+  } as unknown as JsMsg;
 
-    // call the listener
-    await listener.onMessage(data, msg)
+  return { listener, data, msg };
+};
 
-    // checks if the request is sent to queue
-    expect(emailSendQueue.add).toHaveBeenCalledTimes(1)
-    expect(emailSendQueue.add).toHaveBeenCalledWith(
-      expect.objectContaining({
-        receiver: data.email,
-        content: expect.stringContaining(data.otp)
-      })
-    )
+it("Queues a verification email containing the OTP code", async () => {
+  const { listener, data, msg } = await setup();
 
-    // checks if the ack is sent
-    expect(msg.ack).toHaveBeenCalledTimes(1)
-  }
-)
+  await listener.onMessage(data, msg);
+
+  expect(emailSendWorker.add).toHaveBeenCalledTimes(1);
+  expect(emailSendWorker.add).toHaveBeenCalledWith(
+    expect.objectContaining({
+      receiver: data.email,
+      subject: "Your Flight Booking Verification Code",
+      content: expect.stringContaining(`<h1>${data.otp}</h1>`),
+    }),
+  );
+
+  expect(msg.ack).toHaveBeenCalledTimes(1);
+});
+
+it("Does not ack the message if queuing the email fails", async () => {
+  const { listener, data, msg } = await setup();
+  jest
+    .spyOn(emailSendWorker, "add")
+    .mockRejectedValueOnce(new Error("Queue error"));
+
+  await expect(listener.onMessage(data, msg)).rejects.toThrow("Queue error");
+
+  expect(msg.ack).not.toHaveBeenCalled();
+});

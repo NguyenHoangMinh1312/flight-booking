@@ -1,107 +1,112 @@
-import { JsMsg } from "nats"
-import { Subjects, Listener, TicketCanceledEvent, FlightStatus, OrderStatus, RefundReason } from "@mint1312-flight-booking/common"
-import { Ticket } from "../../models/ticket"
-import { Order } from "../../models/order"
-import { queueGroupName } from "./queue-group-name"
-import mongoose from "mongoose"
-import { OrderCanceledPublisher } from "../publishers/order-canceled-publisher"
-import { OrderAwaitingRefundPublisher } from "../publishers/order-awaiting-refund-publisher"
-import { Outbox } from "../../models/outbox"
+import { JsMsg } from "nats";
+import {
+  Subjects,
+  Listener,
+  TicketCanceledEvent,
+  FlightStatus,
+  OrderStatus,
+  RefundReason,
+} from "@mint1312-flight-booking/common";
+import { Ticket } from "../../models/ticket";
+import { Order } from "../../models/order";
+import { queueGroupName } from "./queue-group-name";
+import mongoose from "mongoose";
+import { OrderCanceledPublisher } from "../publishers/order-canceled-publisher";
+import { OrderAwaitingRefundPublisher } from "../publishers/order-awaiting-refund-publisher";
+import { Outbox } from "../../models/outbox";
 
 export class TicketCanceledListener extends Listener<TicketCanceledEvent> {
-  readonly subject = Subjects.TicketCanceled
-  queueGroupName = queueGroupName
+  readonly subject = Subjects.TicketCanceled;
+  queueGroupName = queueGroupName;
 
   async onMessage(data: TicketCanceledEvent["data"], msg: JsMsg) {
     // find the previous ticket version
-    const ticket = await Ticket.findById(data.id)
+    const ticket = await Ticket.findById(data.id);
 
-    if (!ticket)
-      throw new Error("Ticket not found")
+    if (!ticket) throw new Error("Ticket not found");
 
-    if (ticket.version >= data.version)
-      return msg.ack()
+    if (ticket.version >= data.version) return msg.ack();
 
     if (ticket.version !== data.version - 1)
-      throw new Error("Out of order event received")
+      throw new Error("Out of order event received");
 
     // find the orders associated with the ticket
-    const orders = await Order.find({ ticket: data.id })
+    const orders = await Order.find({ ticket: data.id });
 
     // db session
-    const session = await mongoose.startSession()
+    const session = await mongoose.startSession();
 
     try {
-      session.startTransaction()
+      session.startTransaction();
 
       // update the ticket
       ticket.set({
         status: FlightStatus.Canceled,
-        version: data.version
-      })
-      await ticket.save({ session })
+        version: data.version,
+      });
+      await ticket.save({ session });
 
       if (!orders) {
-        await session.commitTransaction()
-        return msg.ack()
+        await session.commitTransaction();
+        return msg.ack();
       }
 
       // process the order
-      const outboxEvents = []
+      const outboxEvents = [];
       for (let order of orders) {
         // if the order is just created (unpaid)
         if (order.status === OrderStatus.Created) {
-          order.set({ status: OrderStatus.Canceled })
-          await order.save({ session })
+          order.set({ status: OrderStatus.Canceled });
+          await order.save({ session });
 
           outboxEvents.push(
             OrderCanceledPublisher.buildOutboxEvent({
               id: order.id,
               version: order.version,
+              userId: order.userId,
               ticket: {
-                id: ticket.id
+                id: ticket.id,
               },
-              userId: order.userId
-            })
-          )
-          continue
+            }),
+          );
+          continue;
         }
 
         // if the order is paid
-        if ([OrderStatus.Complete, OrderStatus.RefundFailed].includes(order.status)) {
+        if (
+          [OrderStatus.Complete, OrderStatus.RefundFailed].includes(
+            order.status,
+          )
+        ) {
           order.set({
             status: OrderStatus.AwaitingRefund,
-            refundReason: RefundReason.FlightCanceled
-          })
-          await order.save({ session })
+            refundReason: RefundReason.FlightCanceled,
+          });
+          await order.save({ session });
 
           // save the event to outbox
           outboxEvents.push(
             OrderAwaitingRefundPublisher.buildOutboxEvent({
               id: order.id,
               version: order.version,
-              ticket: {
-                id: ticket.id
-              },
-              reason: RefundReason.FlightCanceled
-            })
-          )
-          continue
+              reason: RefundReason.FlightCanceled,
+            }),
+          );
+          continue;
         }
       }
 
       // save the outbox events
-      await Outbox.insertMany(outboxEvents, { session })
+      await Outbox.insertMany(outboxEvents, { session });
       // commit db transaction
-      await session.commitTransaction()
+      await session.commitTransaction();
 
-      msg.ack()
-
+      msg.ack();
     } catch (err) {
       await session.abortTransaction();
-      throw new Error("Something went wrong. Please try again")
+      throw new Error("Something went wrong. Please try again");
     } finally {
-      await session.endSession()
+      await session.endSession();
     }
   }
 }

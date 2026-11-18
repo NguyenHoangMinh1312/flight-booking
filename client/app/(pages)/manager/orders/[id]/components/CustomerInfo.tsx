@@ -1,8 +1,4 @@
-import {
-  FaUser,
-  FaEnvelope,
-  FaIdCard,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaIdCard } from "react-icons/fa";
 import { User } from "@/app/types/user";
 
 type CustomerInfoProps = {
@@ -22,7 +18,9 @@ export default function CustomerInfo({ customer, userId }: CustomerInfoProps) {
             <FaUser className="text-base" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Customer Information</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              Customer Information
+            </h2>
           </div>
         </div>
       </div>

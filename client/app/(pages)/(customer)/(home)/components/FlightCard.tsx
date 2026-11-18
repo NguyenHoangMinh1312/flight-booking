@@ -1,14 +1,14 @@
 import { FaCheckCircle, FaPlane, FaTimesCircle } from "react-icons/fa";
 import Link from "next/link";
-import { Flight } from "@/app/types/flight";
+import { Flight, FlightStatus } from "@/app/types/flight";
 import { formatDateTime } from "@/app/utils/format-datetime";
 import { currencyFormatter } from "@/app/utils/format-currency";
 
 type FlightCardProps = { flight: Flight };
 
 // get the corresponding style base on the flight status
-function getStatusDetails(status?: string) {
-  const isCanceled = status?.toLowerCase() === "canceled"
+function getStatusDetails(status?: FlightStatus) {
+  const isCanceled = status === FlightStatus.Canceled;
 
   if (isCanceled) {
     return {
@@ -28,12 +28,17 @@ function getStatusDetails(status?: string) {
 export default function FlightCard({ flight }: FlightCardProps) {
   const departure = formatDateTime(flight.departure.date);
   const arrival = formatDateTime(flight.arrival.date);
-  const economyPrice = flight.priceConfig?.economy;
   const statusDetails = getStatusDetails(flight.status);
+  let minPrice = 0;
+  flight.classConfig.forEach((item) => {
+    minPrice = Math.min(item.price);
+  });
 
   return (
-    <Link href={`/details/${flight.id}`}
-      className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <Link
+      href={`/details/${flight.id}`}
+      className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-600">
@@ -53,34 +58,28 @@ export default function FlightCard({ flight }: FlightCardProps) {
       <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div>
           <p className="font-semibold text-slate-900">
-            {flight.departure.airport}
+            {flight.departure.airport.code}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            <span className="block">
-              {departure.date}
-            </span>
-            {departure.time &&
-              <span className="block">
-                {departure.time}
-              </span>}
+            <span className="block">{departure.date}</span>
+            {departure.time && <span className="block">{departure.time}</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-slate-300" aria-hidden="true">
+        <div
+          className="flex items-center gap-2 text-slate-300"
+          aria-hidden="true"
+        >
           <span className="h-px w-6 bg-slate-900" />
           <FaPlane className="text-sky-600" />
           <span className="h-px w-6 bg-slate-900" />
         </div>
         <div className="text-right">
           <p className="font-semibold text-slate-900">
-            {flight.arrival.airport}
+            {flight.arrival.airport.code}
           </p>
           <p className="mt-1 text-sm text-slate-500">
             <span className="block">{arrival.date}</span>
-            {arrival.time &&
-              <span className="block">
-                {arrival.time}
-              </span>
-            }
+            {arrival.time && <span className="block">{arrival.time}</span>}
           </p>
         </div>
       </div>
@@ -89,9 +88,9 @@ export default function FlightCard({ flight }: FlightCardProps) {
           From
         </p>
         <p className="mt-1 text-lg font-bold text-slate-900">
-          {economyPrice === undefined ?
-            "Contact for price" :
-            currencyFormatter.format(economyPrice)}
+          {minPrice === undefined
+            ? "Contact for price"
+            : currencyFormatter.format(minPrice)}
         </p>
       </div>
     </Link>

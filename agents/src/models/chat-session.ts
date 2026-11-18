@@ -1,25 +1,20 @@
-import mongoose from "mongoose"
-import { UserDoc } from "./user"
-import { messageSchema, MessageAttrs } from "./message"
+import mongoose from "mongoose";
+import { UserDoc } from "./user";
+import { AgentInputItem } from "@openai/agents";
 
 // Properties required to create a new ChatSession
 interface ChatSessionAttrs {
-  user: UserDoc
-  conversation?: MessageAttrs[]
-}
-
-// Properties that a ChatSession model has
-interface ChatSessionModel extends mongoose.Model<ChatSessionDoc> {
-  build(attrs: ChatSessionAttrs): ChatSessionDoc
+  user: UserDoc;
+  history?: AgentInputItem[];
 }
 
 // Properties that a ChatSession document has
 export interface ChatSessionDoc extends mongoose.Document {
-  id: string
-  user: UserDoc
-  conversation: MessageAttrs[]
-  createdAt: Date
-  updatedAt: Date
+  id: string;
+  user: UserDoc;
+  history: AgentInputItem[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const chatSessionSchema = new mongoose.Schema(
@@ -30,28 +25,36 @@ const chatSessionSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    conversation: {
-      type: [messageSchema],
+    history: {
+      type: mongoose.Schema.Types.Mixed,
       default: [],
     },
   },
   {
     timestamps: true,
     toJSON: {
-      transform(_doc, ret: any) {
-        ret.id = ret._id
+      transform(_doc, ret) {
+        return {
+          id: ret._id,
+          user: ret.user,
+          history: ret.history,
+        };
       },
     },
-  }
-)
+  },
+);
 
 chatSessionSchema.statics.build = (attrs: ChatSessionAttrs) => {
-  return new ChatSession(attrs)
+  return new ChatSession(attrs);
+};
+
+interface ChatSessionModel extends mongoose.Model<ChatSessionDoc> {
+  build(attrs: ChatSessionAttrs): ChatSessionDoc;
 }
 
 const ChatSession = mongoose.model<ChatSessionDoc, ChatSessionModel>(
   "ChatSession",
-  chatSessionSchema
-)
+  chatSessionSchema,
+);
 
-export { ChatSession }
+export { ChatSession };

@@ -1,46 +1,41 @@
-import mongoose from "mongoose"
-import { FlightClass, FlightDoc } from "./flight"
-import { FlightStatus } from "@mint1312-flight-booking/common"
+import mongoose from "mongoose";
+import { FlightClass, FlightDoc } from "./flight";
+import { FlightStatus } from "@mint1312-flight-booking/common";
 
 // interface that describes the properties to create a new ticket
 interface TicketAttrs {
-  flight: FlightDoc,
-  price: number,
-  class: FlightClass,
-  status: FlightStatus,
+  flight: FlightDoc;
+  price: number;
+  class: FlightClass;
+  status: FlightStatus;
   seat: {
-    row: number,
-    column: number
-  },
-  orderId?: string
-}
-
-// interface that describes the properties that a Ticket model has
-interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc
+    row: number;
+    column: number;
+  };
+  orderId?: string;
 }
 
 // interface that describes the properties that Ticket document has
 export interface TicketDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  flight: FlightDoc,
-  price: number,
-  class: FlightClass,
-  status: FlightStatus,
+  id: string;
+  version: number;
+  flight: FlightDoc;
+  price: number;
+  class: FlightClass;
+  status: FlightStatus;
   seat: {
-    row: number,
-    column: number
-  },
-  orderId?: string
+    row: number;
+    column: number;
+  };
+  orderId?: string;
 }
 
-// User model schema
+// Ticket model schema
 const ticketSchema = new mongoose.Schema(
   {
     flight: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Flight"
+      ref: "Flight",
     },
     price: {
       type: Number,
@@ -68,7 +63,7 @@ const ticketSchema = new mongoose.Schema(
     },
     orderId: {
       type: String,
-    }
+    },
   },
   {
     versionKey: "version",
@@ -84,16 +79,21 @@ const ticketSchema = new mongoose.Schema(
           status: ret.status,
           seat: ret.seat,
           orderId: ret.orderId,
-        }
-      }
-    }
-  }
-)
+        };
+      },
+    },
+  },
+);
 
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs)
+  return new Ticket(attrs);
+};
+
+// interface that describes the properties that a Ticket model has
+interface TicketModel extends mongoose.Model<TicketDoc> {
+  build(attrs: TicketAttrs): TicketDoc;
 }
 
-const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema)
+const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema);
 
-export { Ticket }
+export { Ticket };

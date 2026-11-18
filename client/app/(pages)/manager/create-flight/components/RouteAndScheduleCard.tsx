@@ -1,11 +1,17 @@
+import { Airport } from "@/app/types/airport";
+
 export interface RouteAndScheduleCardProps {
+  airports?: Airport[];
   departureAirport?: string;
   departureDate?: string;
   arrivalAirport?: string;
   arrivalDate?: string;
 }
 
-export default function RouteAndScheduleCard(props: RouteAndScheduleCardProps) {
+export default function RouteAndScheduleCard({
+  airports = [],
+  ...props
+}: RouteAndScheduleCardProps) {
   const isDepartureAirportReadOnly = props.departureAirport !== undefined;
   const isDepartureDateReadOnly = props.departureDate !== undefined;
   const isArrivalAirportReadOnly = props.arrivalAirport !== undefined;
@@ -25,19 +31,25 @@ export default function RouteAndScheduleCard(props: RouteAndScheduleCardProps) {
           >
             Departure Airport <span className="text-red-500">*</span>
           </label>
-          <input
+          <select
             id="departureAirport"
             name="departureAirport"
-            type="text"
+            defaultValue={props.departureAirport ?? ""}
             required
-            placeholder="e.g. Noi Bai"
-            defaultValue={props.departureAirport}
-            readOnly={isDepartureAirportReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isDepartureAirportReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
-          />
+            disabled={isDepartureAirportReadOnly}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isDepartureAirportReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
+          >
+            <option value="">Select departure airport</option>
+            {airports.map((airport) => (
+              <option key={airport.code} value={airport.code}>
+                {`${airport.code} (${airport.name}, ${airport.city}, ${airport.country})`}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -54,10 +66,11 @@ export default function RouteAndScheduleCard(props: RouteAndScheduleCardProps) {
             required
             defaultValue={props.departureDate}
             readOnly={isDepartureDateReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isDepartureDateReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isDepartureDateReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           />
         </div>
 
@@ -68,19 +81,32 @@ export default function RouteAndScheduleCard(props: RouteAndScheduleCardProps) {
           >
             Arrival Airport <span className="text-red-500">*</span>
           </label>
-          <input
+          {isArrivalAirportReadOnly && (
+            <input
+              type="hidden"
+              name="arrivalAirport"
+              value={props.arrivalAirport}
+            />
+          )}
+          <select
             id="arrivalAirport"
             name="arrivalAirport"
-            type="text"
             required
-            placeholder="e.g. Tan Son Nhat"
-            defaultValue={props.arrivalAirport}
-            readOnly={isArrivalAirportReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isArrivalAirportReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
-          />
+            defaultValue={props.arrivalAirport ?? ""}
+            disabled={isArrivalAirportReadOnly}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isArrivalAirportReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
+          >
+            <option value="">Select arrival airport</option>
+            {airports.map((airport) => (
+              <option key={airport.code} value={airport.code}>
+                {`${airport.code} (${airport.name}, ${airport.city}, ${airport.country})`}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -97,10 +123,11 @@ export default function RouteAndScheduleCard(props: RouteAndScheduleCardProps) {
             required
             defaultValue={props.arrivalDate}
             readOnly={isArrivalDateReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isArrivalDateReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isArrivalDateReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           />
         </div>
       </div>

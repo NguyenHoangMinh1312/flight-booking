@@ -7,11 +7,11 @@ manifests:
 build:
   local:
     push: false
-  # googleCloudBuild:
-  #   projectId: ticketing-dev-508215
+  tagPolicy:
+    sha256: {}
+
   artifacts:
     - image: mint1312/auth
-    # - image: asia.gcr.io/ticketing-dev-508215/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -19,10 +19,12 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+
     - image: mint1312/client
       context: client
       docker:
         dockerfile: Dockerfile
+
     - image: mint1312/flights
       context: flights
       docker:
@@ -31,7 +33,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    # - image: asia.gcr.io/ticketing-dev-508215/orders
+
     - image: mint1312/orders
       context: orders
       docker:
@@ -40,7 +42,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    # - image: asia.gcr.io/ticketing-dev-508215/payments
+
     - image: mint1312/payments
       context: payments
       docker:
@@ -49,9 +51,18 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    # - image: asia.gcr.io/ticketing-dev-508215/emails
+
     - image: mint1312/emails
       context: emails
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+
+    - image: mint1312/agents
+      context: agents
       docker:
         dockerfile: Dockerfile
       sync:

@@ -13,6 +13,5 @@ export enum Subjects {
   ExpirationComplete = "expiration.complete",
   PaymentCreated = "payment.created",
   RefundComplete = "payment.refund-complete",
-  RefundFailed = "payment.refund-failed"
+  RefundFailed = "payment.refund-failed",
 }
-

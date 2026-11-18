@@ -20,7 +20,9 @@ export function ManagerAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   // 1. Skip auth check for the signin page
   const isSignInPage = pathname === "/manager/signin";
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(() => (isSignInPage ? true : null));
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(() =>
+    isSignInPage ? true : null,
+  );
 
   useEffect(() => {
     if (isSignInPage) {

@@ -1,41 +1,42 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import { OrderDoc } from "./order";
+
+export enum PaymentProvider {
+  Stripe = "Stripe",
+}
 
 // interface that describes the properties to create a new payment
 interface PaymentAttrs {
-  orderId: string,
-  stripeId: string,
-  isRefund?: boolean
-}
-
-// interface that describes the properties that a payment model has
-interface PaymentModel extends mongoose.Model<PaymentDoc> {
-  build(attrs: PaymentAttrs): PaymentDoc
+  order: OrderDoc;
+  provider: PaymentProvider;
+  transactionId: string;
 }
 
 // interface that describes the properties that payment document has
 interface PaymentDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  orderId: string,
-  stripeId: string,
-  isRefund: boolean
+  id: string;
+  version: number;
+  order: OrderDoc;
+  provider: PaymentProvider;
+  transactionId: string;
 }
 
 // payment model schema
 const paymentSchema = new mongoose.Schema(
   {
-    orderId: {
-      type: String,
-      required: true
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
     },
-    stripeId: {
+    provider: {
       type: String,
-      required: true
+      enum: Object.values(PaymentProvider),
+      required: true,
     },
-    isRefund: {
-      type: Boolean,
-      default: false
-    }
+    transactionId: {
+      type: String,
+      required: true,
+    },
   },
   {
     versionKey: "version",
@@ -45,19 +46,27 @@ const paymentSchema = new mongoose.Schema(
         return {
           id: ret._id,
           version: ret.__v,
-          orderId: ret.orderId,
-          stripeId: ret.stripeId,
-          isRefund: ret.isRefund
-        }
-      }
-    }
-  }
-)
+          order: ret.order,
+          provider: ret.provider,
+          transactionId: ret.transactionId,
+        };
+      },
+    },
+  },
+);
 
 paymentSchema.statics.build = (attrs: PaymentAttrs) => {
-  return new Payment(attrs)
+  return new Payment(attrs);
+};
+
+// interface that describes the properties that a payment model has
+interface PaymentModel extends mongoose.Model<PaymentDoc> {
+  build(attrs: PaymentAttrs): PaymentDoc;
 }
 
-const Payment = mongoose.model<PaymentDoc, PaymentModel>("Payment", paymentSchema)
+const Payment = mongoose.model<PaymentDoc, PaymentModel>(
+  "Payment",
+  paymentSchema,
+);
 
-export { Payment }
+export { Payment };

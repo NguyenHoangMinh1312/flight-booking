@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { CurrentUser } from "@/app/types/current-user";
+import { apiFetch } from "@/app/utils/api-client";
+import { toast } from "sonner";
 
-type CurrentUser = { email: string };
-type CurrentUserResponse = { currentUser: CurrentUser | null };
-
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
+export type CurrentUserResponse = { currentUser: CurrentUser | null };
 
 export default function Header() {
   const pathname = usePathname();
@@ -18,31 +17,44 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const data = await apiFetch<CurrentUserResponse>(
+          "/api/users/currentuser",
+          { credentials: "include" },
+        );
+        setCurrentUser(data.currentUser);
+      } catch {
+        setCurrentUser(null);
+        toast.error("Failed to get your credentials");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    fetch(`${backendUrl}/api/users/currentuser`, { credentials: "include" })
-      .then(async (response) => {
-        if (!response.ok)
-          throw new Error("Unable to load the current user");
-        return response.json() as Promise<CurrentUserResponse>;
-      })
-      .then(({ currentUser: user }) => setCurrentUser(user))
-      .catch(() => setCurrentUser(null))
-      .finally(() => setIsLoading(false));
+    fetchCurrentUser();
   }, [pathname]);
 
   const signOut = async () => {
-    await fetch(`${backendUrl}/api/users/signout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setCurrentUser(null);
-    router.push("/")
+    try {
+      await apiFetch("/api/users/signout", {
+        credentials: "include",
+        method: "POST",
+      });
+      setCurrentUser(null);
+      window.dispatchEvent(new Event("auth-change"));
+      router.push("/");
+    } catch {
+      toast.error("Failed to sign out");
+    }
   };
 
   return (
     <header className="border-b border-slate-200 bg-white">
       <nav className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="text-xl font-bold text-sky-600">FlightBooking</Link>
+        <Link href="/" className="text-xl font-bold text-sky-600">
+          FlightBooking
+        </Link>
         <div className="flex items-center gap-4">
           {!isLoading && currentUser ? (
             <div className="relative group">
@@ -59,7 +71,13 @@ export default function Header() {
                     href="/orders"
                     className="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-sky-600"
                   >
-                    My Orders
+                    Your Orders
+                  </Link>
+                  <Link
+                    href="/user"
+                    className="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-sky-600"
+                  >
+                    Your Information
                   </Link>
                   <div className="my-1 border-t border-slate-100" />
                   <button
@@ -74,8 +92,18 @@ export default function Header() {
             </div>
           ) : !isLoading ? (
             <>
-              <Link href="/signin" className="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">Sign in</Link>
-              <Link href="/signup" className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700">Sign up</Link>
+              <Link
+                href="/signin"
+                className="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700"
+              >
+                Sign up
+              </Link>
             </>
           ) : null}
         </div>

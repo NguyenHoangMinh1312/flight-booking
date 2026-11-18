@@ -5,11 +5,12 @@ import {
   FaCheckCircle,
   FaChevronRight,
   FaClock,
+  FaPlane,
   FaReceipt,
   FaTimesCircle,
   FaUndoAlt,
 } from "react-icons/fa";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus } from "@/app/types/order";
 import { currencyFormatter } from "@/app/utils/format-currency";
 import { formatDateTime } from "@/app/utils/format-datetime";
 import { columnLabel } from "@/app/utils/column-label";
@@ -18,33 +19,33 @@ type OrderCardProps = {
   order: Order;
 };
 
-function getStatusDetails(status: string) {
-  switch (status.toLowerCase()) {
-    case "complete":
+function getStatusDetails(status: OrderStatus) {
+  switch (status) {
+    case OrderStatus.Complete:
       return {
         label: "Complete",
         badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
         icon: <FaCheckCircle className="text-emerald-500" />,
       };
-    case "created":
+    case OrderStatus.Created:
       return {
         label: "Created",
         badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
         icon: <FaClock className="text-amber-500" />,
       };
-    case "awaiting_refund":
+    case OrderStatus.AwaitingRefund:
       return {
         label: "Awaiting Refund",
         badgeClass: "bg-purple-50 text-purple-700 border-purple-200",
         icon: <FaUndoAlt className="text-purple-500" />,
       };
-    case "canceled":
+    case OrderStatus.Canceled:
       return {
         label: "Canceled",
         badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
         icon: <FaTimesCircle className="text-rose-500" />,
       };
-    case "refund-failed":
+    case OrderStatus.RefundFailed:
       return {
         label: "Refund failed",
         badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
@@ -63,11 +64,6 @@ export default function OrderCard({ order }: OrderCardProps) {
   const statusDetails = getStatusDetails(order.status);
   const ticket = order.ticket;
   const departure = formatDateTime(ticket?.departureDate);
-
-  const seatText =
-    ticket?.seat && ticket.seat.row && ticket.seat.column
-      ? `Seat ${ticket.seat.row}${columnLabel(ticket.seat.column)}`
-      : "Seat Unassigned";
 
   return (
     <Link
@@ -90,11 +86,17 @@ export default function OrderCard({ order }: OrderCardProps) {
             )}
           </div>
 
+          <div className="flex flex-wrap items-center gap-2 text-base font-bold text-slate-900 sm:text-lg">
+            <span>{ticket.departureAirport}</span>
+            <FaPlane className="text-xs text-sky-600 shrink-0" />
+            <span>{ticket.arrivalAirport}</span>
+          </div>
+
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-700">
             {/* Seat Info */}
             <div className="flex items-center gap-2 font-medium text-slate-900">
               <FaChair className="text-sky-600" />
-              <span>{seatText}</span>
+              <span>{`Seat ${ticket.seat.row}${columnLabel(ticket.seat.column)}`}</span>
             </div>
 
             {/* Departure Info */}

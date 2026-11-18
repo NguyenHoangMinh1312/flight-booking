@@ -6,11 +6,7 @@ type Props = {
   onOrder: () => void;
 };
 
-export default function OrderFooter({
-  ticket,
-  isOrdering,
-  onOrder,
-}: Props) {
+export default function OrderFooter({ ticket, isOrdering, onOrder }: Props) {
   if (!ticket || ticket.orderId) return null;
 
   return (

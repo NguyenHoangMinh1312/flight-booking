@@ -5,21 +5,39 @@ import Link from "next/link";
 import { FaExclamationCircle, FaTicketAlt, FaUndoAlt } from "react-icons/fa";
 import OrderCard from "./components/OrderCard";
 import SearchBar, { SearchFilters } from "./components/SearchBar";
+import Pagination from "./components/Pagination";
 import { Order } from "@/app/types/order";
 import { apiFetch } from "@/app/utils/api-client";
 
+const DEFAULT_PAGE_SIZE = 10;
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [currentFilters, setCurrentFilters] = useState<
+    SearchFilters | undefined
+  >(undefined);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const searchOrders = async (filters?: SearchFilters) => {
+  // fetch orders with pagination and optional search filters
+  const fetchOrders = async (
+    page: number = 1,
+    limit: number = DEFAULT_PAGE_SIZE,
+    filters?: SearchFilters,
+  ) => {
     setIsLoading(true);
     setError(null);
 
     try {
       const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+
       if (filters?.createdDate) {
         params.append("createdDate", filters.createdDate);
       }
@@ -28,59 +46,66 @@ export default function OrdersPage() {
       }
 
       const queryString = params.toString();
-      const endpoint = queryString ? `/api/orders?${queryString}` : "/api/orders";
+      const endpoint = `/api/orders?${queryString}`;
 
-      const data = await apiFetch<Order[]>(endpoint, {
-        credentials: "include",
-      });
+      const data = await apiFetch<{ orders: Order[]; total: number }>(
+        endpoint,
+        {
+          credentials: "include",
+        },
+      );
 
-      setOrders(data);
-      setHasSearched(Boolean(queryString));
+      setOrders(data.orders ?? []);
+      setTotal(data.total ?? 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load your orders");
+      setError(
+        err instanceof Error ? err.message : "Failed to load your orders",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  // initial load of orders
   useEffect(() => {
-    let ignore = false;
-
-    async function fetchInitialOrders() {
-      try {
-        const data = await apiFetch<Order[]>("/api/orders", {
-          credentials: "include",
-        });
-        if (!ignore) {
-          setOrders(data);
-        }
-      } catch (err) {
-        if (!ignore) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load your orders"
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    fetchInitialOrders();
-
-    return () => {
-      ignore = true;
+    const loadInitialOrders = async () => {
+      await fetchOrders(1, DEFAULT_PAGE_SIZE);
     };
+
+    loadInitialOrders();
   }, []);
 
   const handleSearch = (filters: SearchFilters) => {
-    searchOrders(filters);
+    const hasFilterValues = Boolean(
+      filters.createdDate || filters.status?.trim(),
+    );
+    setHasSearched(hasFilterValues);
+    setCurrentFilters(filters);
+    setCurrentPage(1);
+    fetchOrders(1, pageSize, filters);
   };
 
   const handleReset = () => {
     setHasSearched(false);
-    searchOrders();
+    setCurrentFilters(undefined);
+    setCurrentPage(1);
+    fetchOrders(1, pageSize);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetchOrders(newPage, pageSize, currentFilters);
+
+    const resultsElement = document.getElementById("orders-results");
+    if (resultsElement) {
+      resultsElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+    fetchOrders(1, newPageSize, currentFilters);
   };
 
   return (
@@ -104,7 +129,7 @@ export default function OrdersPage() {
         />
 
         {/* Content Section */}
-        <div>
+        <div id="orders-results">
           {/* Header count when not loading */}
           {!isLoading && !error && (
             <div className="mb-4 flex items-center justify-between">
@@ -112,7 +137,7 @@ export default function OrdersPage() {
                 {hasSearched ? "Search Results" : "All Orders"}
               </h2>
               <span className="text-sm font-medium text-slate-500">
-                {orders.length} {orders.length === 1 ? "order" : "orders"} found
+                {total} {total === 1 ? "order" : "orders"} found
               </span>
             </div>
           )}
@@ -137,14 +162,16 @@ export default function OrdersPage() {
             >
               <FaExclamationCircle className="mt-0.5 shrink-0 text-xl text-red-500" />
               <div className="flex-1">
-                <h3 className="font-semibold text-red-900">Unable to load orders</h3>
+                <h3 className="font-semibold text-red-900">
+                  Unable to load orders
+                </h3>
                 <p className="mt-1 text-sm text-red-700">{error}</p>
               </div>
             </div>
           )}
 
           {/* Empty State */}
-          {!isLoading && !error && orders.length === 0 && (
+          {!isLoading && !error && total === 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-xs">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                 <FaTicketAlt className="text-2xl" />
@@ -180,12 +207,25 @@ export default function OrdersPage() {
           )}
 
           {/* Orders List: Stacked vertically */}
-          {!isLoading && !error && orders.length > 0 && (
-            <div className="flex flex-col gap-4">
-              {orders.map((order) => (
-                <OrderCard key={order.id} order={order} />
-              ))}
-            </div>
+          {!isLoading && !error && total > 0 && (
+            <>
+              <div className="flex flex-col gap-4">
+                {orders.map((order) => (
+                  <OrderCard key={order.id} order={order} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                total={total}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                isLoading={isLoading}
+                itemLabel="orders"
+              />
+            </>
           )}
         </div>
       </div>

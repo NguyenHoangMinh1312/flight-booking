@@ -7,11 +7,8 @@ import { z } from "zod";
 import { apiFetch } from "@/app/utils/api-client";
 
 const signInSchema = z.object({
-  email: z
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
+  email: z.email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export default function SignInPage() {
@@ -19,46 +16,42 @@ export default function SignInPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (isSubmitting)
-      return
+    if (isSubmitting) return;
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
 
     const result = signInSchema.safeParse({
       email: formData.get("email"),
-      password: formData.get("password")
+      password: formData.get("password"),
     });
 
     if (!result.success) {
       const err = result.error.issues[0]?.message;
 
       toast.error(err || "Please check your input");
-      return
+      return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await apiFetch(
-        "/api/users/signin",
-        {
-          method: "POST",
-          credentials: "include",
-          body: JSON.stringify({
-            email: result.data.email,
-            password: result.data.password,
-            role: "manager"
-          })
-        }
-      )
+      await apiFetch("/api/users/signin", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          email: result.data.email,
+          password: result.data.password,
+          role: "manager",
+        }),
+      });
 
-      router.push("/manager")
+      router.push("/manager");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to sign you in")
+      toast.error(err instanceof Error ? err.message : "Failed to sign you in");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   };
 
@@ -69,7 +62,10 @@ export default function SignInPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="email"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
               Email
             </label>
             <input
@@ -83,7 +79,10 @@ export default function SignInPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
               Password
             </label>
             <input

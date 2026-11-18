@@ -7,11 +7,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const signInSchema = z.object({
-  email: z
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
+  email: z.email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export default function SignInPage() {
@@ -19,54 +16,48 @@ export default function SignInPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (isSubmitting)
-      return
+    if (isSubmitting) return;
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
 
     const result = signInSchema.safeParse({
       email: formData.get("email"),
-      password: formData.get("password")
+      password: formData.get("password"),
     });
 
     if (!result.success) {
       const err = result.error.issues[0]?.message;
 
       toast.error(err || "Please check your input");
-      return
+      return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await apiFetch(
-        "/api/users/signin",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: result.data.email,
-            password: result.data.password,
-            role: "customer"
-          })
-        }
-      )
+      await apiFetch("/api/users/signin", {
+        method: "POST",
+        body: JSON.stringify({
+          email: result.data.email,
+          password: result.data.password,
+          role: "customer",
+        }),
+      });
 
-      router.push("/")
+      router.push("/");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to sign you in")
+      toast.error(err instanceof Error ? err.message : "Failed to sign you in");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   };
 
   return (
     <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-2xl font-bold text-slate-900">
-          Sign in
-        </h1>
+        <h1 className="mb-6 text-2xl font-bold text-slate-900">Sign in</h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

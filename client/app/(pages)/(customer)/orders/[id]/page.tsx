@@ -7,9 +7,11 @@ import { FaArrowLeft, FaExclamationCircle } from "react-icons/fa";
 import FlightInfo from "./components/FlightInfo";
 import TicketInfo from "./components/TicketInfo";
 import OrderInfo from "./components/OrderInfo";
+import PaymentInfo from "./components/PaymentInfo";
 import Footer from "./components/Footer";
-import { Order } from "@/app/types/order";
+import { Order, OrderStatus } from "@/app/types/order";
 import { Flight } from "@/app/types/flight";
+import { Payment } from "@/app/types/payment";
 import { apiFetch } from "@/app/utils/api-client";
 
 export default function OrderDetailsPage() {
@@ -17,48 +19,81 @@ export default function OrderDetailsPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
+  const [payment, setPayment] = useState<Payment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // fetch the order detail
   useEffect(() => {
     async function fetchOrder() {
-      if (!id)
-        return
+      if (!id) return;
 
       try {
-        const data = await apiFetch<Order>(
-          `/api/orders/${id}`,
-          {
-            credentials: "include"
-          }
-        )
-        setOrder(data)
+        const data = await apiFetch<Order>(`/api/orders/${id}`, {
+          credentials: "include",
+        });
+        setOrder(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load this order details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load this order details",
+        );
       }
     }
 
-    fetchOrder()
-  }, [id])
+    fetchOrder();
+  }, [id]);
 
   // fetch the associated flight details
   useEffect(() => {
     async function fetchFlight() {
-      if (!order?.ticket?.id)
-        return
+      if (!order?.ticket?.id) return;
 
       try {
-        const data = await apiFetch<Flight>(`/api/flights/tickets/${order.ticket.id}`)
-        setFlight(data)
+        const data = await apiFetch<Flight>(
+          `/api/flights/tickets/${order.ticket.id}`,
+        );
+        setFlight(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load the flight details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the flight details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlight()
+    fetchFlight();
+  }, [order]);
+
+  // fetch the payment details
+  useEffect(() => {
+    async function fetchPayment() {
+      if (
+        !order ||
+        [OrderStatus.Created, OrderStatus.Canceled].includes(order.status)
+      )
+        return;
+      try {
+        const data = await apiFetch<Payment>(`/api/payments/${order.id}`, {
+          credentials: "include",
+        });
+        setPayment(data);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the payment details",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPayment();
   }, [order]);
 
   const handleRefundSuccess = () => {
@@ -66,7 +101,7 @@ export default function OrderDetailsPage() {
     if (order) {
       setOrder({
         ...order,
-        status: "awaiting-refund",
+        status: OrderStatus.AwaitingRefund,
       });
     }
   };
@@ -87,17 +122,15 @@ export default function OrderDetailsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
               Order Details
             </h1>
-            {order?.id && (
-              <span className="rounded-full bg-slate-200/80 px-3 py-1 font-mono text-xs font-semibold text-slate-700">
-                #{order.id.slice(-8)}
-              </span>
-            )}
           </div>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col gap-6" aria-label="Loading order details">
+          <div
+            className="flex flex-col gap-6"
+            aria-label="Loading order details"
+          >
             <div className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
@@ -106,7 +139,7 @@ export default function OrderDetailsPage() {
         )}
 
         {/* Error State */}
-        {!isLoading && (error) && (
+        {!isLoading && error && (
           <div
             className="flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800"
             role="alert"
@@ -146,7 +179,10 @@ export default function OrderDetailsPage() {
             {/* 3. Order Information */}
             <OrderInfo order={order} />
 
-            {/* 4. Footer */}
+            {/* 4. Payment Information */}
+            <PaymentInfo payment={payment} />
+
+            {/* 5. Footer */}
             <Footer
               order={order}
               flight={flight}

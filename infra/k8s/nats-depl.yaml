@@ -15,19 +15,14 @@ spec:
       containers:
         - name: nats
           image: nats:2.10-alpine
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "200m"
-              memory: "512Mi"
-          args: [
-            "-p", "4222",
-            "-m", "8222",
-            "-js",            
-            "-sd", "/data"
-          ]
+          # resources:
+          #   requests:
+          #     cpu: "100m"
+          #     memory: "128Mi"
+          #   limits:
+          #     cpu: "200m"
+          #     memory: "512Mi"
+          args: ["-p", "4222", "-m", "8222", "-js", "-sd", "/data"]
 ---
 apiVersion: v1
 kind: Service

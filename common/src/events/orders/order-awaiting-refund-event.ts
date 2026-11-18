@@ -1,15 +1,12 @@
-import { RefundReason } from "../../types/refund-reason"
-import { Subjects } from "../subjects"
+import { RefundReason } from "../../types/refund-reason";
+import { Subjects } from "../subjects";
 
 // couple the data to be sent to order:canceled channel
 export interface OrderAwaitingRefundEvent {
-  subject: Subjects.OrderAwaitingRefund
+  subject: Subjects.OrderAwaitingRefund;
   data: {
-    id: string,
-    version: number,
-    ticket: {
-      id: string,
-    },
-    reason: RefundReason
-  }
+    id: string;
+    version: number;
+    reason: RefundReason;
+  };
 }
