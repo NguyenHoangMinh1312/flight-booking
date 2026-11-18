@@ -11,60 +11,59 @@ export const searchFlights = async (
   status: FlightStatus | undefined,
   maxPrice: number | undefined,
   page: number,
-  limit: number
+  limit: number,
 ) => {
-  const query: QueryFilter<FlightDoc> = {}
+  const query: QueryFilter<FlightDoc> = {};
 
   if (flightNumber)
-    query.flightNumber = { $regex: flightNumber.trim(), $options: "i" }
+    query.flightNumber = { $regex: flightNumber.trim(), $options: "i" };
 
   if (departureAirport)
-    query["departure.airport"] = { $regex: departureAirport.trim(), $options: "i" }
+    query["departure.airport"] = {
+      $regex: departureAirport.trim(),
+      $options: "i",
+    };
 
   if (arrivalAirport)
-    query["arrival.airport"] = { $regex: arrivalAirport.trim(), $options: "i" }
+    query["arrival.airport"] = { $regex: arrivalAirport.trim(), $options: "i" };
 
   if (departureDate) {
-    const startOfDay = new Date(departureDate)
-    startOfDay.setUTCHours(0, 0, 0, 0)
+    const startOfDay = new Date(departureDate);
+    startOfDay.setUTCHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(departureDate)
-    endOfDay.setUTCHours(23, 59, 59, 999)
+    const endOfDay = new Date(departureDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     if (!isNaN(startOfDay.getTime()))
-      query["departure.date"] = { $gte: startOfDay, $lte: endOfDay }
+      query["departure.date"] = { $gte: startOfDay, $lte: endOfDay };
   }
 
-  if (status)
-    query.status = status
-  else
-    query.status = FlightStatus.Available
+  if (status) query.status = status;
+  else query.status = FlightStatus.Available;
 
-  if (maxPrice)
-    query["classConfig.price"] = { $lte: Number(maxPrice) }
+  if (maxPrice) query["classConfig.price"] = { $lte: Number(maxPrice) };
 
   // fetch flights in the page scope
-  limit = Math.max(0, limit)
-  const skip = (page - 1) * limit
+  limit = Math.max(0, limit);
+  const skip = (page - 1) * limit;
 
   const [flights, total] = await Promise.all([
     Flight.find(query)
       .populate([
         {
           path: "arrival.airport",
-          foreignField: "code"
+          foreignField: "code",
         },
         {
           path: "departure.airport",
-          foreignField: "code"
-        }
+          foreignField: "code",
+        },
       ])
       .sort({ "departure.date": -1 })
       .skip(skip)
-      .limit(limit)
-    ,
-    Flight.countDocuments(query)
-  ])
+      .limit(limit),
+    Flight.countDocuments(query),
+  ]);
 
-  return { flights, total }
-}
+  return { flights, total };
+};

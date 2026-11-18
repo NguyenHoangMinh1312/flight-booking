@@ -13,7 +13,10 @@ type RefundWarningBoxProps = {
 
 const refundReasons: { value: RefundReason; label: string }[] = [
   { value: RefundReason.Emergency, label: "Personal emergency" },
-  { value: RefundReason.IncorrectBookingInfo, label: "Incorrect booking information" },
+  {
+    value: RefundReason.IncorrectBookingInfo,
+    label: "Incorrect booking information",
+  },
   { value: RefundReason.Other, label: "Other reasons" },
 ];
 
@@ -23,7 +26,9 @@ export default function RefundWarningBox({
   onConfirm,
   isLoading = false,
 }: RefundWarningBoxProps) {
-  const [refundReason, setRefundReason] = useState<RefundReason>(RefundReason.Emergency);
+  const [refundReason, setRefundReason] = useState<RefundReason>(
+    RefundReason.Emergency,
+  );
 
   if (!isOpen) {
     return null;
@@ -34,9 +39,7 @@ export default function RefundWarningBox({
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-center gap-3 text-amber-600">
           <FaExclamationTriangle className="text-2xl shrink-0" />
-          <h3 className="text-lg font-bold text-slate-900">
-            Refund Warning
-          </h3>
+          <h3 className="text-lg font-bold text-slate-900">Refund Warning</h3>
         </div>
 
         <p className="mt-4 text-sm text-slate-600">

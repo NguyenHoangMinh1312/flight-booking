@@ -8,7 +8,7 @@ type FlightCardProps = { flight: Flight };
 
 // get the corresponding style base on the flight status
 function getStatusDetails(status?: FlightStatus) {
-  const isCanceled = status === FlightStatus.Canceled
+  const isCanceled = status === FlightStatus.Canceled;
 
   if (isCanceled) {
     return {
@@ -34,8 +34,10 @@ export default function FlightCard({ flight }: FlightCardProps) {
     : undefined;
 
   return (
-    <Link href={`/manager/details/${flight.id}`}
-      className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <Link
+      href={`/manager/details/${flight.id}`}
+      className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-600">
@@ -58,16 +60,14 @@ export default function FlightCard({ flight }: FlightCardProps) {
             {flight.departure.airport.code}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            <span className="block">
-              {departure.date}
-            </span>
-            {departure.time &&
-              <span className="block">
-                {departure.time}
-              </span>}
+            <span className="block">{departure.date}</span>
+            {departure.time && <span className="block">{departure.time}</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-slate-300" aria-hidden="true">
+        <div
+          className="flex items-center gap-2 text-slate-300"
+          aria-hidden="true"
+        >
           <span className="h-px w-6 bg-slate-900" />
           <FaPlane className="text-sky-600" />
           <span className="h-px w-6 bg-slate-900" />
@@ -78,11 +78,7 @@ export default function FlightCard({ flight }: FlightCardProps) {
           </p>
           <p className="mt-1 text-sm text-slate-500">
             <span className="block">{arrival.date}</span>
-            {arrival.time &&
-              <span className="block">
-                {arrival.time}
-              </span>
-            }
+            {arrival.time && <span className="block">{arrival.time}</span>}
           </p>
         </div>
       </div>
@@ -91,9 +87,9 @@ export default function FlightCard({ flight }: FlightCardProps) {
           From
         </p>
         <p className="mt-1 text-lg font-bold text-slate-900">
-          {minPrice === undefined ?
-            "Contact for price" :
-            currencyFormatter.format(minPrice)}
+          {minPrice === undefined
+            ? "Contact for price"
+            : currencyFormatter.format(minPrice)}
         </p>
       </div>
     </Link>

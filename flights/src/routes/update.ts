@@ -1,10 +1,14 @@
-import express from "express"
-import { body } from "express-validator"
-import { requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
-import { updateFlightController } from "../controllers/update-flight-controller"
-import { FlightClass } from "../models/flight"
+import express from "express";
+import { body } from "express-validator";
+import {
+  requireAuth,
+  requireManager,
+  validateRequest,
+} from "@mint1312-flight-booking/common";
+import { updateFlightController } from "../controllers/update-flight-controller";
+import { FlightClass } from "../models/flight";
 
-const router = express.Router()
+const router = express.Router();
 
 // allow the manager to change priceConfig and description after creating a flight. Others changes are prohibitted
 router.put(
@@ -24,10 +28,10 @@ router.put(
       .withMessage("Class name must be 'first', 'business' or 'economy'."),
     body("priceConfig.*.price")
       .isFloat({ gt: 0 })
-      .withMessage("Price must be a positive number")
+      .withMessage("Price must be a positive number"),
   ],
   validateRequest,
-  updateFlightController
-)
+  updateFlightController,
+);
 
-export { router as updateFlightRouter }
+export { router as updateFlightRouter };

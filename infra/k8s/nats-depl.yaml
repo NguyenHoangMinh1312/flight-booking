@@ -22,12 +22,7 @@ spec:
           #   limits:
           #     cpu: "200m"
           #     memory: "512Mi"
-          args: [
-            "-p", "4222",
-            "-m", "8222",
-            "-js",            
-            "-sd", "/data"
-          ]
+          args: ["-p", "4222", "-m", "8222", "-js", "-sd", "/data"]
 ---
 apiVersion: v1
 kind: Service

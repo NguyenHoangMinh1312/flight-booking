@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const optionalNumber = z.preprocess(
   (val) => (val === "" || val === null || val === undefined ? undefined : val),
-  z.coerce.number().optional()
+  z.coerce.number().optional(),
 );
 
 export const createFlightSchema = z.object({
@@ -27,6 +27,5 @@ export const createFlightSchema = z.object({
   economyFromRow: optionalNumber,
   economyToRow: optionalNumber,
   economyColumns: optionalNumber,
-  economyPrice: optionalNumber
-
+  economyPrice: optionalNumber,
 });

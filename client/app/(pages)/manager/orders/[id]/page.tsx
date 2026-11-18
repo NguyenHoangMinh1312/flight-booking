@@ -16,94 +16,96 @@ import { User } from "@/app/types/user";
 import { Payment } from "@/app/types/payment";
 import { apiFetch } from "@/app/utils/api-client";
 
-
 export default function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
   const [payment, setPayment] = useState<Payment | null>(null);
-  const [customer, setCustomer] = useState<User | null>(null)
+  const [customer, setCustomer] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // fetch the order details
   useEffect(() => {
     async function fetchOrder() {
-      if (!id)
-        return
+      if (!id) return;
 
       try {
         const data = await apiFetch<Order>(`/api/orders/${id}`, {
-          credentials: "include"
-        })
+          credentials: "include",
+        });
 
-        setOrder(data)
+        setOrder(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load this order details")
-        setIsLoading(false)
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load this order details",
+        );
+        setIsLoading(false);
       }
     }
 
-    fetchOrder()
-  }, [id])
-
+    fetchOrder();
+  }, [id]);
 
   useEffect(() => {
     // fetch the flight and customer details
     async function fetchFlightAndCustomer() {
-      if (!order)
-        return
+      if (!order) return;
 
-      const promises = []
+      const promises = [];
       try {
         promises.push(
-          apiFetch<Flight>(`/api/flights/tickets/${order.ticket.id}`)
-            .then((data) => setFlight(data))
-        )
+          apiFetch<Flight>(`/api/flights/tickets/${order.ticket.id}`).then(
+            (data) => setFlight(data),
+          ),
+        );
 
         promises.push(
           apiFetch<User>(`/api/users/${order.userId}`, {
-            credentials: "include"
-          })
-            .then((data) => setCustomer(data))
-        )
+            credentials: "include",
+          }).then((data) => setCustomer(data)),
+        );
 
-        await Promise.allSettled(promises)
-
+        await Promise.allSettled(promises);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load flight and ticket details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load flight and ticket details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightAndCustomer()
-
-  }, [order])
+    fetchFlightAndCustomer();
+  }, [order]);
 
   // fetch the payment details
   useEffect(() => {
     async function fetchPayment() {
-      if (order?.status !== OrderStatus.Complete || !order.id)
-        return
+      if (order?.status !== OrderStatus.Complete || !order.id) return;
       try {
-        const data = await apiFetch<Payment>(
-          `/api/payments/${order.id}`,
-          {
-            credentials: "include"
-          }
-        )
-        setPayment(data)
+        const data = await apiFetch<Payment>(`/api/payments/${order.id}`, {
+          credentials: "include",
+        });
+        setPayment(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load the payment details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the payment details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchPayment()
-  }, [order])
+    fetchPayment();
+  }, [order]);
 
   const handleRefundSuccess = () => {
     // Update local order status immediately to awaiting refund
@@ -134,7 +136,10 @@ export default function OrderDetailsPage() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col gap-6" aria-label="Loading order details">
+          <div
+            className="flex flex-col gap-6"
+            aria-label="Loading order details"
+          >
             <div className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
@@ -185,10 +190,7 @@ export default function OrderDetailsPage() {
 
             <PaymentInfo payment={payment} />
 
-            <Footer
-              order={order}
-              onRefundSuccess={handleRefundSuccess}
-            />
+            <Footer order={order} onRefundSuccess={handleRefundSuccess} />
           </div>
         )}
       </div>

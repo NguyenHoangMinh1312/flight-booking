@@ -49,7 +49,7 @@ export default function SearchBar({
     arrivalAirport.trim() ||
     departureDate ||
     flightNumber.trim() ||
-    maxPrice.trim()
+    maxPrice.trim(),
   );
 
   // handle when user presses search button

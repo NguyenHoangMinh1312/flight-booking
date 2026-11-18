@@ -16,14 +16,12 @@ export default function Header() {
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-
     fetch(`${backendUrl}/api/users/currentuser`, { credentials: "include" })
       .then(async (response) => {
-        if (!response.ok)
-          throw new Error("Unable to load the current user");
+        if (!response.ok) throw new Error("Unable to load the current user");
         return response.json() as Promise<CurrentUserResponse>;
       })
       .then(({ currentUser: user }) => setCurrentUser(user))
@@ -37,13 +35,15 @@ export default function Header() {
       credentials: "include",
     });
     setCurrentUser(null);
-    router.push("/manager/signin")
+    router.push("/manager/signin");
   };
 
   return (
     <header className="border-b border-slate-200 bg-white">
       <nav className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="text-xl font-bold text-sky-600">FlightBooking Management</Link>
+        <Link href="/" className="text-xl font-bold text-sky-600">
+          FlightBooking Management
+        </Link>
         <div className="flex items-center gap-4">
           {!isLoading && currentUser ? (
             <div className="relative group">
@@ -80,7 +80,12 @@ export default function Header() {
               </div>
             </div>
           ) : !isLoading ? (
-            <Link href="/manager/signin" className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700">Sign in</Link>
+            <Link
+              href="/manager/signin"
+              className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700"
+            >
+              Sign in
+            </Link>
           ) : null}
         </div>
       </nav>

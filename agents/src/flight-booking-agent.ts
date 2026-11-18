@@ -3,13 +3,13 @@ import { searchFlightTool } from "./tools/search-flight";
 import { AgentCookieContext, searchOrderTool } from "./tools/search-orders";
 
 export class FlightBookingAgent {
-  private agent: Agent<AgentCookieContext>
+  private agent: Agent<AgentCookieContext>;
 
   constructor(userEmail: string, userId: string, timezone: string) {
-    const now = new Date()
+    const now = new Date();
     const localDateTime = new Intl.DateTimeFormat("en-CA", {
       timeZone: timezone,
-  	  year: "numeric",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
@@ -17,7 +17,7 @@ export class FlightBookingAgent {
       second: "2-digit",
       hour12: false,
       timeZoneName: "longOffset",
-    }).format(now)
+    }).format(now);
 
     this.agent = new Agent<AgentCookieContext>({
       name: "Flight Booking Agent",
@@ -74,24 +74,28 @@ export class FlightBookingAgent {
     });
   }
 
-  public async chat(history: AgentInputItem[], userMessage: string, cookie?: string) {
+  public async chat(
+    history: AgentInputItem[],
+    userMessage: string,
+    cookie?: string,
+  ) {
     const result = await run(
       this.agent,
       [
         ...history,
         {
           role: "user",
-          content: userMessage
-        }
+          content: userMessage,
+        },
       ],
       {
-        context: { cookie }
-      }
-    )
+        context: { cookie },
+      },
+    );
 
     return {
       response: result.finalOutput,
-      conversation: result.history
-    }
+      conversation: result.history,
+    };
   }
 }

@@ -67,9 +67,11 @@ export default function Pagination({
     <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row">
       <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
         <p>
-          Showing <span className="font-semibold text-slate-900">{startItem}</span> to{" "}
+          Showing{" "}
+          <span className="font-semibold text-slate-900">{startItem}</span> to{" "}
           <span className="font-semibold text-slate-900">{endItem}</span> of{" "}
-          <span className="font-semibold text-slate-900">{total}</span> {itemLabel}
+          <span className="font-semibold text-slate-900">{total}</span>{" "}
+          {itemLabel}
         </p>
         <div className="flex items-center gap-2">
           <label htmlFor="pageSize" className="text-xs text-slate-500">
@@ -90,7 +92,10 @@ export default function Pagination({
       </div>
 
       {totalPages > 1 && (
-        <nav aria-label="Pagination Navigation" className="flex items-center gap-1 sm:gap-2">
+        <nav
+          aria-label="Pagination Navigation"
+          className="flex items-center gap-1 sm:gap-2"
+        >
           <button
             type="button"
             onClick={() => handlePageClick(currentPage - 1)}
@@ -125,7 +130,7 @@ export default function Pagination({
               >
                 {page}
               </span>
-            )
+            ),
           )}
 
           <button

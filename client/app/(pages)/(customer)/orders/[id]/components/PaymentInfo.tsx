@@ -1,8 +1,4 @@
-import {
-  FaCreditCard,
-  FaReceipt,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaCreditCard, FaReceipt, FaCheckCircle } from "react-icons/fa";
 import { Payment } from "@/app/types/payment";
 
 type PaymentInfoProps = {

@@ -49,7 +49,7 @@ export default function SearchBar({
     departureDate ||
     flightNumber.trim() ||
     status.trim() ||
-    maxPrice.trim()
+    maxPrice.trim(),
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

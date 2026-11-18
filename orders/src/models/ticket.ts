@@ -1,39 +1,39 @@
-import mongoose from "mongoose"
-import { Order } from "./order"
-import { OrderStatus } from "@mint1312-flight-booking/common"
-import { FlightStatus } from "@mint1312-flight-booking/common"
+import mongoose from "mongoose";
+import { Order } from "./order";
+import { OrderStatus } from "@mint1312-flight-booking/common";
+import { FlightStatus } from "@mint1312-flight-booking/common";
 
 // interface that describes the properties to create a new ticket
 interface TicketAttrs {
-  id: string,
-  version: number,
+  id: string;
+  version: number;
   price: number;
   class: string;
-  status: FlightStatus,
+  status: FlightStatus;
   seat: {
     row: number;
     column: number;
-  },
-  departureDate: Date,
-  departureAirport: string,
-  arrivalAirport: string
+  };
+  departureDate: Date;
+  departureAirport: string;
+  arrivalAirport: string;
 }
 
 // interface that describes the properties that User document has
 export interface TicketDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  price: number,
-  class: string,
-  status: FlightStatus,
+  id: string;
+  version: number;
+  price: number;
+  class: string;
+  status: FlightStatus;
   seat: {
     row: number;
     column: number;
-  },
-  departureDate: Date,
-  departureAirport: string,
-  arrivalAirport: string
-  isReserved(): Promise<boolean>
+  };
+  departureDate: Date;
+  departureAirport: string;
+  arrivalAirport: string;
+  isReserved(): Promise<boolean>;
 }
 
 // User model schema
@@ -41,7 +41,7 @@ const ticketSchema = new mongoose.Schema(
   {
     price: {
       type: Number,
-      required: true
+      required: true,
     },
     class: {
       type: String,
@@ -60,11 +60,11 @@ const ticketSchema = new mongoose.Schema(
       column: {
         type: Number,
         required: true,
-      }
+      },
     },
     departureDate: {
       type: Date,
-      required: true
+      required: true,
     },
     departureAirport: {
       type: String,
@@ -73,7 +73,7 @@ const ticketSchema = new mongoose.Schema(
     arrivalAirport: {
       type: String,
       required: true,
-    }
+    },
   },
   {
     versionKey: "version",
@@ -88,12 +88,12 @@ const ticketSchema = new mongoose.Schema(
           seat: ret.seat,
           departureDate: ret.departureDate,
           departureAirport: ret.departureAirport,
-          arrivalAirport: ret.arrivalAirport
-        }
-      }
-    }
-  }
-)
+          arrivalAirport: ret.arrivalAirport,
+        };
+      },
+    },
+  },
+);
 
 // create a ticket instance in the db
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
@@ -106,36 +106,39 @@ ticketSchema.statics.build = (attrs: TicketAttrs) => {
     seat: attrs.seat,
     departureDate: attrs.departureDate,
     departureAirport: attrs.departureAirport,
-    arrivalAirport: attrs.arrivalAirport
-  })
-}
+    arrivalAirport: attrs.arrivalAirport,
+  });
+};
 
 // check if an order is already reserved
 ticketSchema.methods.isReserved = async function () {
   const existingOrder = await Order.findOne({
     ticket: this,
     status: {
-      $nin: [OrderStatus.Canceled]
-    }
-  })
+      $nin: [OrderStatus.Canceled],
+    },
+  });
 
-  return existingOrder ? true : false
-}
+  return existingOrder ? true : false;
+};
 
 // find the previous version (used when receiving ticket:updated event)
-ticketSchema.statics.findByEvent = (event: { id: string, version: number }) => {
+ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
   return Ticket.findOne({
     _id: event.id,
-    version: event.version - 1
-  })
-}
+    version: event.version - 1,
+  });
+};
 
 // interface that describes the properties that a User model has
 interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc
-  findByEvent(event: { id: string, version: number }): Promise<TicketDoc | null>
+  build(attrs: TicketAttrs): TicketDoc;
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<TicketDoc | null>;
 }
 
-const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema)
+const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema);
 
-export { Ticket }
+export { Ticket };

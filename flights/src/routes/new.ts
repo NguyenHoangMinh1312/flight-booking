@@ -1,10 +1,14 @@
-import express from "express"
-import { body } from "express-validator"
-import { requireAuth, requireManager, validateRequest } from "@mint1312-flight-booking/common"
-import { createFlightController } from "../controllers/create-flight-controller"
-import { FlightClass } from "../models/flight"
+import express from "express";
+import { body } from "express-validator";
+import {
+  requireAuth,
+  requireManager,
+  validateRequest,
+} from "@mint1312-flight-booking/common";
+import { createFlightController } from "../controllers/create-flight-controller";
+import { FlightClass } from "../models/flight";
 
-const router = express.Router()
+const router = express.Router();
 
 router.post(
   "/api/flights",
@@ -19,9 +23,7 @@ router.post(
       .optional()
       .isString()
       .withMessage("Description must be a string"),
-    body("departure")
-      .isObject()
-      .withMessage("Departure is required"),
+    body("departure").isObject().withMessage("Departure is required"),
     body("departure.airport")
       .isString()
       .notEmpty()
@@ -30,9 +32,7 @@ router.post(
       .isISO8601()
       .toDate()
       .withMessage("Departure date must be a valid date"),
-    body("arrival")
-      .isObject()
-      .withMessage("Arrival is required"),
+    body("arrival").isObject().withMessage("Arrival is required"),
     body("arrival.airport")
       .isString()
       .notEmpty()
@@ -64,7 +64,7 @@ router.post(
       .withMessage("Price must be a positive number"),
   ],
   validateRequest,
-  createFlightController
-)
+  createFlightController,
+);
 
-export { router as createFlightRouter }
+export { router as createFlightRouter };

@@ -6,13 +6,8 @@ type Props = {
   onOrder: () => void;
 };
 
-export default function OrderFooter({
-  ticket,
-  isOrdering,
-  onOrder,
-}: Props) {
-  if (!ticket || ticket.orderId)
-    return null;
+export default function OrderFooter({ ticket, isOrdering, onOrder }: Props) {
+  if (!ticket || ticket.orderId) return null;
 
   return (
     <footer className="fixed bottom-0 inset-x-0 z-20 border-t border-slate-200 bg-white/95 px-6 py-4 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur">

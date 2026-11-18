@@ -1,11 +1,8 @@
-import express from "express"
-import { showFlightController } from "../controllers/show-flight-controller"
+import express from "express";
+import { showFlightController } from "../controllers/show-flight-controller";
 
-const router = express.Router()
+const router = express.Router();
 
-router.get(
-  "/api/flights/:id",
-  showFlightController
-)
+router.get("/api/flights/:id", showFlightController);
 
-export { router as showFlightRouter }
+export { router as showFlightRouter };

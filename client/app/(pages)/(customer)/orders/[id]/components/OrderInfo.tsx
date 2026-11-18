@@ -73,7 +73,9 @@ export default function OrderInfo({ order }: OrderInfoProps) {
             <FaReceipt className="text-base" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Order Information</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              Order Information
+            </h2>
           </div>
         </div>
 
@@ -118,7 +120,9 @@ export default function OrderInfo({ order }: OrderInfoProps) {
             {creationTime.date}
             {creationTime.time && ` • ${creationTime.time}`}
           </p>
-          <p className="mt-1 text-xs text-slate-500">{statusConfig.description}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {statusConfig.description}
+          </p>
         </div>
       </div>
     </section>

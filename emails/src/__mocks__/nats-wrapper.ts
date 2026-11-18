@@ -1,3 +1,3 @@
 export const natsWrapper = {
-  nc: jest.fn()
+  nc: jest.fn(),
 };

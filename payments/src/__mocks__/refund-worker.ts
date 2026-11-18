@@ -1,3 +1,3 @@
 export const refundWorker = {
-  add: jest.fn()
-}
+  add: jest.fn(),
+};

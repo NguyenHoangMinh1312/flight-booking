@@ -3,15 +3,15 @@ import { Airport } from "./airport";
 
 export enum FlightStatus {
   Available = "available",
-  Canceled = "canceled"
+  Canceled = "canceled",
 }
 
 export type ClassConfig = {
-  class: SeatClass,
-  fromRow: number,
-  toRow: number,
-  columns: number,
-  price: number
+  class: SeatClass;
+  fromRow: number;
+  toRow: number;
+  columns: number;
+  price: number;
 };
 
 export type Flight = {
@@ -31,4 +31,3 @@ export type Flight = {
   classConfig: ClassConfig[];
   status: FlightStatus;
 };
-

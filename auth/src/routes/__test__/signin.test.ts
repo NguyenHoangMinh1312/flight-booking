@@ -1,111 +1,110 @@
-import request from "supertest"
-import { app } from "../../app"
-import { UserRole } from "@mint1312-flight-booking/common"
-import { User } from "../../models/user"
+import request from "supertest";
+import { app } from "../../app";
+import { UserRole } from "@mint1312-flight-booking/common";
+import { User } from "../../models/user";
 
 async function buildVerifiedUser() {
   const user = User.build({
     email: "test@test.com",
     password: "password",
     role: UserRole.Customer,
-    isVerified: true
-  })
-  await user.save()
+    isVerified: true,
+  });
+  await user.save();
 }
 
 it("Returns 200 on successful customer signin", async () => {
-  await buildVerifiedUser()
+  await buildVerifiedUser();
 
   const response = await request(app)
     .post("/api/users/signin")
     .send({
       email: "test@test.com",
       password: "password",
-      role: UserRole.Customer
+      role: UserRole.Customer,
     })
-    .expect(200)
+    .expect(200);
 
-  expect(response.get("Set-Cookie")).toBeDefined()
-})
+  expect(response.get("Set-Cookie")).toBeDefined();
+});
 
 it("Returns 400 on incorrect email", async () => {
-  await buildVerifiedUser()
+  await buildVerifiedUser();
 
   await request(app)
     .post("/api/users/signin")
     .send({
       email: "test@test1.com",
       password: "password",
-      role: UserRole.Customer
+      role: UserRole.Customer,
     })
-    .expect(400)
-})
+    .expect(400);
+});
 
 it("Returns 400 on incorrect password", async () => {
-  await buildVerifiedUser()
+  await buildVerifiedUser();
 
   await request(app)
     .post("/api/users/signin")
     .send({
       email: "test@test.com",
       password: "password_1",
-      role: UserRole.Customer
+      role: UserRole.Customer,
     })
-    .expect(400)
-})
+    .expect(400);
+});
 
 it("Returns 400 on incorrect role", async () => {
-  await buildVerifiedUser()
+  await buildVerifiedUser();
 
   await request(app)
     .post("/api/users/signin")
     .send({
       email: "test@test.com",
       password: "password",
-      role: UserRole.Manager
+      role: UserRole.Manager,
     })
-    .expect(400)
-})
+    .expect(400);
+});
 
 it("Returns 400 when signing in with an unverified account", async () => {
   const user = User.build({
     email: "unverified@test.com",
     password: "password",
     role: UserRole.Customer,
-    isVerified: false
-  })
-  await user.save()
+    isVerified: false,
+  });
+  await user.save();
 
   await request(app)
     .post("/api/users/signin")
     .send({
       email: "unverified@test.com",
       password: "password",
-      role: UserRole.Customer
+      role: UserRole.Customer,
     })
-    .expect(400)
-})
+    .expect(400);
+});
 
 it("Returns 200 on successful manager signin", async () => {
   const manager = User.build({
     email: "manager@test.com",
     password: "password",
     role: UserRole.Manager,
-    isVerified: true
-  })
-  await manager.save()
+    isVerified: true,
+  });
+  await manager.save();
 
   const response = await request(app)
     .post("/api/users/signin")
     .send({
       email: "manager@test.com",
       password: "password",
-      role: UserRole.Manager
+      role: UserRole.Manager,
     })
-    .expect(200)
+    .expect(200);
 
-  expect(response.get("Set-Cookie")).toBeDefined()
-  expect(response.body.email).toEqual("manager@test.com")
-  expect(response.body.role).toEqual(UserRole.Manager)
-})
-
+  expect(response.get("Set-Cookie")).toBeDefined();
+  expect(response.body.email).toEqual("manager@test.com");
+  expect(response.body.role).toEqual(UserRole.Manager);
+});

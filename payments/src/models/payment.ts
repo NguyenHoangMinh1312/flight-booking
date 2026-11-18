@@ -1,5 +1,5 @@
-import mongoose from "mongoose"
-import { OrderDoc } from "./order"
+import mongoose from "mongoose";
+import { OrderDoc } from "./order";
 
 export enum PaymentProvider {
   Stripe = "Stripe",
@@ -7,18 +7,18 @@ export enum PaymentProvider {
 
 // interface that describes the properties to create a new payment
 interface PaymentAttrs {
-  order: OrderDoc,
-  provider: PaymentProvider,
-  transactionId: string,
+  order: OrderDoc;
+  provider: PaymentProvider;
+  transactionId: string;
 }
 
 // interface that describes the properties that payment document has
 interface PaymentDoc extends mongoose.Document {
-  id: string,
-  version: number,
-  order: OrderDoc,
-  provider: PaymentProvider,
-  transactionId: string,
+  id: string;
+  version: number;
+  order: OrderDoc;
+  provider: PaymentProvider;
+  transactionId: string;
 }
 
 // payment model schema
@@ -26,16 +26,16 @@ const paymentSchema = new mongoose.Schema(
   {
     order: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Order"
+      ref: "Order",
     },
     provider: {
       type: String,
       enum: Object.values(PaymentProvider),
-      required: true
+      required: true,
     },
     transactionId: {
       type: String,
-      required: true
+      required: true,
     },
   },
   {
@@ -48,22 +48,25 @@ const paymentSchema = new mongoose.Schema(
           version: ret.__v,
           order: ret.order,
           provider: ret.provider,
-          transactionId: ret.transactionId
-        }
-      }
-    }
-  }
-)
+          transactionId: ret.transactionId,
+        };
+      },
+    },
+  },
+);
 
 paymentSchema.statics.build = (attrs: PaymentAttrs) => {
-  return new Payment(attrs)
-}
+  return new Payment(attrs);
+};
 
 // interface that describes the properties that a payment model has
 interface PaymentModel extends mongoose.Model<PaymentDoc> {
-  build(attrs: PaymentAttrs): PaymentDoc
+  build(attrs: PaymentAttrs): PaymentDoc;
 }
 
-const Payment = mongoose.model<PaymentDoc, PaymentModel>("Payment", paymentSchema)
+const Payment = mongoose.model<PaymentDoc, PaymentModel>(
+  "Payment",
+  paymentSchema,
+);
 
-export { Payment }
+export { Payment };

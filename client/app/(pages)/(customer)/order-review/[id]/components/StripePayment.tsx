@@ -3,7 +3,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { FaLock, FaTimes, FaSpinner, FaExclamationCircle } from "react-icons/fa";
+import {
+  FaLock,
+  FaTimes,
+  FaSpinner,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { FaCcStripe } from "react-icons/fa6";
 import CheckoutForm from "./CheckoutForm";
 import { apiFetch } from "@/app/utils/api-client";
@@ -19,9 +24,9 @@ interface StripePaymentProps {
 }
 
 export type PaymentIntentResponse = {
-  clientSecret: string | null,
-  paymentIntentId: string
-}
+  clientSecret: string | null;
+  paymentIntentId: string;
+};
 
 export default function StripePayment({
   orderId,
@@ -41,8 +46,7 @@ export default function StripePayment({
 
   useEffect(() => {
     async function fetchPaymentIntent() {
-      if (!isOpen || !orderId)
-        return;
+      if (!isOpen || !orderId) return;
 
       if (!publishableKey) {
         setIntentError("Payment service is temporarily unavailable.");
@@ -52,30 +56,29 @@ export default function StripePayment({
       let isMounted = true;
 
       try {
-        const data = await apiFetch<PaymentIntentResponse>(
-          `/api/payments`,
-          {
-            method: "POST",
-            credentials: "include",
-            body: JSON.stringify({ orderId })
-          }
-        )
+        const data = await apiFetch<PaymentIntentResponse>(`/api/payments`, {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({ orderId }),
+        });
 
-        if (isMounted)
-          setClientSecret(data.clientSecret)
+        if (isMounted) setClientSecret(data.clientSecret);
       } catch (err) {
         if (isMounted)
-          setIntentError(err instanceof Error ? err.message : "Failed to create payment intent.")
+          setIntentError(
+            err instanceof Error
+              ? err.message
+              : "Failed to create payment intent.",
+          );
       } finally {
-        isMounted = false
+        isMounted = false;
       }
     }
 
-    fetchPaymentIntent()
+    fetchPaymentIntent();
   }, [isOpen, orderId]);
 
-  if (!isOpen)
-    return null;
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -87,7 +90,9 @@ export default function StripePayment({
               <FaCcStripe className="text-2xl" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Secure Payment</h2>
+              <h2 className="text-xl font-bold text-slate-900">
+                Secure Payment
+              </h2>
               <p className="text-xs text-slate-500">
                 Encrypted Stripe Checkout • Order #{orderId}
               </p>
@@ -109,7 +114,9 @@ export default function StripePayment({
           {isLoadingIntent && (
             <div className="flex flex-col items-center justify-center py-10 text-slate-500 space-y-3">
               <FaSpinner className="animate-spin text-3xl text-indigo-600" />
-              <p className="text-sm font-medium">Preparing secure checkout...</p>
+              <p className="text-sm font-medium">
+                Preparing secure checkout...
+              </p>
             </div>
           )}
 
@@ -119,7 +126,9 @@ export default function StripePayment({
                 <FaExclamationCircle className="text-2xl" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Checkout Error</h3>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Checkout Error
+                </h3>
                 <p className="mt-1 text-sm text-slate-600">{intentError}</p>
               </div>
               <button

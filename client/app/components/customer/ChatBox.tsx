@@ -46,7 +46,7 @@ export default function ChatBox() {
       try {
         const data = await apiFetch<CurrentUserResponse>(
           "/api/users/currentuser",
-          { credentials: "include" }
+          { credentials: "include" },
         );
         setCurrentUser(data.currentUser);
 
@@ -115,28 +115,28 @@ export default function ChatBox() {
 
       // Step 1 (first message only): Create a new chat session to get chatSessionId
       if (!activeSessionId) {
-        const sessionData = await apiFetch<{chatSessionId: string}>(
+        const sessionData = await apiFetch<{ chatSessionId: string }>(
           "/api/agents",
           {
             method: "POST",
             credentials: "include",
-          }
+          },
         );
         activeSessionId = sessionData.chatSessionId;
         setChatSessionId(activeSessionId);
       }
 
       // Step 2: Send the user's message and current IANA timezone to the active chat session
-      const replyData = await apiFetch<{response: string}>(
+      const replyData = await apiFetch<{ response: string }>(
         `/api/agents/${activeSessionId}`,
         {
           method: "POST",
           credentials: "include",
           body: JSON.stringify({
             userMessage: trimmedMessage,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           }),
-        }
+        },
       );
 
       // Append the agent's response to the chat window
@@ -150,7 +150,7 @@ export default function ChatBox() {
       toast.error(
         err instanceof Error
           ? err.message
-          : "Failed to get a response from the assistant"
+          : "Failed to get a response from the assistant",
       );
     } finally {
       setIsSending(false);
@@ -246,7 +246,9 @@ export default function ChatBox() {
                             <li className="leading-relaxed">{children}</li>
                           ),
                           strong: ({ children }) => (
-                            <strong className="font-semibold">{children}</strong>
+                            <strong className="font-semibold">
+                              {children}
+                            </strong>
                           ),
                           a: ({ href, children }) => (
                             <a

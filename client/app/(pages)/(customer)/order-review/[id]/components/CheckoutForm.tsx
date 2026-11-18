@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { FaLock, FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 import { currencyFormatter } from "@/app/utils/format-currency";
@@ -23,13 +27,11 @@ export default function CheckoutForm({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!stripe || !elements)
-      return;
+    if (!stripe || !elements) return;
 
-    if (isProcessing)
-      return
+    if (isProcessing) return;
 
     setIsProcessing(true);
 
@@ -44,7 +46,7 @@ export default function CheckoutForm({
 
       if (error) {
         toast.error(
-          error.message ?? "An error occurred during payment processing."
+          error.message ?? "An error occurred during payment processing.",
         );
         setIsProcessing(false);
         return;

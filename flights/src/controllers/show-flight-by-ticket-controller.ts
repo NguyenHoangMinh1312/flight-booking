@@ -1,30 +1,29 @@
-import { Request, Response } from "express"
-import { Ticket } from "../models/ticket"
-import { NotFoundError } from "@mint1312-flight-booking/common"
+import { Request, Response } from "express";
+import { Ticket } from "../models/ticket";
+import { NotFoundError } from "@mint1312-flight-booking/common";
 
 type ReqParams = {
-  ticketId: string
-}
+  ticketId: string;
+};
 
 export const showFlightByTicketController = async (
   req: Request<ReqParams>,
-  res: Response
+  res: Response,
 ) => {
-  const ticket = await Ticket.findById(req.params.ticketId).populate("flight")
+  const ticket = await Ticket.findById(req.params.ticketId).populate("flight");
 
-  if (!ticket)
-    throw new NotFoundError()
+  if (!ticket) throw new NotFoundError();
 
   const flight = await ticket.flight.populate([
     {
       path: "arrival.airport",
-      foreignField: "code"
+      foreignField: "code",
     },
     {
       path: "departure.airport",
-      foreignField: "code"
-    }
-  ])
+      foreignField: "code",
+    },
+  ]);
 
-  res.send(flight)
-}
+  res.send(flight);
+};

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@/app/globals.css"
+import "@/app/globals.css";
 import Header from "@/app/components/customer/Header";
 import ChatBox from "@/app/components/customer/ChatBox";
 import { Toaster } from "sonner";
@@ -9,7 +9,9 @@ export const metadata: Metadata = {
   description: "FlightBooking",
 };
 
-export default function RootLayout({ children }: Readonly<{
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (

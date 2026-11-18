@@ -1,4 +1,10 @@
-import { FaPlane, FaPlaneDeparture, FaPlaneArrival, FaCalendarAlt, FaClock } from "react-icons/fa";
+import {
+  FaPlane,
+  FaPlaneDeparture,
+  FaPlaneArrival,
+  FaCalendarAlt,
+  FaClock,
+} from "react-icons/fa";
 import { Flight } from "@/app/types/flight";
 import { formatDateTime } from "@/app/utils/format-datetime";
 
@@ -7,7 +13,10 @@ type FlightInfoProps = {
   fallbackDepartureDate?: string;
 };
 
-export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfoProps) {
+export default function FlightInfo({
+  flight,
+  fallbackDepartureDate,
+}: FlightInfoProps) {
   const departureDateStr = flight?.departure?.date || fallbackDepartureDate;
   const departure = formatDateTime(departureDateStr);
   const arrival = formatDateTime(flight?.arrival?.date);
@@ -20,7 +29,9 @@ export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfo
             <FaPlane className="text-base" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Flight Information</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              Flight Information
+            </h2>
           </div>
         </div>
 
@@ -53,11 +64,13 @@ export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfo
                 {flight.departure.airport.name}
               </p>
             )}
-            {flight?.departure?.airport.city && flight?.departure?.airport.country && (
-              <p className="text-xs text-slate-500">
-                {flight.departure.airport.city}, {flight.departure.airport.country}
-              </p>
-            )}
+            {flight?.departure?.airport.city &&
+              flight?.departure?.airport.country && (
+                <p className="text-xs text-slate-500">
+                  {flight.departure.airport.city},{" "}
+                  {flight.departure.airport.country}
+                </p>
+              )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1.5">
@@ -88,11 +101,13 @@ export default function FlightInfo({ flight, fallbackDepartureDate }: FlightInfo
                 {flight.arrival.airport.name}
               </p>
             )}
-            {flight?.arrival?.airport.city && flight?.arrival?.airport.country && (
-              <p className="text-xs text-slate-500">
-                {flight.arrival.airport.city}, {flight.arrival.airport.country}
-              </p>
-            )}
+            {flight?.arrival?.airport.city &&
+              flight?.arrival?.airport.country && (
+                <p className="text-xs text-slate-500">
+                  {flight.arrival.airport.city},{" "}
+                  {flight.arrival.airport.country}
+                </p>
+              )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
               <span className="inline-flex items-center gap-1.5">

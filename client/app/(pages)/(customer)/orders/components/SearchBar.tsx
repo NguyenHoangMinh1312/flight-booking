@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  FaCalendarAlt,
-  FaSearch,
-  FaTag,
-  FaUndoAlt,
-} from "react-icons/fa";
+import { FaCalendarAlt, FaSearch, FaTag, FaUndoAlt } from "react-icons/fa";
 import { OrderStatus } from "@/app/types/order";
 
 export type SearchFilters = {
@@ -42,7 +37,6 @@ export default function SearchBar({
     setCreatedDate("");
     setStatus("");
     onReset();
-
   };
 
   return (
@@ -87,7 +81,9 @@ export default function SearchBar({
               <option value="">All Statuses</option>
               <option value={OrderStatus.Complete}>Complete</option>
               <option value={OrderStatus.Created}>Created</option>
-              <option value={OrderStatus.AwaitingRefund}>Awaiting Refund</option>
+              <option value={OrderStatus.AwaitingRefund}>
+                Awaiting Refund
+              </option>
               <option value={OrderStatus.Canceled}>Canceled</option>
               <option value={OrderStatus.RefundFailed}>Refund Failed</option>
             </select>

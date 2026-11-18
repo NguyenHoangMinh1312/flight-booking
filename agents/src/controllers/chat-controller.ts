@@ -3,27 +3,32 @@ import { chat } from "../services/chat-service";
 import { BadRequestError } from "@mint1312-flight-booking/common";
 
 type ReqParams = {
-  chatSessionId: string
-}
+  chatSessionId: string;
+};
 
 type ReqBody = {
-  userMessage: string,
-  timezone: string
-}
+  userMessage: string;
+  timezone: string;
+};
 
 export const chatController = async (
   req: Request<ReqParams, any, ReqBody>,
-  res: Response
+  res: Response,
 ) => {
-  const { chatSessionId } = req.params
-  const { userMessage, timezone } = req.body
-  const userId = req.currentUser?.id
-  const cookie = req.headers.cookie
+  const { chatSessionId } = req.params;
+  const { userMessage, timezone } = req.body;
+  const userId = req.currentUser?.id;
+  const cookie = req.headers.cookie;
 
-  if (!userId)
-    throw new BadRequestError("User ID not provided")
+  if (!userId) throw new BadRequestError("User ID not provided");
 
-  const response = await chat(chatSessionId, userId, userMessage, timezone, cookie)
+  const response = await chat(
+    chatSessionId,
+    userId,
+    userMessage,
+    timezone,
+    cookie,
+  );
 
-  res.send({ response })
-}
+  res.send({ response });
+};

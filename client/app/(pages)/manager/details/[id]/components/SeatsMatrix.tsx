@@ -14,7 +14,8 @@ type Props = {
 
 const classStyles: Record<SeatClass, string> = {
   first: "border-amber-300 bg-amber-300 text-amber-950 hover:bg-amber-400",
-  business: "border-orange-300 bg-orange-300 text-orange-950 hover:bg-orange-400",
+  business:
+    "border-orange-300 bg-orange-300 text-orange-950 hover:bg-orange-400",
   economy: "border-sky-300 bg-sky-300 text-sky-950 hover:bg-sky-400",
 };
 
@@ -30,8 +31,7 @@ const classBadgeStyles: Record<SeatClass, string> = {
   economy: "border-sky-200 bg-sky-50 text-sky-900",
 };
 
-const columnLabel = (column: number) =>
-  String.fromCharCode(64 + column);
+const columnLabel = (column: number) => String.fromCharCode(64 + column);
 
 interface SectionConfig {
   class: SeatClass;
@@ -263,16 +263,20 @@ export default function SeatsMatrix({
                                   type="button"
                                   onClick={() => onSelect(ticket)}
                                   aria-pressed={selected}
-                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${isOrdered ? ", Ordered" : ""
-                                    }`}
-                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${classStyles[ticket.class]
-                                    } ${isOrdered
+                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
+                                    isOrdered ? ", Ordered" : ""
+                                  }`}
+                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 ${
+                                    classStyles[ticket.class]
+                                  } ${
+                                    isOrdered
                                       ? "opacity-45 blur-[1px] hover:opacity-75 hover:blur-none"
                                       : ""
-                                    } ${selected
+                                  } ${
+                                    selected
                                       ? "ring-2 ring-slate-900 ring-offset-2 opacity-90 blur-none"
                                       : ""
-                                    }`}
+                                  }`}
                                 >
                                   {row}
                                   {columnLabel(column)}

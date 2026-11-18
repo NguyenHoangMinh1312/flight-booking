@@ -26,7 +26,7 @@ export default function CreateFlightPage() {
 
   const handleToggleClass = (
     seatClass: "first" | "business" | "economy",
-    enabled: boolean
+    enabled: boolean,
   ) => {
     setEnabledClasses((prev) => ({ ...prev, [seatClass]: enabled }));
   };
@@ -44,7 +44,7 @@ export default function CreateFlightPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "We could not load the available airports"
+            : "We could not load the available airports",
         );
       } finally {
         setIsLoading(false);
@@ -163,7 +163,7 @@ export default function CreateFlightPage() {
       router.push("/manager");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to create flight"
+        err instanceof Error ? err.message : "Failed to create flight",
       );
     } finally {
       setIsSubmitting(false);

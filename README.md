@@ -139,7 +139,6 @@ https://<your-domain>/api/payments/stripe-webhook
 
 Select the events required by the payment service. Copy the endpoint's signing secret and update the Kubernetes `stripe-secret` accordingly.
 
-
 ### Step 5: Create Kubernetes Secrets
 
 Create the secrets required by the application.
@@ -190,7 +189,6 @@ Use production credentials and keep all sensitive values secure. For Stripe, con
 3. Update the Ingress resource with the production hostname.
 4. Configure HTTPS using a valid TLS certificate.
 5. Verify that the domain resolves correctly and that requests reach the appropriate application services.
-
 
 ### Step 7: Deploy the Application
 

@@ -33,7 +33,8 @@ export default function TicketPriceCard(props: TicketPriceCardProps) {
 
       {!hasAnyClass ? (
         <div className="rounded-md border border-dashed border-amber-200 bg-amber-50/50 p-4 text-center text-sm text-amber-800">
-          Please include at least one seat class in the Seating Configuration above.
+          Please include at least one seat class in the Seating Configuration
+          above.
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

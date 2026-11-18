@@ -28,46 +28,51 @@ export default function OrderReviewPage() {
   useEffect(() => {
     async function fetchOrderDetails() {
       try {
-        const data = await apiFetch<Order>(
-          `/api/orders/${id}`,
-          {
-            credentials: "include"
-          }
-        )
-        setOrder(data)
+        const data = await apiFetch<Order>(`/api/orders/${id}`, {
+          credentials: "include",
+        });
+        setOrder(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "We could not load the order details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "We could not load the order details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchOrderDetails()
-  }, [id])
+    fetchOrderDetails();
+  }, [id]);
 
   // fetch the associated flight details
   useEffect(() => {
     async function fetchFlightDetails() {
-      if (!order)
-        return
+      if (!order) return;
 
       try {
-        const data = await apiFetch<Flight>(`/api/flights/tickets/${order.ticket.id}`)
-        setFlight(data)
+        const data = await apiFetch<Flight>(
+          `/api/flights/tickets/${order.ticket.id}`,
+        );
+        setFlight(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load the flight details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the flight details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightDetails()
-  }, [order])
+    fetchFlightDetails();
+  }, [order]);
 
   // Reservation timer countdown loop
   useEffect(() => {
-    if (!order?.expiresAt || order?.status === OrderStatus.Complete)
-      return;
+    if (!order?.expiresAt || order?.status === OrderStatus.Complete) return;
 
     const updateTimer = () => {
       const expires = new Date(order.expiresAt).getTime();
@@ -85,8 +90,8 @@ export default function OrderReviewPage() {
   const isComplete = order?.status === OrderStatus.Complete;
   const isExpired =
     !isComplete &&
-    ((timeLeft !== null && timeLeft <= 0) || order?.status === OrderStatus.Canceled);
-
+    ((timeLeft !== null && timeLeft <= 0) ||
+      order?.status === OrderStatus.Canceled);
 
   if (isLoading) {
     return (

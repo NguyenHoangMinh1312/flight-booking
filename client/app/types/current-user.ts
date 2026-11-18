@@ -1,10 +1,10 @@
 export enum UserRole {
   Manager = "manager",
-  Customer = "customer"
+  Customer = "customer",
 }
 
 export type CurrentUser = {
-  id: string,
-  email: string,
-  role: UserRole
-}
+  id: string;
+  email: string;
+  role: UserRole;
+};

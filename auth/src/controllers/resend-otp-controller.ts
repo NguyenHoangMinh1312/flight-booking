@@ -1,17 +1,17 @@
-import { Request, Response } from "express"
-import { resendOtp } from "../services/resend-otp-service"
+import { Request, Response } from "express";
+import { resendOtp } from "../services/resend-otp-service";
 
 type ReqBody = {
-  email: string
-}
+  email: string;
+};
 
 export const resendOtpController = async (
   req: Request<any, any, ReqBody>,
-  res: Response
+  res: Response,
 ) => {
-  const { email } = req.body
+  const { email } = req.body;
 
-  await resendOtp(email)
+  await resendOtp(email);
 
-  res.send({ message: "Your OTP has been sent" })
-}
+  res.send({ message: "Your OTP has been sent" });
+};

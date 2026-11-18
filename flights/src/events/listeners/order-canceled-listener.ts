@@ -1,33 +1,35 @@
-import { Listener, OrderCanceledEvent, Subjects } from "@mint1312-flight-booking/common"
-import { JsMsg } from "nats"
-import { queueGroupName } from "./queue-group-name"
-import { Ticket } from "../../models/ticket"
-import mongoose from "mongoose"
-import { TicketUpdatedPublisher } from "../publishers/ticket-updated-publisher"
+import {
+  Listener,
+  OrderCanceledEvent,
+  Subjects,
+} from "@mint1312-flight-booking/common";
+import { JsMsg } from "nats";
+import { queueGroupName } from "./queue-group-name";
+import { Ticket } from "../../models/ticket";
+import mongoose from "mongoose";
+import { TicketUpdatedPublisher } from "../publishers/ticket-updated-publisher";
 
 export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
-  readonly subject = Subjects.OrderCanceled
-  queueGroupName = queueGroupName
+  readonly subject = Subjects.OrderCanceled;
+  queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCanceledEvent["data"], msg: JsMsg) {
     // find the ticket that the order is reserving
-    const ticket = await Ticket.findById(data.ticket.id).populate("flight")
+    const ticket = await Ticket.findById(data.ticket.id).populate("flight");
 
-    if (!ticket)
-      throw new Error("Ticket not found")
+    if (!ticket) throw new Error("Ticket not found");
 
-    if (ticket.orderId === undefined)
-      return msg.ack()
+    if (ticket.orderId === undefined) return msg.ack();
 
     // db trnsaction
-    const session = await mongoose.startSession()
+    const session = await mongoose.startSession();
 
     try {
-      session.startTransaction()
+      session.startTransaction();
 
       // save the ticket
-      ticket.set({ orderId: undefined })
-      await ticket.save({ session })
+      ticket.set({ orderId: undefined });
+      await ticket.save({ session });
 
       // save event to outbox
       const outboxEvent = TicketUpdatedPublisher.buildOutboxEvent({
@@ -40,18 +42,18 @@ export class OrderCanceledListener extends Listener<OrderCanceledEvent> {
         departureDate: ticket.flight.departure.date,
         departureAirport: ticket.flight.departure.airport,
         arrivalAirport: ticket.flight.arrival.airport,
-      })
-      await outboxEvent.save({ session })
+      });
+      await outboxEvent.save({ session });
 
       // commit db transaction
-      await session.commitTransaction()
+      await session.commitTransaction();
 
-      msg.ack()
+      msg.ack();
     } catch (err) {
-      await session.abortTransaction()
-      throw new Error("Something went wrong. Please try again")
+      await session.abortTransaction();
+      throw new Error("Something went wrong. Please try again");
     } finally {
-      await session.endSession()
+      await session.endSession();
     }
   }
 }

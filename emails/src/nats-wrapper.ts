@@ -1,4 +1,9 @@
-import { connect, NatsConnection, JetStreamClient, ConnectionOptions } from "nats";
+import {
+  connect,
+  NatsConnection,
+  JetStreamClient,
+  ConnectionOptions,
+} from "nats";
 import { createStream } from "@mint1312-flight-booking/common";
 
 class NatsWrapper {

@@ -2,8 +2,8 @@ name: tests-emails
 
 on:
   pull_request:
-    paths: 
-      - 'emails/**'
+    paths:
+      - "emails/**"
 
 jobs:
   build:

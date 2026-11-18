@@ -26,66 +26,75 @@ export default function OrderDetailsPage() {
   // fetch the order detail
   useEffect(() => {
     async function fetchOrder() {
-      if (!id)
-        return
+      if (!id) return;
 
       try {
-        const data = await apiFetch<Order>(
-          `/api/orders/${id}`,
-          {
-            credentials: "include"
-          }
-        )
-        setOrder(data)
+        const data = await apiFetch<Order>(`/api/orders/${id}`, {
+          credentials: "include",
+        });
+        setOrder(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load this order details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load this order details",
+        );
       }
     }
 
-    fetchOrder()
-  }, [id])
+    fetchOrder();
+  }, [id]);
 
   // fetch the associated flight details
   useEffect(() => {
     async function fetchFlight() {
-      if (!order?.ticket?.id)
-        return
+      if (!order?.ticket?.id) return;
 
       try {
-        const data = await apiFetch<Flight>(`/api/flights/tickets/${order.ticket.id}`)
-        setFlight(data)
+        const data = await apiFetch<Flight>(
+          `/api/flights/tickets/${order.ticket.id}`,
+        );
+        setFlight(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load the flight details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the flight details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlight()
+    fetchFlight();
   }, [order]);
 
   // fetch the payment details
   useEffect(() => {
     async function fetchPayment() {
-      if (!order || [OrderStatus.Created, OrderStatus.Canceled].includes(order.status))
-        return
+      if (
+        !order ||
+        [OrderStatus.Created, OrderStatus.Canceled].includes(order.status)
+      )
+        return;
       try {
-        const data = await apiFetch<Payment>(
-          `/api/payments/${order.id}`,
-          {
-            credentials: "include"
-          }
-        )
-        setPayment(data)
+        const data = await apiFetch<Payment>(`/api/payments/${order.id}`, {
+          credentials: "include",
+        });
+        setPayment(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load the payment details")
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load the payment details",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchPayment()
-  }, [order])
+    fetchPayment();
+  }, [order]);
 
   const handleRefundSuccess = () => {
     // Update local order status immediately to awaiting refund
@@ -118,7 +127,10 @@ export default function OrderDetailsPage() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col gap-6" aria-label="Loading order details">
+          <div
+            className="flex flex-col gap-6"
+            aria-label="Loading order details"
+          >
             <div className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
             <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
@@ -127,7 +139,7 @@ export default function OrderDetailsPage() {
         )}
 
         {/* Error State */}
-        {!isLoading && (error) && (
+        {!isLoading && error && (
           <div
             className="flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800"
             role="alert"

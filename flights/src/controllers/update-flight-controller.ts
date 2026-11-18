@@ -1,29 +1,28 @@
-import { Request, Response } from "express"
-import { updateFlight } from "../services/update-flight-service"
-import { FlightClass, FlightDoc } from "../models/flight"
+import { Request, Response } from "express";
+import { updateFlight } from "../services/update-flight-service";
+import { FlightClass, FlightDoc } from "../models/flight";
 
 type ReqParams = {
-  id: string
-}
+  id: string;
+};
 
 type ReqBody = {
-  description: string,
+  description: string;
   priceConfig: {
-    class: FlightClass,
-    price: number
-  }[]
-}
+    class: FlightClass;
+    price: number;
+  }[];
+};
 
 export const updateFlightController = async (
   req: Request<ReqParams, any, ReqBody>,
-  res: Response
+  res: Response,
 ) => {
-
   const flight = await updateFlight(
     req.params.id,
     req.body.description,
-    req.body.priceConfig
-  )
+    req.body.priceConfig,
+  );
 
-  res.send(flight)
-}
+  res.send(flight);
+};

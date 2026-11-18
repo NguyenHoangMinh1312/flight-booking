@@ -15,8 +15,11 @@ type FooterProps = {
   onRefundSuccess?: () => void;
 };
 
-
-export default function Footer({ order, flight, onRefundSuccess }: FooterProps) {
+export default function Footer({
+  order,
+  flight,
+  onRefundSuccess,
+}: FooterProps) {
   const router = useRouter();
   const [isRefunding, setIsRefunding] = useState(false);
   const [isWarningBoxOpen, setIsWarningBoxOpen] = useState(false);
@@ -32,11 +35,13 @@ export default function Footer({ order, flight, onRefundSuccess }: FooterProps) 
         {
           method: "DELETE",
           credentials: "include",
-          body: JSON.stringify({ refundReason })
-        }
-      )
+          body: JSON.stringify({ refundReason }),
+        },
+      );
 
-      toast.success(data.message || "Your order cancel request is being processed");
+      toast.success(
+        data.message || "Your order cancel request is being processed",
+      );
 
       setIsWarningBoxOpen(false);
 
@@ -45,7 +50,9 @@ export default function Footer({ order, flight, onRefundSuccess }: FooterProps) 
       }
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "We could not process your refund request."
+        err instanceof Error
+          ? err.message
+          : "We could not process your refund request.",
       );
     } finally {
       setIsRefunding(false);
@@ -175,7 +182,8 @@ export default function Footer({ order, flight, onRefundSuccess }: FooterProps) 
               Your order is awaiting refund
             </p>
             <p className="mt-0.5 text-xs text-purple-700">
-              Our team is processing your refund request. You will be notified once complete.
+              Our team is processing your refund request. You will be notified
+              once complete.
             </p>
           </div>
         </div>

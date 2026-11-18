@@ -49,9 +49,9 @@ const airportSchema = new mongoose.Schema(
           city: ret.city,
           country: ret.country,
         };
-      }
-    }
-  }
+      },
+    },
+  },
 );
 
 airportSchema.index({ code: 1 }, { unique: true });
@@ -65,6 +65,9 @@ interface AirportModel extends mongoose.Model<AirportDoc> {
   build(attrs: AirportAttrs): AirportDoc;
 }
 
-const Airport = mongoose.model<AirportDoc, AirportModel>("Airport", airportSchema);
+const Airport = mongoose.model<AirportDoc, AirportModel>(
+  "Airport",
+  airportSchema,
+);
 
 export { Airport };

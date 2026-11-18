@@ -1,17 +1,15 @@
-import express from "express"
-import { body } from "express-validator"
-import { validateRequest } from "@mint1312-flight-booking/common"
-import { UserRole } from "@mint1312-flight-booking/common"
-import { signinController } from "../controllers/signin-controller"
+import express from "express";
+import { body } from "express-validator";
+import { validateRequest } from "@mint1312-flight-booking/common";
+import { UserRole } from "@mint1312-flight-booking/common";
+import { signinController } from "../controllers/signin-controller";
 
-const router = express.Router()
+const router = express.Router();
 
 router.post(
   "/api/users/signin",
   [
-    body("email")
-      .isEmail()
-      .withMessage("Email must be valid"),
+    body("email").isEmail().withMessage("Email must be valid"),
     body("password")
       .trim()
       .notEmpty()
@@ -20,10 +18,10 @@ router.post(
       .trim()
       .isString()
       .isIn(Object.values(UserRole))
-      .withMessage("Invalid user role")
+      .withMessage("Invalid user role"),
   ],
   validateRequest,
-  signinController
-)
+  signinController,
+);
 
-export { router as signinRouter }
+export { router as signinRouter };

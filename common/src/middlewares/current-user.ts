@@ -1,22 +1,22 @@
-import type { Request, Response, NextFunction } from "express"
-import "cookie-session"
-import jwt from "jsonwebtoken"
+import type { Request, Response, NextFunction } from "express";
+import "cookie-session";
+import jwt from "jsonwebtoken";
 
 export enum UserRole {
   Manager = "manager",
-  Customer = "customer"
+  Customer = "customer",
 }
 
 interface UserPayload {
-  id: string,
-  email: string,
-  role: UserRole
+  id: string;
+  email: string;
+  role: UserRole;
 }
 
 declare global {
   namespace Express {
     interface Request {
-      currentUser?: UserPayload
+      currentUser?: UserPayload;
     }
   }
 }
@@ -25,15 +25,17 @@ declare global {
 export const currentUser = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  if (!req.session?.jwt)
-    return next()
+  if (!req.session?.jwt) return next();
 
   try {
-    const payload = jwt.verify(req.session.jwt, process.env.JWT_KEY!) as UserPayload
-    req.currentUser = payload
-  } catch (err) { }
+    const payload = jwt.verify(
+      req.session.jwt,
+      process.env.JWT_KEY!,
+    ) as UserPayload;
+    req.currentUser = payload;
+  } catch (err) {}
 
-  next()
-}
+  next();
+};

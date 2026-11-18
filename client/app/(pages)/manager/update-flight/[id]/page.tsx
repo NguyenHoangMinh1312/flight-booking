@@ -46,11 +46,13 @@ export default function UpdateFlightPage() {
       if (!id) return;
 
       try {
-        const data = await apiFetch<FlightDetailsResponse>(`/api/flights/${id}`);
+        const data = await apiFetch<FlightDetailsResponse>(
+          `/api/flights/${id}`,
+        );
         setFlight(data.flight);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load flight details"
+          err instanceof Error ? err.message : "Failed to load flight details",
         );
       } finally {
         setIsLoading(false);
@@ -80,7 +82,10 @@ export default function UpdateFlightPage() {
       return;
     }
 
-    const priceConfig: { class: "first" | "business" | "economy"; price: number }[] = [];
+    const priceConfig: {
+      class: "first" | "business" | "economy";
+      price: number;
+    }[] = [];
     if (result.data.firstPrice !== undefined) {
       priceConfig.push({ class: "first", price: result.data.firstPrice });
     }
@@ -106,7 +111,9 @@ export default function UpdateFlightPage() {
       toast.success("Flight updated successfully!");
       router.push("/manager");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update flight");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update flight",
+      );
     } finally {
       setIsSubmitting(false);
     }

@@ -1,3 +1,3 @@
 export const emailSendWorker = {
-  add: jest.fn()
-}
+  add: jest.fn(),
+};

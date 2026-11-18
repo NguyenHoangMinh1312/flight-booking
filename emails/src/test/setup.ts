@@ -1,24 +1,24 @@
-import mongoose from "mongoose"
-import { beforeAll, beforeEach, afterAll } from "@jest/globals"
-import { jest } from "@jest/globals"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import mongoose from "mongoose";
+import { beforeAll, beforeEach, afterAll } from "@jest/globals";
+import { jest } from "@jest/globals";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 
-jest.mock("../nats-wrapper")
-jest.mock("../workers/email-send-worker")
+jest.mock("../nats-wrapper");
+jest.mock("../workers/email-send-worker");
 
-let mongo: MongoMemoryReplSet
+let mongo: MongoMemoryReplSet;
 
 beforeAll(async () => {
-  jest.clearAllMocks()
-  mongo = await MongoMemoryReplSet.create({ replSet: { count: 1 } })
-  const mongoUri = mongo.getUri()
+  jest.clearAllMocks();
+  mongo = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  const mongoUri = mongo.getUri();
 
-  await mongoose.connect(mongoUri, {})
-})
+  await mongoose.connect(mongoUri, {});
+});
 
 // reset the database and mocks before each test
 beforeEach(async () => {
-  jest.clearAllMocks()
+  jest.clearAllMocks();
   if (mongoose.connection.db) {
     const collections = await mongoose.connection.db.collections();
 
@@ -26,12 +26,12 @@ beforeEach(async () => {
       await collection.deleteMany({});
     }
   }
-})
+});
 
 // disconnect from mongodb after all tests
 afterAll(async () => {
-  await mongoose.connection.close()
+  await mongoose.connection.close();
   if (mongo) {
-    await mongo.stop()
+    await mongo.stop();
   }
-})
+});

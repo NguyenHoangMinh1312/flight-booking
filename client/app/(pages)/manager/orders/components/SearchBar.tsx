@@ -32,7 +32,7 @@ export default function SearchBar({
   const [status, setStatus] = useState("");
 
   const hasActiveFilters = Boolean(
-    userId.trim() || createdDate || status.trim()
+    userId.trim() || createdDate || status.trim(),
   );
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -113,7 +113,9 @@ export default function SearchBar({
               <option value="">All Statuses</option>
               <option value={OrderStatus.Complete}>Complete</option>
               <option value={OrderStatus.Created}>Created</option>
-              <option value={OrderStatus.AwaitingRefund}>Awaiting Refund</option>
+              <option value={OrderStatus.AwaitingRefund}>
+                Awaiting Refund
+              </option>
               <option value={OrderStatus.Canceled}>Canceled</option>
               <option value={OrderStatus.RefundFailed}>Refund Failed</option>
             </select>

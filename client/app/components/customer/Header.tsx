@@ -21,41 +21,40 @@ export default function Header() {
       try {
         const data = await apiFetch<CurrentUserResponse>(
           "/api/users/currentuser",
-          { credentials: "include" }
-        )
-        setCurrentUser(data.currentUser)
+          { credentials: "include" },
+        );
+        setCurrentUser(data.currentUser);
       } catch {
-        setCurrentUser(null)
-        toast.error("Failed to get your credentials")
+        setCurrentUser(null);
+        toast.error("Failed to get your credentials");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchCurrentUser()
+    fetchCurrentUser();
   }, [pathname]);
 
   const signOut = async () => {
     try {
-      await apiFetch(
-        '/api/users/signout',
-        {
-          credentials: "include",
-          method: "POST"
-        }
-      )
-      setCurrentUser(null)
-      window.dispatchEvent(new Event("auth-change"))
-      router.push("/")
+      await apiFetch("/api/users/signout", {
+        credentials: "include",
+        method: "POST",
+      });
+      setCurrentUser(null);
+      window.dispatchEvent(new Event("auth-change"));
+      router.push("/");
     } catch {
-      toast.error("Failed to sign out")
+      toast.error("Failed to sign out");
     }
   };
 
   return (
     <header className="border-b border-slate-200 bg-white">
       <nav className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="text-xl font-bold text-sky-600">FlightBooking</Link>
+        <Link href="/" className="text-xl font-bold text-sky-600">
+          FlightBooking
+        </Link>
         <div className="flex items-center gap-4">
           {!isLoading && currentUser ? (
             <div className="relative group">
@@ -93,8 +92,18 @@ export default function Header() {
             </div>
           ) : !isLoading ? (
             <>
-              <Link href="/signin" className="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">Sign in</Link>
-              <Link href="/signup" className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700">Sign up</Link>
+              <Link
+                href="/signin"
+                className="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700"
+              >
+                Sign up
+              </Link>
             </>
           ) : null}
         </div>

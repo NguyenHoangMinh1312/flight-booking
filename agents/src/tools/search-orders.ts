@@ -1,10 +1,10 @@
-import { OrderStatus } from "@mint1312-flight-booking/common"
-import { RunContext, tool } from "@openai/agents"
-import { z } from "zod"
+import { OrderStatus } from "@mint1312-flight-booking/common";
+import { RunContext, tool } from "@openai/agents";
+import { z } from "zod";
 
 export type AgentCookieContext = {
-  cookie?: string
-}
+  cookie?: string;
+};
 
 export const createSearchOrderTool = (cookie?: string) =>
   tool({
@@ -15,11 +15,15 @@ export const createSearchOrderTool = (cookie?: string) =>
       createdDate: z
         .string()
         .optional()
-        .describe("Filter orders by creation date in UTC in YYYY-MM-DD format, e.g., '2026-10-15'"),
+        .describe(
+          "Filter orders by creation date in UTC in YYYY-MM-DD format, e.g., '2026-10-15'",
+        ),
       status: z
         .enum(Object.values(OrderStatus))
         .optional()
-        .describe("Filter orders by status ('created', 'canceled', 'awaiting-refund', 'complete', or 'refund-failed')"),
+        .describe(
+          "Filter orders by status ('created', 'canceled', 'awaiting-refund', 'complete', or 'refund-failed')",
+        ),
       page: z
         .int()
         .positive()
@@ -29,59 +33,60 @@ export const createSearchOrderTool = (cookie?: string) =>
         .int()
         .positive()
         .optional()
-        .describe("Maximum number of order results to return per page (defaults to 10)"),
+        .describe(
+          "Maximum number of order results to return per page (defaults to 10)",
+        ),
     }),
     execute: async (
       { createdDate, status, page, limit },
-      runContext?: RunContext<AgentCookieContext>
+      runContext?: RunContext<AgentCookieContext>,
     ) => {
       try {
-        const url = new URL(`${process.env.ORDERS_SRV_URL}/api/orders`)
+        const url = new URL(`${process.env.ORDERS_SRV_URL}/api/orders`);
 
-        if (createdDate)
-          url.searchParams.set("createdDate", createdDate)
+        if (createdDate) url.searchParams.set("createdDate", createdDate);
 
-        if (status)
-          url.searchParams.set("status", status)
+        if (status) url.searchParams.set("status", status);
 
-        if (page !== undefined)
-          url.searchParams.set("page", page.toString())
+        if (page !== undefined) url.searchParams.set("page", page.toString());
 
         if (limit !== undefined)
-          url.searchParams.set("limit", limit.toString())
+          url.searchParams.set("limit", limit.toString());
 
-        const customerCookie = cookie ?? runContext?.context?.cookie
+        const customerCookie = cookie ?? runContext?.context?.cookie;
 
         const headers: Record<string, string> = {
           Accept: "application/json",
-        }
+        };
 
         if (customerCookie) {
-          headers.Cookie = customerCookie
+          headers.Cookie = customerCookie;
         }
 
         const response = await fetch(url.toString(), {
           method: "GET",
           headers,
-        })
+        });
 
         if (!response.ok) {
-          const errorText = await response.text().catch(() => "")
+          const errorText = await response.text().catch(() => "");
           return {
-            error: `Orders service responded with HTTP ${response.status}: ${errorText || response.statusText
-              }`,
-          }
+            error: `Orders service responded with HTTP ${response.status}: ${
+              errorText || response.statusText
+            }`,
+          };
         }
 
-        const orders = await response.json()
-        return orders
+        const orders = await response.json();
+        return orders;
       } catch (err: any) {
         return {
-          error: `Failed to query orders service: ${err.message || String(err)
-            }`,
-        }
+          error: `Failed to query orders service: ${
+            err.message || String(err)
+          }`,
+        };
       }
     },
-  })
+  });
 
-export const searchOrderTool = createSearchOrderTool()
+export const searchOrderTool = createSearchOrderTool();

@@ -55,11 +55,13 @@ export default function FlightDetailsCard({ flight, ticket }: Props) {
               {flight.departure.airport.name}
             </p>
           )}
-          {flight?.departure?.airport.city && flight?.departure?.airport.country && (
-            <p className="text-xs text-slate-500">
-              {flight.departure.airport.city}, {flight.departure.airport.country}
-            </p>
-          )}
+          {flight?.departure?.airport.city &&
+            flight?.departure?.airport.country && (
+              <p className="text-xs text-slate-500">
+                {flight.departure.airport.city},{" "}
+                {flight.departure.airport.country}
+              </p>
+            )}
           <p className="mt-2 text-sm text-slate-600">
             <span>{departure.date}</span>
             {departure.time && <span className="ml-2">{departure.time}</span>}
@@ -78,11 +80,12 @@ export default function FlightDetailsCard({ flight, ticket }: Props) {
               {flight.arrival.airport.name}
             </p>
           )}
-          {flight?.arrival?.airport.city && flight?.arrival?.airport.country && (
-            <p className="text-xs text-slate-500">
-              {flight.arrival.airport.city}, {flight.arrival.airport.country}
-            </p>
-          )}
+          {flight?.arrival?.airport.city &&
+            flight?.arrival?.airport.country && (
+              <p className="text-xs text-slate-500">
+                {flight.arrival.airport.city}, {flight.arrival.airport.country}
+              </p>
+            )}
           <p className="mt-2 text-sm text-slate-600">
             <span>{arrival.date}</span>
             {arrival.time && <span className="ml-2">{arrival.time}</span>}

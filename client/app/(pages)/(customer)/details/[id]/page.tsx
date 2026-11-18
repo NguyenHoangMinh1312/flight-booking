@@ -31,45 +31,47 @@ export default function FlightDetailsPage() {
   useEffect(() => {
     async function fetchFlightDetails() {
       try {
-        const data = await apiFetch<FlightDetailsResponse>(`/api/flights/${id}`)
-        setDetails(data)
+        const data = await apiFetch<FlightDetailsResponse>(
+          `/api/flights/${id}`,
+        );
+        setDetails(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "We could not load this flight.")
+        setError(
+          err instanceof Error ? err.message : "We could not load this flight.",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightDetails()
-  }, [id])
+    fetchFlightDetails();
+  }, [id]);
 
   // handle when user presses Order
   const orderTicket = async () => {
-    if (!selectedTicket || selectedTicket.orderId || isOrdering)
-      return
+    if (!selectedTicket || selectedTicket.orderId || isOrdering) return;
 
-    setIsOrdering(true)
+    setIsOrdering(true);
 
     try {
-      const data = await apiFetch<{ id: string }>(
-        "/api/orders",
-        {
-          method: "POST",
-          credentials: "include",
-          body: JSON.stringify({
-            ticketId: selectedTicket.id,
-          })
-        }
-      )
+      const data = await apiFetch<{ id: string }>("/api/orders", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          ticketId: selectedTicket.id,
+        }),
+      });
 
-      setSelectedTicket(null)
-      router.push(`/order-review/${data.id}`)
+      setSelectedTicket(null);
+      router.push(`/order-review/${data.id}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "We cannot reserve the seat")
+      toast.error(
+        err instanceof Error ? err.message : "We cannot reserve the seat",
+      );
     } finally {
-      setIsOrdering(false)
+      setIsOrdering(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (

@@ -33,21 +33,24 @@ export default function FlightDetailsPage() {
   useEffect(() => {
     async function fetchFlightDetails() {
       try {
-        const data = await apiFetch<FlightDetailsResponse>(`/api/flights/${id}`)
-        setDetails(data)
+        const data = await apiFetch<FlightDetailsResponse>(
+          `/api/flights/${id}`,
+        );
+        setDetails(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "We could not load this flight.")
+        setError(
+          err instanceof Error ? err.message : "We could not load this flight.",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchFlightDetails()
-  }, [id])
+    fetchFlightDetails();
+  }, [id]);
 
   const handleCancelFlight = async () => {
-    if (!id)
-      return;
+    if (!id) return;
 
     setIsCanceling(true);
 
@@ -55,17 +58,19 @@ export default function FlightDetailsPage() {
       await apiFetch(`/api/flights/${id}`, {
         method: "DELETE",
         credentials: "include",
-      })
+      });
 
-      toast.success("Flight canceled successfully!")
-      setShowCancelWarning(false)
-      router.push("/manager")
+      toast.success("Flight canceled successfully!");
+      setShowCancelWarning(false);
+      router.push("/manager");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to cancel flight")
+      toast.error(
+        err instanceof Error ? err.message : "Failed to cancel flight",
+      );
     } finally {
-      setIsCanceling(false)
+      setIsCanceling(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -127,7 +132,9 @@ export default function FlightDetailsPage() {
               <button
                 type="button"
                 onClick={() => setShowCancelWarning(true)}
-                disabled={isCanceling || details.flight.status === FlightStatus.Canceled}
+                disabled={
+                  isCanceling || details.flight.status === FlightStatus.Canceled
+                }
                 className="w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {isCanceling ? "Canceling..." : "Cancel flight"}

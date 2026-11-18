@@ -21,7 +21,9 @@ export default function TicketInfo({ ticket }: TicketInfoProps) {
             <FaTicketAlt className="text-base" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Ticket Information</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              Ticket Information
+            </h2>
           </div>
         </div>
       </div>
@@ -33,7 +35,9 @@ export default function TicketInfo({ ticket }: TicketInfoProps) {
             <FaChair className="text-sky-600" />
             <span>Seat</span>
           </div>
-          <p className="mt-2 text-2xl font-black text-slate-900">{seatDisplay}</p>
+          <p className="mt-2 text-2xl font-black text-slate-900">
+            {seatDisplay}
+          </p>
         </div>
 
         {/* Class */}

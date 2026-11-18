@@ -17,8 +17,7 @@ function VerifyOtpContent() {
 
   // 1-minute countdown timer for the resend button
   useEffect(() => {
-    if (cooldown <= 0)
-      return;
+    if (cooldown <= 0) return;
 
     const timer = setInterval(() => {
       setCooldown((prev) => prev - 1);
@@ -30,8 +29,7 @@ function VerifyOtpContent() {
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (isSubmitting || !email)
-      return;
+    if (isSubmitting || !email) return;
 
     const formData = new FormData(e.currentTarget);
     const otp = (formData.get("otp") as string)?.trim();
@@ -52,7 +50,9 @@ function VerifyOtpContent() {
       toast.success("Account verified successfully!");
       router.push("/");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to verify your account");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to verify your account",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -81,9 +81,12 @@ function VerifyOtpContent() {
   if (!email) {
     return (
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <h1 className="mb-2 text-2xl font-bold text-slate-900">Missing Email</h1>
+        <h1 className="mb-2 text-2xl font-bold text-slate-900">
+          Missing Email
+        </h1>
         <p className="mb-6 text-sm text-slate-600">
-          No email address found to verify. Please complete the registration form first.
+          No email address found to verify. Please complete the registration
+          form first.
         </p>
         <Link
           href="/signup"
@@ -97,7 +100,9 @@ function VerifyOtpContent() {
 
   return (
     <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-      <h1 className="mb-2 text-2xl font-bold text-slate-900">Verify your email</h1>
+      <h1 className="mb-2 text-2xl font-bold text-slate-900">
+        Verify your email
+      </h1>
       <p className="mb-6 text-sm text-slate-600">
         We sent a 6-digit confirmation code to{" "}
         <span className="font-semibold text-slate-800">{email}</span>.
@@ -105,7 +110,10 @@ function VerifyOtpContent() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="otp" className="mb-2 block text-sm font-medium text-slate-700">
+          <label
+            htmlFor="otp"
+            className="mb-2 block text-sm font-medium text-slate-700"
+          >
             Verification code
           </label>
           <input
@@ -149,7 +157,10 @@ function VerifyOtpContent() {
 
       <div className="mt-6 border-t border-slate-100 pt-4 text-center text-sm text-slate-500">
         Wrong email address?{" "}
-        <Link href="/signup" className="font-medium text-sky-600 hover:text-sky-700">
+        <Link
+          href="/signup"
+          className="font-medium text-sky-600 hover:text-sky-700"
+        >
           Back to Sign up
         </Link>
       </div>

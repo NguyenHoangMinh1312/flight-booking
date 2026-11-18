@@ -15,7 +15,9 @@ export default function HomePage() {
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [currentFilters, setCurrentFilters] = useState<SearchFilters | undefined>(undefined);
+  const [currentFilters, setCurrentFilters] = useState<
+    SearchFilters | undefined
+  >(undefined);
 
   const [airports, setAirports] = useState<Airport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function HomePage() {
   const fetchFlights = async (
     page: number = 1,
     limit: number = DEFAULT_PAGE_SIZE,
-    filters?: SearchFilters
+    filters?: SearchFilters,
   ) => {
     setIsLoading(true);
     setError(null);
@@ -55,14 +57,16 @@ export default function HomePage() {
       const queryString = params.toString();
       const endpoint = `/api/flights?${queryString}`;
 
-      const data = await apiFetch<{ flights: Flight[]; total: number }>(endpoint);
+      const data = await apiFetch<{ flights: Flight[]; total: number }>(
+        endpoint,
+      );
       setFlights(data.flights ?? []);
       setTotal(data.total ?? 0);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "We could not load the available flights."
+          : "We could not load the available flights.",
       );
     } finally {
       setIsLoading(false);
@@ -98,7 +102,7 @@ export default function HomePage() {
       filters.arrivalAirport?.trim() ||
       filters.departureDate ||
       filters.flightNumber?.trim() ||
-      filters.maxPrice?.trim()
+      filters.maxPrice?.trim(),
     );
     setHasSearched(hasFilterValues);
     setCurrentFilters(filters);
@@ -140,7 +144,8 @@ export default function HomePage() {
             Find your next journey
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            Explore our available flights and choose the route that takes you where you want to go.
+            Explore our available flights and choose the route that takes you
+            where you want to go.
           </p>
         </div>
 

@@ -14,7 +14,8 @@ type Props = {
 
 const classStyles: Record<SeatClass, string> = {
   first: "border-amber-300 bg-amber-300 text-amber-950 hover:bg-amber-400",
-  business: "border-orange-300 bg-orange-300 text-orange-950 hover:bg-orange-400",
+  business:
+    "border-orange-300 bg-orange-300 text-orange-950 hover:bg-orange-400",
   economy: "border-sky-300 bg-sky-300 text-sky-950 hover:bg-sky-400",
 };
 
@@ -30,8 +31,7 @@ const classBadgeStyles: Record<SeatClass, string> = {
   economy: "border-sky-200 bg-sky-50 text-sky-900",
 };
 
-const columnLabel = (column: number) =>
-  String.fromCharCode(64 + column);
+const columnLabel = (column: number) => String.fromCharCode(64 + column);
 
 interface SectionConfig {
   class: SeatClass;
@@ -268,13 +268,16 @@ export default function SeatsMatrix({
                                   disabled={unavailable}
                                   onClick={() => onSelect(ticket)}
                                   aria-pressed={selected}
-                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${unavailable ? ", unavailable" : ""
-                                    }`}
-                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:blur-[1.5px] disabled:opacity-45 ${classStyles[ticket.class]
-                                    } ${selected
+                                  aria-label={`Seat ${row}${columnLabel(column)}, ${ticket.class}${
+                                    unavailable ? ", unavailable" : ""
+                                  }`}
+                                  className={`h-12 rounded-lg border text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:blur-[1.5px] disabled:opacity-45 ${
+                                    classStyles[ticket.class]
+                                  } ${
+                                    selected
                                       ? "ring-2 ring-slate-900 ring-offset-2"
                                       : ""
-                                    }`}
+                                  }`}
                                 >
                                   {row}
                                   {columnLabel(column)}

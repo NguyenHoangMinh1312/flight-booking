@@ -37,10 +37,11 @@ export default function RouteAndScheduleCard({
             defaultValue={props.departureAirport ?? ""}
             required
             disabled={isDepartureAirportReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isDepartureAirportReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isDepartureAirportReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           >
             <option value="">Select departure airport</option>
             {airports.map((airport) => (
@@ -65,10 +66,11 @@ export default function RouteAndScheduleCard({
             required
             defaultValue={props.departureDate}
             readOnly={isDepartureDateReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isDepartureDateReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isDepartureDateReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           />
         </div>
 
@@ -80,7 +82,11 @@ export default function RouteAndScheduleCard({
             Arrival Airport <span className="text-red-500">*</span>
           </label>
           {isArrivalAirportReadOnly && (
-            <input type="hidden" name="arrivalAirport" value={props.arrivalAirport} />
+            <input
+              type="hidden"
+              name="arrivalAirport"
+              value={props.arrivalAirport}
+            />
           )}
           <select
             id="arrivalAirport"
@@ -88,10 +94,11 @@ export default function RouteAndScheduleCard({
             required
             defaultValue={props.arrivalAirport ?? ""}
             disabled={isArrivalAirportReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isArrivalAirportReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isArrivalAirportReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           >
             <option value="">Select arrival airport</option>
             {airports.map((airport) => (
@@ -116,10 +123,11 @@ export default function RouteAndScheduleCard({
             required
             defaultValue={props.arrivalDate}
             readOnly={isArrivalDateReadOnly}
-            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${isArrivalDateReadOnly
-              ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-              : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              }`}
+            className={`w-full rounded-md border px-3 py-2 text-slate-900 outline-none transition ${
+              isArrivalDateReadOnly
+                ? "border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                : "border-slate-300 bg-white focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            }`}
           />
         </div>
       </div>

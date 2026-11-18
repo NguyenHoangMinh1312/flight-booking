@@ -1,11 +1,8 @@
-import express from "express"
-import { stripeWebhookController } from "../controllers/stripe-webhook-controller"
+import express from "express";
+import { stripeWebhookController } from "../controllers/stripe-webhook-controller";
 
-const router = express.Router()
+const router = express.Router();
 
-router.post(
-  "/api/payments/stripe-webhook",
-  stripeWebhookController
-)
+router.post("/api/payments/stripe-webhook", stripeWebhookController);
 
-export { router as stripeWebhookRouter }
+export { router as stripeWebhookRouter };

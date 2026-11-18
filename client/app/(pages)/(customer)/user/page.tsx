@@ -29,12 +29,14 @@ export default function UserPage() {
       try {
         const data = await apiFetch<CurrentUserResponse>(
           "/api/users/currentuser",
-          { credentials: "include" }
+          { credentials: "include" },
         );
         setCurrentUser(data.currentUser);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load user information"
+          err instanceof Error
+            ? err.message
+            : "Failed to load user information",
         );
       } finally {
         setIsLoading(false);

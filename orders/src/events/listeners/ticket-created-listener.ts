@@ -1,16 +1,20 @@
-import { JsMsg } from "nats"
-import { Subjects, Listener, TicketCreatedEvent, FlightStatus } from "@mint1312-flight-booking/common"
-import { Ticket } from "../../models/ticket"
-import { queueGroupName } from "./queue-group-name"
+import { JsMsg } from "nats";
+import {
+  Subjects,
+  Listener,
+  TicketCreatedEvent,
+  FlightStatus,
+} from "@mint1312-flight-booking/common";
+import { Ticket } from "../../models/ticket";
+import { queueGroupName } from "./queue-group-name";
 
 export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
-  readonly subject = Subjects.TicketCreated
-  queueGroupName = queueGroupName
+  readonly subject = Subjects.TicketCreated;
+  queueGroupName = queueGroupName;
 
   async onMessage(data: TicketCreatedEvent["data"], msg: JsMsg) {
-    const existingTicket = await Ticket.findById(data.id)
-    if (existingTicket)
-      return msg.ack()
+    const existingTicket = await Ticket.findById(data.id);
+    if (existingTicket) return msg.ack();
 
     const ticket = Ticket.build({
       id: data.id,
@@ -21,10 +25,10 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
       seat: data.seat,
       departureDate: data.departureDate,
       departureAirport: data.departureAirport,
-      arrivalAirport: data.arrivalAirport
-    })
-    await ticket.save()
+      arrivalAirport: data.arrivalAirport,
+    });
+    await ticket.save();
 
-    msg.ack()
+    msg.ack();
   }
 }

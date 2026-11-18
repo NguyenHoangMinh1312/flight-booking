@@ -1,19 +1,21 @@
-import { Listener, OrderCompleteEvent, Subjects } from "@mint1312-flight-booking/common"
-import { JsMsg } from "nats"
-import { queueGroupName } from "./queue-group-name"
-import { emailSendWorker } from "../../workers/email-send-worker"
-import { User } from "../../models/user"
+import {
+  Listener,
+  OrderCompleteEvent,
+  Subjects,
+} from "@mint1312-flight-booking/common";
+import { JsMsg } from "nats";
+import { queueGroupName } from "./queue-group-name";
+import { emailSendWorker } from "../../workers/email-send-worker";
+import { User } from "../../models/user";
 
 export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
-  readonly subject = Subjects.OrderComplete
-  queueGroupName = queueGroupName
+  readonly subject = Subjects.OrderComplete;
+  queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCompleteEvent["data"], msg: JsMsg) {
-    const user = await User.findById(data.userId)
+    const user = await User.findById(data.userId);
 
-    if (!user)
-      throw new Error("User not found")
-
+    if (!user) throw new Error("User not found");
 
     await emailSendWorker.add({
       receiver: user.email,
@@ -50,10 +52,9 @@ export class OrderCompleteListener extends Listener<OrderCompleteEvent> {
         </p>
       </body>
     </html>
-  `
-    })
+  `,
+    });
 
-
-    msg.ack()
+    msg.ack();
   }
 }

@@ -9,7 +9,7 @@ export type Ticket = {
     column: number;
   };
   orderId?: string;
-  departureDate: string,
-  departureAirport: string,
-  arrivalAirport: string
+  departureDate: string;
+  departureAirport: string;
+  arrivalAirport: string;
 };

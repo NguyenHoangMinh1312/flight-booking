@@ -1,22 +1,21 @@
-import { Request, Response } from "express"
-import { User } from "../models/user"
-import { NotFoundError } from "@mint1312-flight-booking/common"
+import { Request, Response } from "express";
+import { User } from "../models/user";
+import { NotFoundError } from "@mint1312-flight-booking/common";
 
 type ReqParams = {
-  id: string
-}
+  id: string;
+};
 
 export const showCustomerController = async (
   req: Request<ReqParams>,
-  res: Response
+  res: Response,
 ) => {
-  const user = await User.findById(req.params.id)
+  const user = await User.findById(req.params.id);
 
-  if (!user || !user.isVerified)
-    throw new NotFoundError()
+  if (!user || !user.isVerified) throw new NotFoundError();
 
   res.send({
     id: user.id,
-    email: user.email
-  })
-}
+    email: user.email,
+  });
+};

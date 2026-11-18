@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   description: "FlightBooking Management",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html className="h-full">
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900 antialiased">

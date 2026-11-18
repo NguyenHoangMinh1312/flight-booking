@@ -16,7 +16,9 @@ export default function OrdersPage() {
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [currentFilters, setCurrentFilters] = useState<SearchFilters | undefined>(undefined);
+  const [currentFilters, setCurrentFilters] = useState<
+    SearchFilters | undefined
+  >(undefined);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function OrdersPage() {
   const fetchOrders = async (
     page: number = 1,
     limit: number = DEFAULT_PAGE_SIZE,
-    filters?: SearchFilters
+    filters?: SearchFilters,
   ) => {
     setIsLoading(true);
     setError(null);
@@ -46,14 +48,19 @@ export default function OrdersPage() {
       const queryString = params.toString();
       const endpoint = `/api/orders?${queryString}`;
 
-      const data = await apiFetch<{ orders: Order[]; total: number }>(endpoint, {
-        credentials: "include",
-      });
+      const data = await apiFetch<{ orders: Order[]; total: number }>(
+        endpoint,
+        {
+          credentials: "include",
+        },
+      );
 
       setOrders(data.orders ?? []);
       setTotal(data.total ?? 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load your orders");
+      setError(
+        err instanceof Error ? err.message : "Failed to load your orders",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +77,7 @@ export default function OrdersPage() {
 
   const handleSearch = (filters: SearchFilters) => {
     const hasFilterValues = Boolean(
-      filters.createdDate || filters.status?.trim()
+      filters.createdDate || filters.status?.trim(),
     );
     setHasSearched(hasFilterValues);
     setCurrentFilters(filters);
@@ -155,7 +162,9 @@ export default function OrdersPage() {
             >
               <FaExclamationCircle className="mt-0.5 shrink-0 text-xl text-red-500" />
               <div className="flex-1">
-                <h3 className="font-semibold text-red-900">Unable to load orders</h3>
+                <h3 className="font-semibold text-red-900">
+                  Unable to load orders
+                </h3>
                 <p className="mt-1 text-sm text-red-700">{error}</p>
               </div>
             </div>

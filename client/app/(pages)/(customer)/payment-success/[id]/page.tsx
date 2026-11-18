@@ -24,7 +24,10 @@ function PaymentSuccessContent() {
         {/* Order Reference if present */}
         {id && (
           <p className="mt-2 text-xs font-medium text-slate-500">
-            Order Reference: <span className="font-mono font-semibold text-slate-700">#{id}</span>
+            Order Reference:{" "}
+            <span className="font-mono font-semibold text-slate-700">
+              #{id}
+            </span>
           </p>
         )}
 

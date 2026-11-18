@@ -12,7 +12,6 @@ type FooterProps = {
   onRefundSuccess?: () => void;
 };
 
-
 export default function Footer({ order, onRefundSuccess }: FooterProps) {
   const [isRefunding, setIsRefunding] = useState(false);
   const [isWarningBoxOpen, setIsWarningBoxOpen] = useState(false);
@@ -28,11 +27,13 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
         {
           method: "DELETE",
           credentials: "include",
-          body: JSON.stringify({ refundReason })
-        }
-      )
+          body: JSON.stringify({ refundReason }),
+        },
+      );
 
-      toast.success(data.message || "Your order cancel request is being processed");
+      toast.success(
+        data.message || "Your order cancel request is being processed",
+      );
 
       setIsWarningBoxOpen(false);
 
@@ -41,7 +42,9 @@ export default function Footer({ order, onRefundSuccess }: FooterProps) {
       }
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "We could not process your refund request."
+        err instanceof Error
+          ? err.message
+          : "We could not process your refund request.",
       );
     } finally {
       setIsRefunding(false);

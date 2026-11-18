@@ -10,44 +10,45 @@ export const updateFlight = async (
   flightId: string,
   description: string,
   priceConfig: {
-    class: FlightClass,
-    price: number
-  }[]
+    class: FlightClass;
+    price: number;
+  }[],
 ) => {
   // find the flight
-  const flight = await Flight.findById(flightId)
-  if (!flight)
-    throw new NotFoundError()
+  const flight = await Flight.findById(flightId);
+  if (!flight) throw new NotFoundError();
 
   // Update the flight and tickets
   const session = await mongoose.startSession();
   try {
-    session.startTransaction()
+    session.startTransaction();
 
-    const mapping = new Map()
-    priceConfig.forEach((item) => mapping.set(item.class, item.price))
+    const mapping = new Map();
+    priceConfig.forEach((item) => mapping.set(item.class, item.price));
 
     flight.classConfig.forEach((item) => {
-      item.price = mapping.get(item.class)
-    })
+      item.price = mapping.get(item.class);
+    });
 
     flight.set({
       description,
-      classConfig: flight.classConfig
-    })
-    await flight.save({ session })
+      classConfig: flight.classConfig,
+    });
+    await flight.save({ session });
 
     // Find tickets that have not been ordered
     const tickets = await Ticket.find({
       flight: flight._id,
-      orderId: { $exists: false }
-    }).populate("flight")
+      orderId: { $exists: false },
+    }).populate("flight");
 
     // Save all updated tickets
-    await Promise.all(tickets.map((ticket) => {
-      ticket.set({ price: mapping.get(ticket.class) })
-      return ticket.save({ session })
-    }))
+    await Promise.all(
+      tickets.map((ticket) => {
+        ticket.set({ price: mapping.get(ticket.class) });
+        return ticket.save({ session });
+      }),
+    );
 
     // save events the outbox
     const outboxEvents = tickets.map((ticket) => {
@@ -61,19 +62,19 @@ export const updateFlight = async (
         departureDate: flight.departure.date,
         departureAirport: ticket.flight.departure.airport,
         arrivalAirport: ticket.flight.arrival.airport,
-      })
-    })
+      });
+    });
 
-    await Outbox.insertMany(outboxEvents, { session })
+    await Outbox.insertMany(outboxEvents, { session });
 
     // commit db transaction
     await session.commitTransaction();
 
-    return flight
+    return flight;
   } catch (err) {
     await session.abortTransaction();
-    throw new Error("Something went wrong. Please try again")
+    throw new Error("Something went wrong. Please try again");
   } finally {
-    await session.endSession()
+    await session.endSession();
   }
-}
+};

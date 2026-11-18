@@ -1,57 +1,57 @@
-import mongoose from "mongoose"
-import { FlightStatus } from "@mint1312-flight-booking/common"
+import mongoose from "mongoose";
+import { FlightStatus } from "@mint1312-flight-booking/common";
 
 export enum FlightClass {
   First = "first",
   Business = "business",
-  Economy = "economy"
+  Economy = "economy",
 }
 
 // interface that describes the properties to create a new Flight
 interface FlightAttrs {
-  flightNumber: string,
-  description?: string,
+  flightNumber: string;
+  description?: string;
   departure: {
-    airport: string,
-    date: Date
-  },
+    airport: string;
+    date: Date;
+  };
   arrival: {
-    airport: string,
-    date: Date
-  },
-  rows: number,
+    airport: string;
+    date: Date;
+  };
+  rows: number;
   classConfig: {
-    class: FlightClass,
-    fromRow: number,
-    toRow: number,
-    columns: number,
-    price: number,
-  }[],
-  status?: FlightStatus
+    class: FlightClass;
+    fromRow: number;
+    toRow: number;
+    columns: number;
+    price: number;
+  }[];
+  status?: FlightStatus;
 }
 
 // interface that describes the properties that Flight document has
 export interface FlightDoc extends mongoose.Document {
-  id: string,
-  flightNumber: string,
-  description?: string,
+  id: string;
+  flightNumber: string;
+  description?: string;
   departure: {
-    airport: string,
-    date: Date
-  },
+    airport: string;
+    date: Date;
+  };
   arrival: {
-    airport: string,
-    date: Date
-  },
-  rows: number,
+    airport: string;
+    date: Date;
+  };
+  rows: number;
   classConfig: {
-    class: FlightClass,
-    fromRow: number,
-    toRow: number,
-    columns: number,
-    price: number
-  }[],
-  status: FlightStatus
+    class: FlightClass;
+    fromRow: number;
+    toRow: number;
+    columns: number;
+    price: number;
+  }[];
+  status: FlightStatus;
 }
 
 // Flight model schema
@@ -68,7 +68,7 @@ const flightSchema = new mongoose.Schema(
       airport: {
         type: String,
         required: true,
-        ref: "Airport"
+        ref: "Airport",
       },
       date: {
         type: Date,
@@ -79,7 +79,7 @@ const flightSchema = new mongoose.Schema(
       airport: {
         type: String,
         required: true,
-        ref: "Airport"
+        ref: "Airport",
       },
       date: {
         type: Date,
@@ -95,31 +95,31 @@ const flightSchema = new mongoose.Schema(
         class: {
           type: String,
           enum: Object.values(FlightClass),
-          required: true
+          required: true,
         },
         fromRow: {
           type: Number,
-          required: true
+          required: true,
         },
         toRow: {
           type: Number,
-          required: true
+          required: true,
         },
         columns: {
           type: Number,
-          required: true
+          required: true,
         },
         price: {
           type: Number,
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     ],
     status: {
       type: String,
       enum: Object.values(FlightStatus),
-      default: FlightStatus.Available
-    }
+      default: FlightStatus.Available,
+    },
   },
   {
     toJSON: {
@@ -133,22 +133,22 @@ const flightSchema = new mongoose.Schema(
           arrival: ret.arrival,
           rows: ret.rows,
           classConfig: ret.classConfig,
-          status: ret.status
-        }
-      }
-    }
-  }
-)
+          status: ret.status,
+        };
+      },
+    },
+  },
+);
 
 flightSchema.statics.build = (attrs: FlightAttrs) => {
-  return new Flight(attrs)
-}
+  return new Flight(attrs);
+};
 
 // interface that describes the properties that a Flight model has
 interface FlightModel extends mongoose.Model<FlightDoc> {
-  build(attrs: FlightAttrs): FlightDoc
+  build(attrs: FlightAttrs): FlightDoc;
 }
 
-const Flight = mongoose.model<FlightDoc, FlightModel>("Flight", flightSchema)
+const Flight = mongoose.model<FlightDoc, FlightModel>("Flight", flightSchema);
 
-export { Flight }
+export { Flight };

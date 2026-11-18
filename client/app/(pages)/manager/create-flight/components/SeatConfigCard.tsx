@@ -20,7 +20,7 @@ export interface SeatConfigCardProps {
   };
   onToggleClass?: (
     seatClass: "first" | "business" | "economy",
-    enabled: boolean
+    enabled: boolean,
   ) => void;
 }
 
@@ -53,7 +53,7 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
 
   const handleToggle = (
     seatClass: "first" | "business" | "economy",
-    checked: boolean
+    checked: boolean,
   ) => {
     if (isReadOnly) return;
     if (props.onToggleClass) {
@@ -185,7 +185,8 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   htmlFor="firstColumns"
                   className="mb-1 block text-xs font-medium text-slate-600"
                 >
-                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                  Columns per Row (Seats A-Z){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="firstColumns"
@@ -290,7 +291,8 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   htmlFor="businessColumns"
                   className="mb-1 block text-xs font-medium text-slate-600"
                 >
-                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                  Columns per Row (Seats A-Z){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="businessColumns"
@@ -395,7 +397,8 @@ export default function SeatConfigCard(props: SeatConfigCardProps) {
                   htmlFor="economyColumns"
                   className="mb-1 block text-xs font-medium text-slate-600"
                 >
-                  Columns per Row (Seats A-Z) <span className="text-red-500">*</span>
+                  Columns per Row (Seats A-Z){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="economyColumns"

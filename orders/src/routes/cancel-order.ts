@@ -1,9 +1,13 @@
-import { requireAuth, validateRequest, RefundReason } from "@mint1312-flight-booking/common"
-import express from "express"
-import { body } from "express-validator"
-import { cancelOrderController } from "../controllers/cancel-order-controller"
+import {
+  requireAuth,
+  validateRequest,
+  RefundReason,
+} from "@mint1312-flight-booking/common";
+import express from "express";
+import { body } from "express-validator";
+import { cancelOrderController } from "../controllers/cancel-order-controller";
 
-const router = express.Router()
+const router = express.Router();
 
 router.delete(
   "/api/orders/:orderId",
@@ -12,10 +16,10 @@ router.delete(
     body("refundReason")
       .isString()
       .isIn(Object.values(RefundReason))
-      .withMessage("refundReason is invalid")
+      .withMessage("refundReason is invalid"),
   ],
   validateRequest,
-  cancelOrderController
-)
+  cancelOrderController,
+);
 
-export { router as cancelOrderRouter }
+export { router as cancelOrderRouter };
